@@ -1,0 +1,5 @@
+pdfminer
+pdf2image>=1.11.0
+numpy
+opencv-python
+logzero
