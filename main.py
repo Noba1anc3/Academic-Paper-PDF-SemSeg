@@ -4,15 +4,30 @@ from utils.layout import *
 from extraction import *
 
 from logzero import logger
+
 import numpy as np
+import sys
+
+status = DEBUG   #DEBUG/RUN
 
 if __name__ == '__main__':
+    if status == DEBUG:
+        fileList = sorted(os.listdir('../pdf/'))
+    else:
+        fileList = sorted(os.listdir('example/pdf_file'))
+
     if not os.path.exists('example/analysis_result/'):
         os.mkdir('example/analysis_result/')
-    fileList = sorted(os.listdir('example/pdf_file'))
+
     fileNum = len(fileList)
 
     for index in range(fileNum):
+
+        if status == DEBUG:
+            c = str(input())
+            if c == 'q':
+                sys.exit()
+
         fileName = fileList[index]
 
         if not fileName.endswith('.pdf'):
@@ -21,7 +36,11 @@ if __name__ == '__main__':
         else:
             logger.info('Processing File {}  ({}/{})'.format(fileName, index+1, fileNum))
 
-        filePath = 'example/pdf_file/' + fileName
+        if status == DEBUG:
+            filePath = '../pdf/' + fileName
+        else:
+            filePath = 'example/pdf_file/' + fileName
+
         PagesLayout = layout_analysis(filePath)
         PagesImage  = pdf_to_image(filePath)
 
@@ -49,7 +68,6 @@ if __name__ == '__main__':
                 Anno_Image = layoutImage(PageImage, PageLayout, liRatio)
                 cv2.imshow('2', Anno_Image)
                 cv2.waitKey(0)
-
                 continue
             # if not os.path.exists('example/analysis_result/' + fileName[:-4]):
             #     os.mkdir('example/analysis_result/' +fileName[:-4])

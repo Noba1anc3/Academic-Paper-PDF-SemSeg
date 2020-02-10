@@ -1,3 +1,8 @@
+class DEBUG:
+    pass
+
+class RUN:
+    pass
 
 class Title:
     pass
