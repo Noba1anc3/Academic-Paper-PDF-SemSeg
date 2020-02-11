@@ -59,3 +59,70 @@ def AuthorExtraction(PageLayout, titleIndex):
                 author.append(PageLayout._objs[index])
 
     return author
+
+def half_full_judge(PageLayout):
+    # To judge whether the main_text block's width approximates to the page's width
+    # or it approximates to half of the page's width
+    # 判断正文块的宽度接近整个页面的宽度或是接近整个页面宽度的一半
+
+    PageWidth = PageLayout.width
+    TextBlockWidth = []
+    ModeList = []  #众数列表
+
+    for item in PageLayout:
+        if isinstance(item, LTTextBoxHorizontal):
+            itemWidth = item.width
+            if 3*itemWidth > PageWidth:
+                TextBlockWidth.append(itemWidth)
+    TextBlockWidth.sort()
+
+    for index in range(len(TextBlockWidth) - 1):
+        itemL = TextBlockWidth[index]
+        itemR = TextBlockWidth[index+1]
+        if itemR - itemL <= 5:
+            continue
+        else:
+            ModeList.append(itemL)
+            ModeList.append(index)
+            if index + 2 == len(TextBlockWidth):
+                ModeList.append(itemR)
+                ModeList.append(index + 1)
+
+    if not len(ModeList) == 0:
+        for index in range(len(ModeList)-1, 0, -2):
+            if index - 2 > 0:
+                ModeList[index] = ModeList[index] - ModeList[index-2]
+        ModeList[1] += 1
+
+    Mode = -1
+    ModeCount = 0
+
+    for index in range(1, len(ModeList), 2):
+        count = ModeList[index]
+        if count > ModeCount:
+            Mode = ModeList[index-1]
+            ModeCount = count
+
+    if 2*Mode < PageWidth:
+        return 0
+    else:
+        return 1
+
+
+def noteExtraction(PageLayout):
+    PageHeight = PageLayout.height
+    PageWidth = PageLayout.width
+    textBlockWidth = PageWidth/4
+    for item in PageLayout:
+        if isinstance(item, LTTextBoxHorizontal):
+            itemWidth = item.width
+            if itemWidth > textBlockWidth and itemWidth < PageWidth/2:
+                textBlockWidth = itemWidth
+
+    for item in PageLayout:
+        if isinstance(item, LTTextBoxHorizontal):
+            if PageHeight > 5*item.y1:
+                text0 = item.get_text()[0]
+                if text0.isdigit():
+                    print(item.get_text())
+

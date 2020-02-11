@@ -44,6 +44,8 @@ if __name__ == '__main__':
 
             if PageNo == 0:
                 Title, titleIndex, titleError = titleExtraction(PageLayout)
+                PageType = half_full_judge(PageLayout)
+                print(PageType)
                 if titleError:
                     logger.info('Unexpected Error when Locating Title in Page {} of File {}'.format(PageNo, fileName))
                 else:
@@ -53,19 +55,20 @@ if __name__ == '__main__':
                 Author = AuthorExtraction(PageLayout, titleIndex)
                 BBoxes = getBoundingBoxes(LayoutHeight, Author, liRatio)
                 PageImage = drawBox(PageImage, LTAuthor, BBoxes)
-                cv2.imshow('1', PageImage)
+                #cv2.imshow('1', PageImage)
 
-                Anno_Image = layoutImage(PageImage, PageLayout, liRatio)
-                cv2.imshow('2', Anno_Image)
-                cv2.waitKey(0)
-                continue
+            #noteExtraction(PageLayout)
+            Anno_Image = layoutImage(PageImage, PageLayout, liRatio)
+            #cv2.imshow('2', Anno_Image)
+            #cv2.waitKey(0)
+            continue
             # if not os.path.exists('example/analysis_result/' + fileName[:-4]):
             #     os.mkdir('example/analysis_result/' +fileName[:-4])
             # cv2.imwrite('example/analysis_result/' + fileName[:-4] + '/' + str(PageNo) + '.jpg', Anno_Image)
 
-        if status == DEBUG:
-            c = str(input())
-            if c == 'q':
-                sys.exit()
+        # if status == DEBUG:
+        #     c = str(input())
+        #     if c == 'q':
+        #         sys.exit()
 
     logger.info("All file processed")
