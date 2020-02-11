@@ -2,6 +2,7 @@
 from pdfminer.layout import *
 from logzero import logger
 
+from utils.layout import *
 import numpy as np
 import cv2
 import os
@@ -104,25 +105,35 @@ def half_full_judge(PageLayout):
             ModeCount = count
 
     if 2*Mode < PageWidth:
-        return 0
+        return HALF
     else:
-        return 1
+        return FULL
 
-
-def noteExtraction(PageLayout):
+def noteExtraction(PageLayout, PageType):
+    widthCheck = True
     PageHeight = PageLayout.height
     PageWidth = PageLayout.width
-    textBlockWidth = PageWidth/4
-    for item in PageLayout:
-        if isinstance(item, LTTextBoxHorizontal):
-            itemWidth = item.width
-            if itemWidth > textBlockWidth and itemWidth < PageWidth/2:
-                textBlockWidth = itemWidth
 
     for item in PageLayout:
         if isinstance(item, LTTextBoxHorizontal):
             if PageHeight > 5*item.y1:
-                text0 = item.get_text()[0]
-                if text0.isdigit():
-                    print(item.get_text())
+                itemText = item.get_text()
+
+                allDigit = True
+                for char in itemText:
+                    if not char.isdigit():
+                        allDigit = False
+                        break
+                if allDigit:
+                    print("Page", itemText)
+
+                else:
+                    itemWidth = item.width
+                    if PageType == HALF:
+                        if 2*itemWidth >= PageWidth:
+                            widthCheck = False
+                    if widthCheck:
+                        text0 = item.get_text()[0]
+                        if text0.isdigit():
+                            print(item.get_text())
 

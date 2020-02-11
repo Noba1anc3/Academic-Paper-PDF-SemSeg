@@ -43,9 +43,9 @@ if __name__ == '__main__':
             liRatio = get_liRatio(PageImage, PageLayout)
 
             if PageNo == 0:
-                Title, titleIndex, titleError = titleExtraction(PageLayout)
                 PageType = half_full_judge(PageLayout)
-                print(PageType)
+
+                Title, titleIndex, titleError = titleExtraction(PageLayout)
                 if titleError:
                     logger.info('Unexpected Error when Locating Title in Page {} of File {}'.format(PageNo, fileName))
                 else:
@@ -57,11 +57,12 @@ if __name__ == '__main__':
                 PageImage = drawBox(PageImage, LTAuthor, BBoxes)
                 #cv2.imshow('1', PageImage)
 
-            #noteExtraction(PageLayout)
+            logger.info(PageNo+1)
+            noteExtraction(PageLayout, PageType)
             Anno_Image = layoutImage(PageImage, PageLayout, liRatio)
             #cv2.imshow('2', Anno_Image)
             #cv2.waitKey(0)
-            continue
+
             # if not os.path.exists('example/analysis_result/' + fileName[:-4]):
             #     os.mkdir('example/analysis_result/' +fileName[:-4])
             # cv2.imwrite('example/analysis_result/' + fileName[:-4] + '/' + str(PageNo) + '.jpg', Anno_Image)

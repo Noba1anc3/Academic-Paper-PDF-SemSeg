@@ -4,6 +4,12 @@ class DEBUG:
 class RUN:
     pass
 
+class HALF:
+    pass
+
+class FULL:
+    pass
+
 class Title:
     pass
 
