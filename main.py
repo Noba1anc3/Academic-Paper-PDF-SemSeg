@@ -8,17 +8,18 @@ from logzero import logger
 import numpy as np
 import sys
 
-status = DEBUG   #DEBUG/RUN
+status = RUN   #DEBUG/RUN
 
 if __name__ == '__main__':
     if status == DEBUG:
-        fileList = sorted(os.listdir('../pdf/'))
+        fileFolder = '../pdf/'
     else:
-        fileList = sorted(os.listdir('example/pdf_file'))
+        fileFolder = 'example/pdf_file/'
 
     if not os.path.exists('example/analysis_result/'):
         os.mkdir('example/analysis_result/')
 
+    fileList = sorted(os.listdir(fileFolder))
     fileNum = len(fileList)
 
     for index in range(fileNum):
@@ -36,11 +37,7 @@ if __name__ == '__main__':
         else:
             logger.info('Processing File {}  ({}/{})'.format(fileName, index+1, fileNum))
 
-        if status == DEBUG:
-            filePath = '../pdf/' + fileName
-        else:
-            filePath = 'example/pdf_file/' + fileName
-
+        filePath = fileFolder + fileName
         PagesLayout = layout_analysis(filePath)
         PagesImage  = pdf_to_image(filePath)
 
