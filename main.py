@@ -8,29 +8,22 @@ from logzero import logger
 import numpy as np
 import sys
 
-status = RUN   #DEBUG/RUN
+status = DEBUG   #DEBUG/RUN
 
 if __name__ == '__main__':
+    if not os.path.exists('example/analysis_result/'):
+        os.mkdir('example/analysis_result/')
+
     if status == DEBUG:
         fileFolder = '../pdf/'
     else:
         fileFolder = 'example/pdf_file/'
 
-    if not os.path.exists('example/analysis_result/'):
-        os.mkdir('example/analysis_result/')
-
     fileList = sorted(os.listdir(fileFolder))
     fileNum = len(fileList)
 
     for index in range(fileNum):
-
-        if status == DEBUG:
-            c = str(input())
-            if c == 'q':
-                sys.exit()
-
         fileName = fileList[index]
-
         if not fileName.endswith('.pdf'):
             logger.info('{} is skipped  ({}/{})'.format(fileName, index+1, fileNum))
             continue
@@ -69,5 +62,10 @@ if __name__ == '__main__':
             # if not os.path.exists('example/analysis_result/' + fileName[:-4]):
             #     os.mkdir('example/analysis_result/' +fileName[:-4])
             # cv2.imwrite('example/analysis_result/' + fileName[:-4] + '/' + str(PageNo) + '.jpg', Anno_Image)
+
+        if status == DEBUG:
+            c = str(input())
+            if c == 'q':
+                sys.exit()
 
     logger.info("All file processed")
