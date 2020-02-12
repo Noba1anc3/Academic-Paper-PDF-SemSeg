@@ -114,26 +114,23 @@ def noteExtraction(PageLayout, PageType):
     PageHeight = PageLayout.height
     PageWidth = PageLayout.width
 
-    for item in PageLayout:
-        if isinstance(item, LTTextBoxHorizontal):
-            if PageHeight > 5*item.y1:
-                itemText = item.get_text()
+    Page = []
+    Note = []
 
-                allDigit = True
-                for char in itemText:
-                    if not char.isdigit():
-                        allDigit = False
-                        break
-                if allDigit:
-                    print("Page", itemText)
-
+    for Box in PageLayout:
+        if isinstance(Box, LTTextBoxHorizontal) and PageHeight > 5*Box.y1:
+            for item in Box:
+                itemText = item.get_text()[:-1].replace(' ', '')
+                if itemText.isdigit():
+                    Page.append(Box)
                 else:
                     itemWidth = item.width
                     if PageType == HALF:
                         if 2*itemWidth >= PageWidth:
                             widthCheck = False
                     if widthCheck:
-                        text0 = item.get_text()[0]
-                        if text0.isdigit():
-                            print(item.get_text())
+                        if len(itemText) > 2 and itemText[0].isdigit() and not itemText[1] == '.' and itemText[2].isalpha():
+                            Note.append(Box)
+                            break
 
+    return Page, Note

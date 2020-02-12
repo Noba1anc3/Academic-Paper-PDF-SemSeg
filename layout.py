@@ -10,6 +10,12 @@ class HALF:
 class FULL:
     pass
 
+class LTPageNo:
+    pass
+
+class LTNote:
+    pass
+
 class Title:
     pass
 

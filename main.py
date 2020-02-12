@@ -1,6 +1,5 @@
 
 from utils.pdfminer import *
-from utils.layout import *
 from extraction import *
 
 from logzero import logger
@@ -57,19 +56,27 @@ if __name__ == '__main__':
                 PageImage = drawBox(PageImage, LTAuthor, BBoxes)
                 #cv2.imshow('1', PageImage)
 
-            logger.info(PageNo+1)
-            noteExtraction(PageLayout, PageType)
-            Anno_Image = layoutImage(PageImage, PageLayout, liRatio)
-            #cv2.imshow('2', Anno_Image)
-            #cv2.waitKey(0)
+            Page, Note = noteExtraction(PageLayout, PageType)
+            PageBBoxes = getBoundingBoxes(LayoutHeight, Page, liRatio)
+            NoteBBoxes = getBoundingBoxes(LayoutHeight, Note, liRatio)
+            PageImage = drawBox(PageImage, LTPageNo, PageBBoxes)
+            PageImage = drawBox(PageImage, LTNote, NoteBBoxes)
+
+            height, width = PageImage.shape[:2]
+            #width = PageImage.width
+            size = (int(height*0.7), int(width))
+            PageImage = cv2.resize(PageImage, size)
+            #Anno_Image = layoutImage(PageImage, PageLayout, liRatio)
+            cv2.imshow('2', PageImage)
+            cv2.waitKey(0)
 
             # if not os.path.exists('example/analysis_result/' + fileName[:-4]):
             #     os.mkdir('example/analysis_result/' +fileName[:-4])
             # cv2.imwrite('example/analysis_result/' + fileName[:-4] + '/' + str(PageNo) + '.jpg', Anno_Image)
 
-        # if status == DEBUG:
-        #     c = str(input())
-        #     if c == 'q':
-        #         sys.exit()
+        if status == DEBUG:
+            c = str(input())
+            if c == 'q':
+                sys.exit()
 
     logger.info("All file processed")

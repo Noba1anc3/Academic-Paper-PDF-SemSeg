@@ -38,10 +38,12 @@ def drawBox(image, LTType, Boxes):
     elif LTType == LTAuthor:               #green
         color = (0, 255,0)
         typeText = 'Author'
-    elif LTType == LTLine:                 #yellow
+    elif LTType == LTPageNo:                 #yellow
         color = (0, 255, 255)
-    elif LTType == LTFigure:               #blue
+        typeText = 'PageNo'
+    elif LTType == LTNote:                   #blue
         color = (255, 0, 0)
+        typeText = 'Note'
     elif LTType == LTRect:                 #darkvoilet
         color = (211, 0, 148)
     elif LTType == LTCurve:                #darkcyan
