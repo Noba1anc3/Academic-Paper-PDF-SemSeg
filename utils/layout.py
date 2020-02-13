@@ -20,16 +20,24 @@ def drawBox(image, LTType, Boxes):
     elif LTType == LTNote:                   #blue
         color = (255, 0, 0)
         typeText = 'Note'
-    # elif LTType == LTRect:                 #darkvoilet
-    #     color = (211, 0, 148)
-    # elif LTType == LTCurve:                #darkcyan
-    #     color = (139, 139, 0)
+    elif LTType == LTFigureNote:                 #darkvoilet
+        color = (211, 0, 148)
+        typeText = 'FigureNote'
+    elif LTType == LTTableNote:                #darkcyan
+        color = (139, 139, 0)
+        typeText = 'TableNote'
 
-    for Box in Boxes:
+    if LTType == LTFigureNote or LTType == LTTableNote:
+        index = 1
+    else:
+        index = 0
+
+    for i in range(index, len(Boxes)):
+        Box = Boxes[i]
         leftTop = (Box[0], Box[1])
         rightDown = (Box[2], Box[3])
         cv2.rectangle(image, leftTop, rightDown, color, 3)
-        if not Text:
+        if not Text or index == 1:
             cv2.putText(image, typeText, (Box[0], Box[1]), 0, 1.5, color, thickness=3)
             Text = True
 
@@ -49,7 +57,7 @@ def get_liRatio(PageImage, PageLayout):
 
 def getBoundingBoxes(LAYOUT_H, BBoxList, liRatio):
     #根据Layout的高度和liRatio将从Layout提取出来的坐标转换为Image上的坐标
-    #BBoxList由若干个LTTextBoxHorizontal组成，其内部由若干个LTTextLineHorizontal组成
+    #传入进来的BBoxList或者由若干个LTTextBoxHorizontal组成，或者由若干个LTTextLineHorizontal组成
     #该方法根据从Layout中提取出来的BBoxList生成用于标注图片的BBoxes列表并返回
 
     BBoxes = []
@@ -77,11 +85,18 @@ def getBoundingBoxes(LAYOUT_H, BBoxList, liRatio):
             SafeCheck = True
             BBoxes.append([XleftUp, YleftUp, XrightDown, YrightDown])
 
-        for Item in BBox:
-            XleftUp = int(Item.x0 / liRatio[0])
-            YleftUp = int((LAYOUT_H - Item.y1) / liRatio[1])
-            XrightDown = int(Item.x1 / liRatio[0])
-            YrightDown = int((LAYOUT_H - Item.y0) / liRatio[1])
+        if isinstance(BBox, LTTextBoxHorizontal):
+            for Item in BBox:
+                XleftUp = int(Item.x0 / liRatio[0])
+                YleftUp = int((LAYOUT_H - Item.y1) / liRatio[1])
+                XrightDown = int(Item.x1 / liRatio[0])
+                YrightDown = int((LAYOUT_H - Item.y0) / liRatio[1])
+                BBoxes.append([XleftUp, YleftUp, XrightDown, YrightDown])
+        else:
+            XleftUp = int(BBox.x0 / liRatio[0])
+            YleftUp = int((LAYOUT_H - BBox.y1) / liRatio[1])
+            XrightDown = int(BBox.x1 / liRatio[0])
+            YrightDown = int((LAYOUT_H - BBox.y0) / liRatio[1])
             BBoxes.append([XleftUp, YleftUp, XrightDown, YrightDown])
 
     return BBoxes

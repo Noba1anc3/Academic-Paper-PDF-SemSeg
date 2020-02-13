@@ -16,7 +16,10 @@ class LTPageNo:
     pass
 class LTNote:
     pass
-
+class LTTableNote:
+    pass
+class LTFigureNote:
+    pass
 # class Title:
 #     pass
 # class Author:

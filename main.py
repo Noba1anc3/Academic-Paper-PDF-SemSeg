@@ -68,6 +68,12 @@ if __name__ == '__main__':
             NoteBBoxes = getBoundingBoxes(LayoutHeight, Note, liRatio)
             PageImage = drawBox(PageImage, LTNote, NoteBBoxes)
 
+            FigNote, TabNote = figTableExtraction(PageLayout)
+            FigNoteBBoxes = getBoundingBoxes(LayoutHeight, FigNote, liRatio)
+            TabNoteBBoxes = getBoundingBoxes(LayoutHeight, TabNote, liRatio)
+            PageImage = drawBox(PageImage, LTFigureNote, FigNoteBBoxes)
+            PageImage = drawBox(PageImage, LTTableNote, TabNoteBBoxes)
+
             height, width = PageImage.shape[:2]
             size = (int(height*0.8), int(width*1.2))
             PageImage = cv2.resize(PageImage, size)

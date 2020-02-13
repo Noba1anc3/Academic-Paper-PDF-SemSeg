@@ -109,6 +109,35 @@ def half_full_judge(PageLayout):
     else:
         return FULL
 
+def figTableExtraction(PageLayout):
+    Figure = []
+    Table = []
+    for Box in PageLayout:
+        if isinstance(Box, LTTextBoxHorizontal):
+            for Line in Box:
+                LineText = Line.get_text()[:-1].replace(' ', '').lower()
+                figPos = LineText.find('fig')
+                tabPos = LineText.find('table')
+                if figPos == 0:
+                    if LineText[figPos + 3] == '.' and LineText[figPos + 4].isdigit():
+                        Figure.append(Line)
+                    else:
+                        colonPos = LineText.find(':')
+                        if colonPos > 0 and LineText[figPos+3:colonPos].find('ure') == 0:
+                            if LineText[figPos+6:colonPos].isdigit():
+                                Figure.append(Line)
+                if tabPos == 0:
+                    colonPos = LineText.find(':')
+                    if colonPos > 0:
+                        if LineText[tabPos+5:colonPos].isdigit():
+                            Table.append(Line)
+                    else:
+                        if LineText[tabPos+6].isdigit():
+                            Table.append(Line)
+
+    return Figure, Table
+
+
 def noteExtraction(PageLayout, PageType):
     widthCheck = True
     PageHeight = PageLayout.height
