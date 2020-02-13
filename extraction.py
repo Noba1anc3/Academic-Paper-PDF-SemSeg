@@ -133,4 +133,16 @@ def noteExtraction(PageLayout, PageType):
                             Note.append(Box)
                             break
 
+    if len(Page) > 1:
+        smallestY = PageHeight
+        smallestIndex = -1
+        for index in range(len(Page)):
+            LeftUpY = Page[index].y1
+            if LeftUpY < smallestY:
+                smallestY = LeftUpY
+                smallestIndex = index
+        realPage = Page[smallestIndex]
+        Page = []
+        Page.append(realPage)
+
     return Page, Note

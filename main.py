@@ -35,6 +35,8 @@ if __name__ == '__main__':
         filePath = fileFolder + fileName
         PagesLayout = layout_analysis(filePath)
         PagesImage  = pdf_to_image(filePath)
+        withPageNo = False
+        PageType = half_full_judge(PagesLayout[0])
 
         for PageNo in range(len(PagesImage)):
             PageImage = PagesImage[PageNo]
@@ -44,9 +46,9 @@ if __name__ == '__main__':
             LayoutHeight = PageLayout.height
             liRatio = get_liRatio(PageImage, PageLayout)
 
-            if PageNo == 0:
-                PageType = half_full_judge(PageLayout)
+            Page, Note = noteExtraction(PageLayout, PageType)
 
+            if PageNo == 0:
                 Title, titleIndex, titleError = titleExtraction(PageLayout)
                 if titleError:
                     logger.info('Unexpected Error when Locating Title in Page {} of File {}'.format(PageNo, fileName))
@@ -57,20 +59,20 @@ if __name__ == '__main__':
                 Author = AuthorExtraction(PageLayout, titleIndex)
                 BBoxes = getBoundingBoxes(LayoutHeight, Author, liRatio)
                 PageImage = drawBox(PageImage, LTAuthor, BBoxes)
-                #cv2.imshow('1', PageImage)
+                if not len(Page) == 0:
+                    withPageNo = True
 
-            Page, Note = noteExtraction(PageLayout, PageType)
-            PageBBoxes = getBoundingBoxes(LayoutHeight, Page, liRatio)
+            if withPageNo:
+                PageBBoxes = getBoundingBoxes(LayoutHeight, Page, liRatio)
+                PageImage = drawBox(PageImage, LTPageNo, PageBBoxes)
             NoteBBoxes = getBoundingBoxes(LayoutHeight, Note, liRatio)
-            PageImage = drawBox(PageImage, LTPageNo, PageBBoxes)
             PageImage = drawBox(PageImage, LTNote, NoteBBoxes)
 
             height, width = PageImage.shape[:2]
-            #width = PageImage.width
-            size = (int(height*0.7), int(width))
+            size = (int(height*0.8), int(width*1.2))
             PageImage = cv2.resize(PageImage, size)
             #Anno_Image = layoutImage(PageImage, PageLayout, liRatio)
-            cv2.imshow('2', PageImage)
+            cv2.imshow('img', PageImage)
             cv2.waitKey(0)
 
             # if not os.path.exists('example/analysis_result/' + fileName[:-4]):
