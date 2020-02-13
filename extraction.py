@@ -125,7 +125,7 @@ def figTableExtraction(PageLayout):
                             Figure.append(Line)
                         else:
                             # figure 1: / figure 5.
-                            if LineText[3:6] == 'ure' and len(LineText) > 7:
+                            if len(LineText) > 7 and LineText[3:6] == 'ure':
                                 if LineText[6] == ' ' and LineText[7].isdigit():
                                     Figure.append(Line)
 
