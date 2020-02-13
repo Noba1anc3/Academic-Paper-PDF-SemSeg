@@ -115,24 +115,27 @@ def figTableExtraction(PageLayout):
     for Box in PageLayout:
         if isinstance(Box, LTTextBoxHorizontal):
             for Line in Box:
-                LineText = Line.get_text()[:-1].replace(' ', '').lower()
+                LineText = Line.get_text()[:-1].lower()
                 figPos = LineText.find('fig')
                 tabPos = LineText.find('table')
                 if figPos == 0:
-                    if LineText[figPos + 3] == '.' and LineText[figPos + 4].isdigit():
-                        Figure.append(Line)
-                    else:
-                        colonPos = LineText.find(':')
-                        if colonPos > 0 and LineText[figPos+3:colonPos].find('ure') == 0:
-                            if LineText[figPos+6:colonPos].isdigit():
-                                Figure.append(Line)
+                    # fig. 1 / fig. 1. / fig. 1:
+                    if len(LineText) > 5:
+                        if LineText[3] == '.' and LineText[4] == ' ' and LineText[5].isdigit():
+                            Figure.append(Line)
+                        else:
+                            # figure 1: / figure 5.
+                            if LineText[3:6] == 'ure' and len(LineText) > 7:
+                                if LineText[6] == ' ' and LineText[7].isdigit():
+                                    Figure.append(Line)
+
                 if tabPos == 0:
-                    colonPos = LineText.find(':')
-                    if colonPos > 0:
-                        if LineText[tabPos+5:colonPos].isdigit():
+                    # table 1 / table 1: / table 4. / table I /table II:
+                    if len(LineText) > 6 and LineText[tabPos + 5] == ' ':
+                        digit = LineText[tabPos+6]
+                        if digit.isdigit():
                             Table.append(Line)
-                    else:
-                        if LineText[tabPos+6].isdigit():
+                        elif digit == 'I' or digit == 'V' or digit == 'X':
                             Table.append(Line)
 
     return Figure, Table
