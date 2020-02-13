@@ -115,27 +115,27 @@ def figTableExtraction(PageLayout):
     for Box in PageLayout:
         if isinstance(Box, LTTextBoxHorizontal):
             for Line in Box:
-                LineText = Line.get_text()[:-1].lower()
+                LineText = Line.get_text()[:-1].lower().replace(' ', '')
                 figPos = LineText.find('fig')
                 tabPos = LineText.find('table')
                 if figPos == 0:
                     # fig. 1 / fig. 1. / fig. 1:
-                    if len(LineText) > 5:
-                        if LineText[3] == '.' and LineText[4] == ' ' and LineText[5].isdigit():
+                    if len(LineText) > 4:
+                        if LineText[3] == '.' and LineText[4].isdigit():
                             Figure.append(Line)
                         else:
                             # figure 1: / figure 5.
-                            if len(LineText) > 7 and LineText[3:6] == 'ure':
-                                if LineText[6] == ' ' and LineText[7].isdigit():
+                            if len(LineText) > 6 and LineText[3:6] == 'ure':
+                                if LineText[6].isdigit():
                                     Figure.append(Line)
 
                 if tabPos == 0:
                     # table 1 / table 1: / table 4. / table I /table II:
-                    if len(LineText) > 6 and LineText[tabPos + 5] == ' ':
-                        digit = LineText[tabPos+6]
+                    if len(LineText) > 5:
+                        digit = LineText[tabPos+5]
                         if digit.isdigit():
                             Table.append(Line)
-                        elif digit == 'I' or digit == 'V' or digit == 'X':
+                        elif digit == 'i' or digit == 'v' or digit == 'x':
                             Table.append(Line)
 
     return Figure, Table

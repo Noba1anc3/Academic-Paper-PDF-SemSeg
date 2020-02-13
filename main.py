@@ -9,8 +9,9 @@ import sys
 
 status = DEBUG   #DEBUG/RUN
 #DEBUG状态下读取的是外目录下的pdf文件夹，并且每个文件处理完成后需要在控制台按任意键回车
-#按Ｑ键则会终止程序执行
-#RUN状态下读取的是内目录下'example/pdf_file/'下的文件，所有文件依次顺序处理，不需要中途干预
+#按q键则会终止程序执行
+#RUN状态下读取的是内目录下'example/pdf_file/'下的文件，所有文件依次顺序处理
+#在每一页运行出结束后按任意键跳页即可，不需要中途干预
 
 if __name__ == '__main__':
     if not os.path.exists('example/analysis_result/'):
@@ -43,6 +44,7 @@ if __name__ == '__main__':
             PageLayout = PagesLayout[PageNo]
 
             PageImage = cv2.cvtColor(np.asarray(PageImage), cv2.COLOR_RGB2BGR)
+            Anno_Image = PageImage
             LayoutHeight = PageLayout.height
             liRatio = get_liRatio(PageImage, PageLayout)
 
@@ -77,8 +79,9 @@ if __name__ == '__main__':
             height, width = PageImage.shape[:2]
             size = (int(height*0.8), int(width*1.2))
             PageImage = cv2.resize(PageImage, size)
-            #Anno_Image = layoutImage(PageImage, PageLayout, liRatio)
+            #Anno_Image = layoutImage(Anno_Image, PageLayout, liRatio)
             cv2.imshow('img', PageImage)
+            #cv2.imshow('img', Anno_Image)
             cv2.waitKey(0)
 
             # if not os.path.exists('example/analysis_result/' + fileName[:-4]):
