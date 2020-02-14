@@ -38,6 +38,7 @@ if __name__ == '__main__':
         PagesImage  = pdf_to_image(filePath)
         withPageNo = False
         PageType = half_full_judge(PagesLayout[0])
+        FileFNoteType = []
 
         for PageNo in range(len(PagesImage)):
             PageImage = PagesImage[PageNo]
@@ -70,7 +71,7 @@ if __name__ == '__main__':
             NoteBBoxes = getBoundingBoxes(LayoutHeight, Note, liRatio)
             PageImage = drawBox(PageImage, LTNote, NoteBBoxes)
 
-            Figure, FigNote, TabNote = figTableExtraction(PageLayout)
+            Figure, FigNote, TabNote, FileFNoteType = figTableExtraction(PageLayout, FileFNoteType)
             FigNoteBBoxes = getBoundingBoxes(LayoutHeight, FigNote, liRatio)
             TabNoteBBoxes = getBoundingBoxes(LayoutHeight, TabNote, liRatio)
             PageImage = drawBox(PageImage, LTFigureNote, FigNoteBBoxes)

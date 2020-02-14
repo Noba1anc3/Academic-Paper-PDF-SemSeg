@@ -109,14 +109,56 @@ def half_full_judge(PageLayout):
     else:
         return FULL
 
-def figTableExtraction(PageLayout):
+def FigNoteTypeCheck(FileFNoteType, FigNoteType):
+    if len(FileFNoteType) == 0:
+        return True
+    for index in range(0,3):
+        if not FileFNoteType[index] == FigNoteType[index]:
+            return False
+    return True
+
+def FLRC_Check(figNote, Figure, LRC, PageHeight, LineHeight):
+    KEEP = False
+    figNoteUpY = PageHeight - figNote.y1
+    figNotelrX = [figNote.x0, figNote.x1]
+    for fig in Figure:
+        figDownY = PageHeight - fig.y0
+        figlrX = [fig.x0, fig.x1]
+        diff = figNoteUpY - figDownY
+        if diff < 5 * LineHeight and diff > 0:
+            if overlap(figNotelrX, figlrX) > 0:
+                KEEP = True
+                return 1
+    if not KEEP:
+        for lrc in LRC:
+            lrcDownY = PageHeight - lrc.y0
+            lrclrX = [lrc.x0, lrc.x1]
+            diff = figNoteUpY - lrcDownY
+            if diff < 5 * LineHeight and diff > 0:
+                if overlap(figNotelrX, lrclrX) > 0:
+                    KEEP = True
+                    return 1
+    if not KEEP:
+        return 0
+
+def figTableExtraction(PageLayout, FileFNoteType):
     FigureNote = []
-    Table = []
+    TableNote = []
     Figure = []
     LRC = []  #Line / Rect / Curve
+    # FNoteType[321]
+    # 3: figure(1) / fig(0)
+    # 2: with .(1) / without .(0)
+    # 1: :(2) / .(1) / alpha(0)
 
     LineHeight = PageLayout._objs[0]._objs[0].height
     PageHeight = PageLayout.height
+
+    for Box in PageLayout:
+        if isinstance(Box, LTFigure):
+            Figure.append(Box)
+        elif isinstance(Box, LTLine) or isinstance(Box, LTRect) or isinstance(Box, LTCurve):
+            LRC.append(Box)
 
     for Box in PageLayout:
         if isinstance(Box, LTTextBoxHorizontal):
@@ -125,56 +167,49 @@ def figTableExtraction(PageLayout):
                 figPos = LineText.find('fig')
                 tabPos = LineText.find('table')
                 if figPos == 0:
+                    FNoteType = []
                     # fig. 1 / fig. 1. / fig. 1:
-                    if len(LineText) > 4:
+                    if len(LineText) > 6:
                         if LineText[3] == '.' and LineText[4].isdigit():
-                            FigureNote.append(Line)
+                            FNoteType.append(0)
+                            FNoteType.append(1)
+                            if LineText[5:7].find(':') >= 0:
+                                FNoteType.append(2)
+                            elif LineText[5:7].find(':') >= 0:
+                                FNoteType.append(1)
+                            else:
+                                FNoteType.append(0)
+                            if FLRC_Check(Line, Figure, LRC, PageHeight, LineHeight):
+                                if FigNoteTypeCheck(FileFNoteType, FNoteType):
+                                    FigureNote.append(Line)
+                                    FileFNoteType = FNoteType.copy()
                         else:
                             # figure 1: / figure 5.
-                            if len(LineText) > 6 and LineText[3:6] == 'ure':
+                            if len(LineText) > 8 and LineText[3:6] == 'ure':
                                 if LineText[6].isdigit():
-                                    FigureNote.append(Line)
+                                    FNoteType.append(1)
+                                    FNoteType.append(0)
+                                    if LineText[7:9].find(':') >= 0:
+                                        FNoteType.append(2)
+                                    elif LineText[7:9].find('.') >= 0:
+                                        FNoteType.append(1)
+                                    else:
+                                        FNoteType.append(0)
+                                    if FLRC_Check(Line, Figure, LRC, PageHeight, LineHeight):
+                                        if FigNoteTypeCheck(FileFNoteType, FNoteType):
+                                            FigureNote.append(Line)
+                                            FileFNoteType = FNoteType.copy()
 
                 if tabPos == 0:
                     # table 1 / table 1: / table 4. / table I / table II:
                     if len(LineText) > 5:
                         digit = LineText[tabPos+5]
                         if digit.isdigit():
-                            Table.append(Line)
+                            TableNote.append(Line)
                         elif digit == 'i' or digit == 'v' or digit == 'x':
-                            Table.append(Line)
-        elif isinstance(Box, LTFigure):
-            Figure.append(Box)
-        elif isinstance(Box, LTLine) or isinstance(Box, LTRect) or isinstance(Box, LTCurve):
-            LRC.append(Box)
+                            TableNote.append(Line)
 
-    # 去除掉错误的图注
-    for index in range(len(FigureNote)-1, -1, -1):
-        figNote = FigureNote[index]
-        KEEP = False
-        figNoteUpY = PageHeight - figNote.y1
-        figNotelrX = [figNote.x0, figNote.x1]
-        for fig in Figure:
-            figDownY = PageHeight - fig.y0
-            figlrX = [fig.x0, fig.x1]
-            diff = figNoteUpY - figDownY
-            if diff < 5*LineHeight and diff > 0:
-                if overlap(figNotelrX, figlrX) > 0:
-                    KEEP = True
-                    break
-        if not KEEP:
-            for lrc in LRC:
-                lrcDownY = PageHeight - lrc.y0
-                lrclrX = [lrc.x0, lrc.x1]
-                diff = figNoteUpY - lrcDownY
-                if diff < 5*LineHeight and diff > 0:
-                    if overlap(figNotelrX, lrclrX) > 0:
-                        KEEP = True
-                        break
-        if not KEEP:
-            FigureNote.remove(figNote)
-
-    return Figure, FigureNote, Table
+    return Figure, FigureNote, TableNote, FileFNoteType
 
 
 def noteExtraction(PageLayout, PageType):
