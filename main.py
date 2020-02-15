@@ -72,8 +72,10 @@ if __name__ == '__main__':
             PageImage = drawBox(PageImage, LTNote, NoteBBoxes)
 
             Figure, FigNote, TabNote, FileFNoteType = figTableExtraction(PageLayout, FileFNoteType)
+            FigureBBoxes = getBoundingBoxes(LayoutHeight, Figure, liRatio)
             FigNoteBBoxes = fNoteBoundingBoxes(LayoutHeight, FigNote, liRatio)
             TabNoteBBoxes = getBoundingBoxes(LayoutHeight, TabNote, liRatio)
+            PageImage = drawBox(PageImage, LTFigure, FigureBBoxes)
             PageImage = drawBox(PageImage, LTFigureNote, FigNoteBBoxes)
             PageImage = drawBox(PageImage, LTTableNote, TabNoteBBoxes)
 

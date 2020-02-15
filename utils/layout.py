@@ -21,6 +21,9 @@ def drawBox(image, LTType, Boxes):
     elif LTType == LTNote:                 #blue
         color = (255, 0, 0)
         typeText = 'Note'
+    elif LTType == LTFigure:               #slateblue
+        color = (238, 103, 122)
+        typeText = 'Figure'
     elif LTType == LTFigureNote:           #darkvoilet
         color = (211, 0, 148)
         typeText = 'FigureNote'
@@ -40,7 +43,7 @@ def drawBox(image, LTType, Boxes):
                     Text = True
         return image
     else:
-        if LTType == LTTableNote:
+        if LTType == LTTableNote or LTType == LTFigure:
             index = 1
         else:
             index = 0
