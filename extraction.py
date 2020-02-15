@@ -117,29 +117,53 @@ def FigNoteTypeCheck(FileFNoteType, FigNoteType):
             return False
     return True
 
-def FLRC_Check(figNote, Figure, LRC, PageHeight, LineHeight):
-    KEEP = False
+def FLRC_Check(figNote, Figure, LRC, PageHeight):
+    LineHeight = figNote.height
     figNoteUpY = PageHeight - figNote.y1
     figNotelrX = [figNote.x0, figNote.x1]
+
     for fig in Figure:
         figDownY = PageHeight - fig.y0
         figlrX = [fig.x0, fig.x1]
         diff = figNoteUpY - figDownY
         if diff < 5 * LineHeight and diff > 0:
             if overlap(figNotelrX, figlrX) > 0:
-                KEEP = True
-                return 1
-    if not KEEP:
-        for lrc in LRC:
-            lrcDownY = PageHeight - lrc.y0
-            lrclrX = [lrc.x0, lrc.x1]
-            diff = figNoteUpY - lrcDownY
-            if diff < 5 * LineHeight and diff > 0:
-                if overlap(figNotelrX, lrclrX) > 0:
-                    KEEP = True
-                    return 1
-    if not KEEP:
-        return 0
+                return True
+
+    for lrc in LRC:
+        lrcDownY = PageHeight - lrc.y0
+        lrclrX = [lrc.x0, lrc.x1]
+        diff = figNoteUpY - lrcDownY
+        if diff < 5 * LineHeight and diff > 0:
+            if overlap(figNotelrX, lrclrX) > 0:
+                return True
+
+    return False
+
+def FigNoteAggregation(PageHeight, Line, Box):
+    fNoteLX = Line.x0
+    fNoteRX = Line.x1
+    fNoteUY = PageHeight - Line.y1
+    fNoteDY = PageHeight - Line.y0
+    LineHeight = Line.height
+    AggFigNote = [Line]
+    # aggregation in the direction of Right and Down
+    for Line in Box:
+        if isinstance(Line, LTTextLineHorizontal):
+            LineLX = Line.x0
+            LineUY = PageHeight - Line.y1
+            LineDY = PageHeight - Line.y0
+            if LineLX - fNoteRX > 0 and LineLX - fNoteRX < LineHeight:
+                if LineUY - fNoteUY > -1*LineHeight and LineUY - fNoteUY < LineHeight:
+                    if LineDY - fNoteDY > -1*LineHeight and LineDY - fNoteDY < LineHeight:
+                        fNoteRX = Line.x1
+                        AggFigNote.append(Line)
+            if LineLX - fNoteLX > -1*LineHeight and LineLX - fNoteLX < LineHeight:
+                if LineUY - fNoteUY > 0 and LineUY - fNoteUY < 1.5*LineHeight:
+                    fNoteUY = LineUY
+                    AggFigNote.append(Line)
+
+    return AggFigNote
 
 def figTableExtraction(PageLayout, FileFNoteType):
     FigureNote = []
@@ -150,8 +174,6 @@ def figTableExtraction(PageLayout, FileFNoteType):
     # 3: figure(1) / fig(0)
     # 2: with .(1) / without .(0)
     # 1: :(2) / .(1) / alpha(0)
-
-    LineHeight = PageLayout._objs[0]._objs[0].height
     PageHeight = PageLayout.height
 
     for Box in PageLayout:
@@ -179,9 +201,10 @@ def figTableExtraction(PageLayout, FileFNoteType):
                                 FNoteType.append(1)
                             else:
                                 FNoteType.append(0)
-                            if FLRC_Check(Line, Figure, LRC, PageHeight, LineHeight):
+                            if FLRC_Check(Line, Figure, LRC, PageHeight):
                                 if FigNoteTypeCheck(FileFNoteType, FNoteType):
-                                    FigureNote.append(Line)
+                                    AggFigNote = FigNoteAggregation(PageHeight, Line, Box)
+                                    FigureNote.append(AggFigNote)
                                     FileFNoteType = FNoteType.copy()
                         else:
                             # figure 1: / figure 5.
@@ -195,9 +218,10 @@ def figTableExtraction(PageLayout, FileFNoteType):
                                         FNoteType.append(1)
                                     else:
                                         FNoteType.append(0)
-                                    if FLRC_Check(Line, Figure, LRC, PageHeight, LineHeight):
+                                    if FLRC_Check(Line, Figure, LRC, PageHeight):
                                         if FigNoteTypeCheck(FileFNoteType, FNoteType):
-                                            FigureNote.append(Line)
+                                            AggFigNote = FigNoteAggregation(PageHeight, Line, Box)
+                                            FigureNote.append(AggFigNote)
                                             FileFNoteType = FNoteType.copy()
 
                 if tabPos == 0:

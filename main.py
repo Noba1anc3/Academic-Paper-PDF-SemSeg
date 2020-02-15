@@ -72,7 +72,7 @@ if __name__ == '__main__':
             PageImage = drawBox(PageImage, LTNote, NoteBBoxes)
 
             Figure, FigNote, TabNote, FileFNoteType = figTableExtraction(PageLayout, FileFNoteType)
-            FigNoteBBoxes = getBoundingBoxes(LayoutHeight, FigNote, liRatio)
+            FigNoteBBoxes = fNoteBoundingBoxes(LayoutHeight, FigNote, liRatio)
             TabNoteBBoxes = getBoundingBoxes(LayoutHeight, TabNote, liRatio)
             PageImage = drawBox(PageImage, LTFigureNote, FigNoteBBoxes)
             PageImage = drawBox(PageImage, LTTableNote, TabNoteBBoxes)
@@ -80,9 +80,11 @@ if __name__ == '__main__':
             height, width = PageImage.shape[:2]
             size = (int(height*0.8), int(width*1.2))
             PageImage = cv2.resize(PageImage, size)
-            #Anno_Image = layoutImage(Anno_Image, PageLayout, liRatio)
             cv2.imshow('img', PageImage)
-            #cv2.imshow('img', Anno_Image)
+
+            # Anno_Image = layoutImage(Anno_Image, PageLayout, liRatio)
+            # cv2.imshow('img', Anno_Image)
+
             cv2.waitKey(0)
 
             # if not os.path.exists('example/analysis_result/' + fileName[:-4]):

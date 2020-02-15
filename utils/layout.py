@@ -6,6 +6,7 @@ def drawBox(image, LTType, Boxes):
     #在image图像上根据LTType绘制相应颜色的检测框，并在左上角附上其所属的类型
     #Boxes由若干个Box组成，第一个Box为该类型所有小区域所形成的大区域，后面的Box分别是该类型下所有的小区域
     #每一个Box由四个整数组成，分别是左上角的横坐标，左上角的纵坐标，右下角的横坐标，右下角的纵坐标
+
     Text = False
 
     if LTType == LTTitle:                  #red
@@ -14,34 +15,45 @@ def drawBox(image, LTType, Boxes):
     elif LTType == LTAuthor:               #green
         color = (0, 255,0)
         typeText = 'Author'
-    elif LTType == LTPageNo:                 #yellow
+    elif LTType == LTPageNo:               #yellow
         color = (0, 255, 255)
         typeText = 'PageNo'
-    elif LTType == LTNote:                   #blue
+    elif LTType == LTNote:                 #blue
         color = (255, 0, 0)
         typeText = 'Note'
-    elif LTType == LTFigureNote:                 #darkvoilet
+    elif LTType == LTFigureNote:           #darkvoilet
         color = (211, 0, 148)
         typeText = 'FigureNote'
-    elif LTType == LTTableNote:                #darkcyan
+    elif LTType == LTTableNote:            #darkcyan
         color = (139, 139, 0)
         typeText = 'TableNote'
 
-    if LTType == LTFigureNote or LTType == LTTableNote:
-        index = 1
+    if LTType == LTFigureNote:
+        for Box in Boxes:
+            Text = False
+            for Line in Box:
+                leftTop = (Line[0], Line[1])
+                rightDown = (Line[2], Line[3])
+                cv2.rectangle(image, leftTop, rightDown, color, 3)
+                if not Text:
+                    cv2.putText(image, typeText, (Line[0], Line[1]), 0, 1.5, color, thickness=3)
+                    Text = True
+        return image
     else:
-        index = 0
+        if LTType == LTTableNote:
+            index = 1
+        else:
+            index = 0
 
-    for i in range(index, len(Boxes)):
-        Box = Boxes[i]
-        leftTop = (Box[0], Box[1])
-        rightDown = (Box[2], Box[3])
-        cv2.rectangle(image, leftTop, rightDown, color, 3)
-        if not Text or index == 1:
-            cv2.putText(image, typeText, (Box[0], Box[1]), 0, 1.5, color, thickness=3)
-            Text = True
-
-    return image
+        for i in range(index, len(Boxes)):
+            Box = Boxes[i]
+            leftTop = (Box[0], Box[1])
+            rightDown = (Box[2], Box[3])
+            cv2.rectangle(image, leftTop, rightDown, color, 3)
+            if not Text or index == 1:
+                cv2.putText(image, typeText, (Box[0], Box[1]), 0, 1.5, color, thickness=3)
+                Text = True
+        return image
 
 def overlap(lineA, lineB):
     lengthA = lineA[1] - lineA[0]
@@ -73,6 +85,39 @@ def get_liRatio(PageImage, PageLayout):
     liRatioW = LAYOUT_W / IMG_W
 
     return [liRatioW, liRatioH]
+
+def fNoteBoundingBoxes(LAYOUT_H, BBoxList, liRatio):
+    # 针对图注类型特殊处理的计算其BBoxes的方法，其中BBoxList的每一项为一个列表
+    # 每一个列表都是一个图注，列表内部由若干个LTTextLineHorizontal组成
+
+    BBoxes = []
+    for index in range(len(BBoxList)):
+        Block = BBoxList[index]
+        SafeCheck = False
+        BBoxes.append([])
+        for Line in Block:
+            XleftUp = int(Line.x0 / liRatio[0])
+            YleftUp = int((LAYOUT_H - Line.y1) / liRatio[1])
+            XrightDown = int(Line.x1 / liRatio[0])
+            YrightDown = int((LAYOUT_H - Line.y0) / liRatio[1])
+
+            if SafeCheck:
+                # 该目的为确定出所有LTTextBoxHorizontal所组成的大区域并置为该方法返回的BBoxes的第一项
+                if XleftUp < BBoxes[index][0][0]:
+                    BBoxes[index][0][0] = XleftUp
+                if YleftUp < BBoxes[index][0][1]:
+                    BBoxes[index][0][1] = YleftUp
+                if XrightDown > BBoxes[index][0][2]:
+                    BBoxes[index][0][2] = XrightDown
+                if YrightDown > BBoxes[index][0][3]:
+                    BBoxes[index][0][3] = YrightDown
+            else:
+                SafeCheck = True
+                BBoxes[index].append([XleftUp, YleftUp, XrightDown, YrightDown])
+
+            BBoxes[index].append([XleftUp, YleftUp, XrightDown, YrightDown])
+
+    return BBoxes
 
 def getBoundingBoxes(LAYOUT_H, BBoxList, liRatio):
     #根据Layout的高度和liRatio将从Layout提取出来的坐标转换为Image上的坐标
@@ -112,10 +157,6 @@ def getBoundingBoxes(LAYOUT_H, BBoxList, liRatio):
                 YrightDown = int((LAYOUT_H - Item.y0) / liRatio[1])
                 BBoxes.append([XleftUp, YleftUp, XrightDown, YrightDown])
         else:
-            XleftUp = int(BBox.x0 / liRatio[0])
-            YleftUp = int((LAYOUT_H - BBox.y1) / liRatio[1])
-            XrightDown = int(BBox.x1 / liRatio[0])
-            YrightDown = int((LAYOUT_H - BBox.y0) / liRatio[1])
             BBoxes.append([XleftUp, YleftUp, XrightDown, YrightDown])
 
     return BBoxes
