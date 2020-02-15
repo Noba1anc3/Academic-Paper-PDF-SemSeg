@@ -117,6 +117,14 @@ def FigNoteTypeCheck(FileFNoteType, FigNoteType):
             return False
     return True
 
+def TableNoteTypeCheck(FileTNoteType, TableNoteType):
+    if len(FileTNoteType) == 0:
+        return True
+    for index in range(0,2):
+        if not FileTNoteType[index] == TableNoteType[index]:
+            return False
+    return True
+
 def FLRC_Check(figNote, Figure, LRC, PageHeight):
     LineHeight = figNote.height
     figNoteUpY = PageHeight - figNote.y1
@@ -165,15 +173,12 @@ def FigNoteAggregation(PageHeight, Line, Box):
 
     return AggFigNote
 
-def figTableExtraction(PageLayout, FileFNoteType):
+def figTableExtraction(PageLayout, FileFNoteType, FileTNoteType):
     FigureNote = []
     TableNote = []
     Figure = []
     LRC = []  #Line / Rect / Curve
-    # FNoteType[321]
-    # 3: figure(1) / fig(0)
-    # 2: with .(1) / without .(0)
-    # 1: :(2) / .(1) / alpha(0)
+
     PageHeight = PageLayout.height
 
     for Box in PageLayout:
@@ -190,6 +195,10 @@ def figTableExtraction(PageLayout, FileFNoteType):
                 tabPos = LineText.find('table')
                 if figPos == 0:
                     FNoteType = []
+                    # FNoteType[321]
+                    # 3: figure(1) / fig(0)
+                    # 2: with .(1) / without .(0)
+                    # 1: :(2) / .(1) / alpha(0)
                     # fig. 1 / fig. 1. / fig. 1:
                     if len(LineText) > 6:
                         if LineText[3] == '.' and LineText[4].isdigit():
@@ -225,15 +234,59 @@ def figTableExtraction(PageLayout, FileFNoteType):
                                             FileFNoteType = FNoteType.copy()
 
                 if tabPos == 0:
+                    TNoteType = []
+                    # TNoteType[21]
+                    # 2: arabic numerals(1) / greek numerals(0)
+                    # 1: :(2) / .(1) / alpha(0) / NULL(-1) for the situation:[Table I]
                     # table 1 / table 1: / table 4. / table I / table II:
                     if len(LineText) > 5:
-                        digit = LineText[tabPos+5]
+                        digit = LineText[5]
                         if digit.isdigit():
-                            TableNote.append(Line)
+                            TNoteType.append(1)
                         elif digit == 'i' or digit == 'v' or digit == 'x':
-                            TableNote.append(Line)
+                            TNoteType.append(0)
+                        if len(LineText) == 6:
+                            if len(TNoteType) == 1:
+                                TNoteType.append(-1)
+                                if TableNoteTypeCheck(FileTNoteType, TNoteType):
+                                    TableNote.append(Line)
+                                    FileTNoteType = TNoteType.copy()
+                        else:
+                            if len(TNoteType) == 1:
+                                if LineText[6:].find(':') >= 0:
+                                    TNoteType.append(2)
+                                elif LineText[6:].find('.') >= 0:
+                                    TNoteType.append(1)
+                                else:
+                                    if TNoteType[0] == 0:
+                                        if len(LineText) == 7:
+                                            if LineText[5:7] == 'ii' or LineText[5:7] == 'iv'\
+                                                    or LineText[5:7] == 'vi' or LineText[5:7] == 'ix'\
+                                                    or LineText[5:7] == 'xi':
+                                                TNoteType.append(-1)
+                                            else:
+                                                TNoteType.append(0)
+                                        elif len(LineText) == 8:
+                                            if LineText[5:8] == 'iii' or LineText[5:8] == 'vii'\
+                                                    or LineText[5:8] == 'xii':
+                                                TNoteType.append(-1)
+                                            else:
+                                                TNoteType.append(0)
+                                        elif len(LineText) == 9:
+                                            if LineText[5:9] == 'viii':
+                                                TNoteType.append(-1)
+                                            else:
+                                                TNoteType.append(0)
+                                        else:
+                                            TNoteType.append(0)
+                                    else:
+                                        TNoteType.append(0)
+                                if TableNoteTypeCheck(FileTNoteType, TNoteType):
+                                    TableNote.append(Line)
+                                    FileTNoteType = TNoteType.copy()
 
-    return Figure, FigureNote, TableNote, FileFNoteType
+
+    return Figure, FigureNote, TableNote, FileFNoteType, FileTNoteType
 
 
 def noteExtraction(PageLayout, PageType):
