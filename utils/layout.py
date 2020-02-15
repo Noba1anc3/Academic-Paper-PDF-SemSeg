@@ -31,7 +31,7 @@ def drawBox(image, LTType, Boxes):
         color = (139, 139, 0)
         typeText = 'TableNote'
 
-    if LTType == LTFigureNote:
+    if LTType == LTFigureNote or LTType == LTTableNote:
         for Box in Boxes:
             Text = False
             for Line in Box:
@@ -43,7 +43,7 @@ def drawBox(image, LTType, Boxes):
                     Text = True
         return image
     else:
-        if LTType == LTTableNote or LTType == LTFigure:
+        if LTType == LTFigure:
             index = 1
         else:
             index = 0
@@ -89,7 +89,7 @@ def get_liRatio(PageImage, PageLayout):
 
     return [liRatioW, liRatioH]
 
-def fNoteBoundingBoxes(LAYOUT_H, BBoxList, liRatio):
+def NoteBoundingBoxes(LAYOUT_H, BBoxList, liRatio):
     # 针对图注类型特殊处理的计算其BBoxes的方法，其中BBoxList的每一项为一个列表
     # 每一个列表都是一个图注，列表内部由若干个LTTextLineHorizontal组成
 

@@ -125,6 +125,28 @@ def TableNoteTypeCheck(FileTNoteType, TableNoteType):
             return False
     return True
 
+def LineCheck(TableNote, Line, PageHeight):
+    LineHeight = TableNote[0].height
+    NoteYTop = PageHeight
+    NoteYDown = 0
+
+    for NoteLine in TableNote:
+        YTop = PageHeight - NoteLine.y1
+        YDown = PageHeight - NoteLine.y0
+        if YTop < NoteYTop:
+            NoteYTop = YTop
+        if YDown > NoteYDown:
+            NoteYDown = YDown
+
+    for line in Line:
+        if line.y0 == line.y1:
+            lineY = PageHeight - line.y1
+            if NoteYTop - lineY > 0 and NoteYTop - lineY < 12*LineHeight:
+                return True
+            if lineY - NoteYDown > 0 and lineY - NoteYDown < 12*LineHeight:
+                return True
+    return False
+
 def FLRC_Check(figNote, Figure, LRC, PageHeight):
     LineHeight = figNote.height
     figNoteUpY = PageHeight - figNote.y1
@@ -148,7 +170,7 @@ def FLRC_Check(figNote, Figure, LRC, PageHeight):
 
     return False
 
-def FigNoteAggregation(PageHeight, Line, Box):
+def NoteAggregation(PageHeight, Line, Box):
     fNoteLX = Line.x0
     fNoteRX = Line.x1
     fNoteUY = PageHeight - Line.y1
@@ -161,12 +183,12 @@ def FigNoteAggregation(PageHeight, Line, Box):
             LineLX = Line.x0
             LineUY = PageHeight - Line.y1
             LineDY = PageHeight - Line.y0
-            if LineLX - fNoteRX > 0 and LineLX - fNoteRX < LineHeight:
+            if LineLX - fNoteRX > 0 and LineLX - fNoteRX < 2*LineHeight:
                 if LineUY - fNoteUY > -1*LineHeight and LineUY - fNoteUY < LineHeight:
                     if LineDY - fNoteDY > -1*LineHeight and LineDY - fNoteDY < LineHeight:
                         fNoteRX = Line.x1
                         AggFigNote.append(Line)
-            if LineLX - fNoteLX > -1*LineHeight and LineLX - fNoteLX < LineHeight:
+            if LineLX - fNoteLX > -0.5*LineHeight and LineLX - fNoteLX < 0.5*LineHeight:
                 if LineUY - fNoteUY > 0 and LineUY - fNoteUY < 1.5*LineHeight:
                     fNoteUY = LineUY
                     AggFigNote.append(Line)
@@ -178,13 +200,17 @@ def figTableExtraction(PageLayout, FileFNoteType, FileTNoteType):
     TableNote = []
     Figure = []
     LRC = []  #Line / Rect / Curve
+    LineList = []
 
     PageHeight = PageLayout.height
 
     for Box in PageLayout:
         if isinstance(Box, LTFigure):
             Figure.append(Box)
-        elif isinstance(Box, LTLine) or isinstance(Box, LTRect) or isinstance(Box, LTCurve):
+        elif isinstance(Box, LTLine):
+            LineList.append(Box)
+            LRC.append(Box)
+        elif isinstance(Box, LTRect) or isinstance(Box, LTCurve):
             LRC.append(Box)
 
     for Box in PageLayout:
@@ -204,15 +230,24 @@ def figTableExtraction(PageLayout, FileFNoteType, FileTNoteType):
                         if LineText[3] == '.' and LineText[4].isdigit():
                             FNoteType.append(0)
                             FNoteType.append(1)
-                            if LineText[5:7].find(':') >= 0:
+                            colon = LineText[5:7].find(':')
+                            point = LineText[5:7].find('.')
+
+                            if colon >= 0 and point < 0:
                                 FNoteType.append(2)
-                            elif LineText[5:7].find(':') >= 0:
+                            elif colon < 0 and point >= 0:
                                 FNoteType.append(1)
+                            elif colon >= 0 and point >= 0:
+                                if colon < point:
+                                    FNoteType.append(2)
+                                else:
+                                    FNoteType.append(1)
                             else:
                                 FNoteType.append(0)
+
                             if FLRC_Check(Line, Figure, LRC, PageHeight):
                                 if FigNoteTypeCheck(FileFNoteType, FNoteType):
-                                    AggFigNote = FigNoteAggregation(PageHeight, Line, Box)
+                                    AggFigNote = NoteAggregation(PageHeight, Line, Box)
                                     FigureNote.append(AggFigNote)
                                     FileFNoteType = FNoteType.copy()
                         else:
@@ -221,15 +256,24 @@ def figTableExtraction(PageLayout, FileFNoteType, FileTNoteType):
                                 if LineText[6].isdigit():
                                     FNoteType.append(1)
                                     FNoteType.append(0)
-                                    if LineText[7:9].find(':') >= 0:
+                                    colon = LineText[7:9].find(':')
+                                    point = LineText[7:9].find('.')
+
+                                    if colon >= 0 and point < 0:
                                         FNoteType.append(2)
-                                    elif LineText[7:9].find('.') >= 0:
+                                    elif colon < 0 and point >= 0:
                                         FNoteType.append(1)
+                                    elif colon >= 0 and point >= 0:
+                                        if colon < point:
+                                            FNoteType.append(2)
+                                        else:
+                                            FNoteType.append(1)
                                     else:
                                         FNoteType.append(0)
+
                                     if FLRC_Check(Line, Figure, LRC, PageHeight):
                                         if FigNoteTypeCheck(FileFNoteType, FNoteType):
-                                            AggFigNote = FigNoteAggregation(PageHeight, Line, Box)
+                                            AggFigNote = NoteAggregation(PageHeight, Line, Box)
                                             FigureNote.append(AggFigNote)
                                             FileFNoteType = FNoteType.copy()
 
@@ -238,51 +282,68 @@ def figTableExtraction(PageLayout, FileFNoteType, FileTNoteType):
                     # TNoteType[21]
                     # 2: arabic numerals(1) / greek numerals(0)
                     # 1: :(2) / .(1) / alpha(0) / NULL(-1) for the situation:[Table I]
-                    # table 1 / table 1: / table 4. / table I / table II:
+                    # table 1   (1 -1)
+                    # table 1:  (1  2)
+                    # table 4.  (1  1)
+                    # table I   (0 -1)
+                    # table II: (0  1)
                     if len(LineText) > 5:
                         digit = LineText[5]
                         if digit.isdigit():
                             TNoteType.append(1)
                         elif digit == 'i' or digit == 'v' or digit == 'x':
                             TNoteType.append(0)
+                    if len(TNoteType) == 1:
                         if len(LineText) == 6:
-                            if len(TNoteType) == 1:
-                                TNoteType.append(-1)
+                            TNoteType.append(-1)
+                            AggTableNote = NoteAggregation(PageHeight, Line, Box)
+                            if LineCheck(AggTableNote, LineList, PageHeight):
                                 if TableNoteTypeCheck(FileTNoteType, TNoteType):
-                                    TableNote.append(Line)
+                                    TableNote.append(AggTableNote)
                                     FileTNoteType = TNoteType.copy()
                         else:
-                            if len(TNoteType) == 1:
-                                if LineText[6:].find(':') >= 0:
-                                    TNoteType.append(2)
-                                elif LineText[6:].find('.') >= 0:
+                            colon = LineText[6:].find(':')
+                            point = LineText[6:].find('.')
+                            if colon >= 0 and point < 0:
+                                TNoteType.append(2)
+                            elif point >= 0 and colon < 0:
+                                TNoteType.append(1)
+                            elif colon >= 0 and point >= 0:
+                                if colon > point:
                                     TNoteType.append(1)
                                 else:
-                                    if TNoteType[0] == 0:
-                                        if len(LineText) == 7:
-                                            if LineText[5:7] == 'ii' or LineText[5:7] == 'iv'\
-                                                    or LineText[5:7] == 'vi' or LineText[5:7] == 'ix'\
-                                                    or LineText[5:7] == 'xi':
-                                                TNoteType.append(-1)
-                                            else:
-                                                TNoteType.append(0)
-                                        elif len(LineText) == 8:
-                                            if LineText[5:8] == 'iii' or LineText[5:8] == 'vii'\
-                                                    or LineText[5:8] == 'xii':
-                                                TNoteType.append(-1)
-                                            else:
-                                                TNoteType.append(0)
-                                        elif len(LineText) == 9:
-                                            if LineText[5:9] == 'viii':
-                                                TNoteType.append(-1)
-                                            else:
-                                                TNoteType.append(0)
+                                    TNoteType.append(2)
+                            else:
+                                if TNoteType[0] == 0:
+                                    if len(LineText) == 7:
+                                        if LineText[5:7] == 'ii' or LineText[5:7] == 'iv'\
+                                                or LineText[5:7] == 'vi' or LineText[5:7] == 'ix'\
+                                                or LineText[5:7] == 'xi':
+                                            TNoteType.append(-1)
+                                        else:
+                                            TNoteType.append(0)
+                                    elif len(LineText) == 8:
+                                        if LineText[5:8] == 'iii' or LineText[5:8] == 'vii'\
+                                                or LineText[5:8] == 'xii':
+                                            TNoteType.append(-1)
+                                        else:
+                                            TNoteType.append(0)
+                                    elif len(LineText) == 9:
+                                        if LineText[5:9] == 'viii':
+                                            TNoteType.append(-1)
                                         else:
                                             TNoteType.append(0)
                                     else:
                                         TNoteType.append(0)
+                                else:
+                                    if len(LineText) == 7 and LineText[6].isdigit():
+                                        TNoteType.append(-1)
+                                    else:
+                                        TNoteType.append(0)
+                            AggTableNote = NoteAggregation(PageHeight, Line, Box)
+                            if LineCheck(AggTableNote, LineList, PageHeight):
                                 if TableNoteTypeCheck(FileTNoteType, TNoteType):
-                                    TableNote.append(Line)
+                                    TableNote.append(AggTableNote)
                                     FileTNoteType = TNoteType.copy()
 
 
