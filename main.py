@@ -1,13 +1,24 @@
 
-from utils.pdfminer import *
-from extraction import *
+from preprocess.pdfminer import layout_analysis
+from preprocess.pdf2image import pdf2image
+from preprocess.half_full_judge import *
+
+from extraction.text.image_note import FigureNoteExtraction
+from extraction.text.table_note import TableNoteExtraction
+from extraction.text.author import AuthorExtraction
+from extraction.text.title import TitleExtraction
+from extraction.text.note import NoteExtraction
+
+from extraction.tools import *
+from visualize.annotate import *
 
 from logzero import logger
-
 import numpy as np
 import sys
+import cv2
+import os
 
-status = DEBUG   #DEBUG/RUN
+status = 1
 #DEBUG状态下读取的是外目录下的pdf文件夹，并且每个文件处理完成后需要在控制台按任意键回车
 #按q键则会终止程序执行
 #RUN状态下读取的是内目录下'example/pdf_file/'下的文件，所有文件依次顺序处理
@@ -17,7 +28,7 @@ if __name__ == '__main__':
     if not os.path.exists('example/analysis_result/'):
         os.mkdir('example/analysis_result/')
 
-    if status == DEBUG:
+    if status == 1:
         fileFolder = '../pdf/'
     else:
         fileFolder = 'example/pdf_file/'
@@ -35,67 +46,49 @@ if __name__ == '__main__':
 
         filePath = fileFolder + fileName
         PagesLayout = layout_analysis(filePath)
-        PagesImage  = pdf_to_image(filePath)
+        PagesImage  = pdf2image(filePath)
 
         withPageNo = False
-        PageType = half_full_judge(PagesLayout[0])
         FileFNoteType = []
         FileTNoteType = []
+        PageType = half_full_judge(PagesLayout[0])
 
         for PageNo in range(len(PagesImage)):
             PageImage = PagesImage[PageNo]
             PageLayout = PagesLayout[PageNo]
-
             PageImage = cv2.cvtColor(np.asarray(PageImage), cv2.COLOR_RGB2BGR)
             Anno_Image = PageImage
+
             LayoutHeight = PageLayout.height
             liRatio = get_liRatio(PageImage, PageLayout)
+            PV = PageVisualize(PageImage, LayoutHeight, liRatio)
 
-            Page, Note = noteExtraction(PageLayout, PageType)
-
+            Page, Note = NoteExtraction(PageLayout, PageType)
             if PageNo == 0:
-                Title, titleIndex, titleError = titleExtraction(PageLayout)
-                if titleError:
-                    logger.info('Unexpected Error when Locating Title in Page {} of File {}'.format(PageNo, fileName))
-                else:
-                    BBoxes = getBoundingBoxes(LayoutHeight, Title, liRatio)
-                    PageImage = drawBox(PageImage, LTTitle, BBoxes)
-
+                Title, titleIndex = TitleExtraction(PageLayout)
+                PageVisualize.annotate(PV, LTTitle, Title)
                 Author = AuthorExtraction(PageLayout, titleIndex)
-                BBoxes = getBoundingBoxes(LayoutHeight, Author, liRatio)
-                PageImage = drawBox(PageImage, LTAuthor, BBoxes)
+                PageVisualize.annotate(PV, LTAuthor, Author)
                 if not len(Page) == 0:
                     withPageNo = True
 
             if withPageNo:
-                PageBBoxes = getBoundingBoxes(LayoutHeight, Page, liRatio)
-                PageImage = drawBox(PageImage, LTPageNo, PageBBoxes)
-            NoteBBoxes = getBoundingBoxes(LayoutHeight, Note, liRatio)
-            PageImage = drawBox(PageImage, LTNote, NoteBBoxes)
+                PageVisualize.annotate(PV, LTPageNo, Page)
 
-            Figure, FigNote, TabNote, FileFNoteType, FileTNoteType = figTableExtraction(PageLayout, FileFNoteType, FileTNoteType)
-            FigureBBoxes = getBoundingBoxes(LayoutHeight, Figure, liRatio)
-            FigNoteBBoxes = NoteBoundingBoxes(LayoutHeight, FigNote, liRatio)
-            TabNoteBBoxes = NoteBoundingBoxes(LayoutHeight, TabNote, liRatio)
-            PageImage = drawBox(PageImage, LTFigure, FigureBBoxes)
-            PageImage = drawBox(PageImage, LTFigureNote, FigNoteBBoxes)
-            PageImage = drawBox(PageImage, LTTableNote, TabNoteBBoxes)
+            PageVisualize.annotate(PV, LTNote, Note)
+            Figure, FigNote, FileFNoteType = FigureNoteExtraction(PageLayout, FileFNoteType)
+            TabNote, FileTNoteType = TableNoteExtraction(PageLayout, FileTNoteType)
+            PageVisualize.annotate(PV, LTFigure, Figure)
+            PageVisualize.annotate(PV, LTFigureNote, FigNote)
+            PageVisualize.annotate(PV, LTTableNote, TabNote)
 
-            height, width = PageImage.shape[:2]
-            size = (int(height*0.8), int(width*1.2))
-            PageImage = cv2.resize(PageImage, size)
-            cv2.imshow('img', PageImage)
+            PageVisualize.show(PV)
 
+            # from visualize.originLayout import layoutImage
             # Anno_Image = layoutImage(Anno_Image, PageLayout, liRatio)
             # cv2.imshow('img', Anno_Image)
 
-            cv2.waitKey(0)
-
-            # if not os.path.exists('example/analysis_result/' + fileName[:-4]):
-            #     os.mkdir('example/analysis_result/' +fileName[:-4])
-            # cv2.imwrite('example/analysis_result/' + fileName[:-4] + '/' + str(PageNo) + '.jpg', Anno_Image)
-
-        if status == DEBUG:
+        if status == 1:
             c = str(input())
             if c == 'q':
                 sys.exit()

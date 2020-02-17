@@ -4,17 +4,12 @@ from pdfminer.pdfparser import PDFParser, PDFDocument
 from pdfminer.converter import PDFPageAggregator
 from pdfminer.layout import *
 
-from pdf2image import convert_from_path
 from binascii import b2a_hex
-
-import tempfile
 import os
 
 def with_pdf (pdf_doc, pdf_pwd, fn, *args):
-#"""Open the pdf document, and apply the function, returning the results"""
     result = None
     try:
-    # open the pdf file
         fp = open(pdf_doc, 'rb')
         # create a parser object associated with the file object
         parser = PDFParser(fp)
@@ -31,7 +26,6 @@ def with_pdf (pdf_doc, pdf_pwd, fn, *args):
         # close the pdf file
         fp.close()
     except IOError:
-        # the file doesn't exist or similar problem
         pass
     return result
 
@@ -120,8 +114,3 @@ def write_file (folder, filename, filedata, flags='w'):
 def layout_analysis(fileName):
     PagesLayout = with_pdf(fileName, '', _parse_pages, *tuple(['/tmp']))
     return PagesLayout
-
-def pdf_to_image(fileName):
-    with tempfile.TemporaryDirectory() as path:
-        PagesImage = convert_from_path(fileName, output_folder = path)
-    return PagesImage
