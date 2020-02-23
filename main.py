@@ -14,46 +14,39 @@ from visualize.annotate import *
 
 from logzero import logger
 import numpy as np
-import argparse
+
 import sys
 import cv2
 import os
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--folder", type=str, default='../pdf/pdf_file/', help="pdf file's folder")
-    parser.add_argument("--filename", type=str, default='', help="specify a unique pdf file with '.pdf' ")
-    parser.add_argument("--debug", default=True, help="whether debug or not")
-    parser.add_argument("--seg_level", type=int, default=1,
-                        help="1: level-1 segmentation on text and image, 2: level-2 segmentation on text and image")
-    parser.add_argument("--table_level", type=int, default=1,
-                        help="1: only segment the bounding box of tables, 2: segment all the cells in the tables, additionally")
-    parser.add_argument("--tit_choice", type=int, default=0,
-                        help="0: segment all kinds of semantic type, 1: only segment text out, 2: only segment image out, 3: only segment table out")
-    parser.add_argument("--save_image", default=True, help="whether save the image result of segmentation")
-    parser.add_argument("--save_text", default=True, help="whether save the text result of segmentation")
-    opt = parser.parse_args()
-    print(opt)
+    configList = []
+    with open('config.txt', 'r') as configFile:
+        config = configFile.readlines()
+        for index in range(0, len(config), 3):
+            cfg = config[index]
+            cfgValue = cfg.replace(' ', '').split(":")[1].split('\n')[0]
+            configList.append(cfgValue)
 
-    if opt.save_image == True or opt.save_text == True:
+    if configList[7] == 'True' or configList[6] == 'True':
         seg_result_folder = 'example/seg_result/'
         if not os.path.exists(seg_result_folder):
             os.mkdir(seg_result_folder)
-        if opt.save_image == True and not os.path.exists(seg_result_folder + 'image/'):
+        if configList[6] == 'True' and not os.path.exists(seg_result_folder + 'image/'):
             os.mkdir(seg_result_folder + 'image/')
-        if opt.save_text == True and not os.path.exists(seg_result_folder + 'text/'):
+        if configList[7] == 'True' and not os.path.exists(seg_result_folder + 'text/'):
             os.mkdir(seg_result_folder + 'text/')
 
-    if opt.debug == True:
-        fileFolder = opt.folder
+    if configList[2] == 'True':
+        fileFolder = configList[0]
     else:
         fileFolder = 'example/pdf_file/'
 
-    if opt.filename == '':
+    if configList[1] == '':
         fileList = sorted(os.listdir(fileFolder))
         fileNum = len(fileList)
     else:
-        fileList = [opt.filename]
+        fileList = [configList[1]]
         fileNum = 1
 
     for index in range(fileNum):
@@ -108,7 +101,7 @@ if __name__ == '__main__':
             # Anno_Image = layoutImage(Anno_Image, PageLayout, liRatio)
             # cv2.imshow('img', Anno_Image)
 
-        if opt.debug == True:
+        if configList[2] == 'True':
             c = str(input())
             if c == 'q':
                 sys.exit()
