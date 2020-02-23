@@ -1,5 +1,5 @@
 from pdfminer.layout import *
-from visualize.Layout import *
+from utils.postProcess.visualize.Layout import *
 
 import cv2
 

@@ -1,5 +1,4 @@
-
-from preprocess.half_full_judge import HALF
+from semseg.tools import *
 from pdfminer.layout import *
 
 def NoteExtraction(PageLayout, PageType):
