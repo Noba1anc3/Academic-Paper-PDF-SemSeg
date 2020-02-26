@@ -1,13 +1,15 @@
 from pdfminer.layout import *
-from utils.postProcess.visualize.Layout import *
+from utils.formatChange.visualize.Layout import *
 
 import cv2
 
 class PageVisualize():
-    def __init__(self, Image, LayoutHeight, liRatio):
+    def __init__(self, Image, Layout):
         self.Image = Image
-        self.LayoutHeight = LayoutHeight
-        self.liRatio = liRatio
+        self.IMG_SIZE = Image.shape
+        self.LayoutHeight = Layout.height
+        self.LayoutWidth  = Layout.width
+        self.liRatio = [self.LayoutWidth / self.IMG_SIZE[1], self.LayoutHeight / self.IMG_SIZE[0]]
 
     def annotate(self, LTType, LTBBoxes):
         if LTType == LTTableNote or LTType == LTFigureNote:

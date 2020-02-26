@@ -25,8 +25,9 @@ def with_pdf (pdf_doc, pdf_pwd, fn, *args):
             result = fn(doc, *args)
         # close the pdf file
         fp.close()
-    except IOError:
-        pass
+    except Exception:
+        print("pdfminer Error:", Exception.mro())
+
     return result
 
 def _parse_pages (doc, image_folder):
@@ -111,6 +112,6 @@ def write_file (folder, filename, filedata, flags='w'):
             pass
     return result
 
-def layout_analysis(fileName):
+def pdf2layout(fileName):
     PagesLayout = with_pdf(fileName, '', _parse_pages, *tuple(['/tmp']))
     return PagesLayout
