@@ -5,45 +5,42 @@ from semseg.text.subExtract.title import TitleExtraction
 from semseg.text.subExtract.note import *
 from semseg.text.subExtract.tools import *
 
-from utils.formatChange.visualize.annotate import *
-
 class TextExtraction():
     def __init__(self, TextLevel, PagesImage, PagesLayout):
         self.Text = []
+        self.Title = []
+        self.Author = []
+        self.Page = []
+        self.Note = []
+        self.FigureNote = []
+        self.TableNote = []
+
         self.TextLevel = TextLevel
         self.PagesImage = PagesImage
         self.PagesLayout = PagesLayout
         self.Segmentation()
 
     def Segmentation(self):
-        withPageNo = False
         FileFNoteType = []
         FileTNoteType = []
         PageType = half_full_judge(self.PagesLayout[0])
 
         for PageNo in range(len(self.PagesImage)):
-            PageImage = self.PagesImage[PageNo]
             PageLayout = self.PagesLayout[PageNo]
 
-            PV = PageVisualize(PageImage, PageLayout)
             Page, Note = NoteExtraction(PageLayout, PageType)
-
+            self.Page.append(Page)
+            self.Note.append(Note)
             if PageNo == 0:
                 Title, titleIndex = TitleExtraction(PageLayout)
-                PageVisualize.annotate(PV, LTTitle, Title)
                 Author = AuthorExtraction(PageLayout, titleIndex)
-                PageVisualize.annotate(PV, LTAuthor, Author)
-                if not len(Page) == 0:
-                    withPageNo = True
+                self.Title.append(Title)
+                self.Author.append(Author)
 
-            if withPageNo:
-                PageVisualize.annotate(PV, LTPageNo, Page)
-
-            PageVisualize.annotate(PV, LTNote, Note)
             Figure, FigNote, FileFNoteType = FigureNoteExtraction(PageLayout, FileFNoteType)
             TabNote, FileTNoteType = TableNoteExtraction(PageLayout, FileTNoteType)
-            PageVisualize.annotate(PV, LTFigure, Figure)
-            PageVisualize.annotate(PV, LTFigureNote, FigNote)
-            PageVisualize.annotate(PV, LTTableNote, TabNote)
+            self.FigureNote.append(FigNote)
+            self.TableNote.append(TabNote)
+            self.Title.append([])
+            self.Author.append([])
 
-            PageVisualize.show(PV)

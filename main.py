@@ -34,17 +34,18 @@ if __name__ == '__main__':
                 Anno = annotation()
                 pre, rec, f1 = estimate(seg_rst, Anno)
                 EstimationWrite(pre, rec, f1, fileName, conf.eva_folder)
-            else:
-                if conf.save_image == True:
-                    ImageList = rst2image(seg_rst, PagesImage)
-                    ImageWrite(ImageList, fileName, conf.img_folder)
-                if conf.save_text == True:
-                    jsonFile = rst2json(seg_rst)
-                    JsonWrite(jsonFile, fileName, conf.json_folder)
 
-        c = str(input())
-        if c == 'q':
-            import sys
-            sys.exit()
+            if conf.save_image == True:
+                ImageList = rst2image(seg_rst, PagesImage, PagesLayout)
+                ImageWrite(ImageList, fileName, conf.img_folder)
+
+            if conf.save_text == True:
+                jsonFile = rst2json(seg_rst)
+                JsonWrite(jsonFile, fileName, conf.json_folder)
+
+        # c = str(input())
+        # if c == 'q':
+        #     import sys
+        #     sys.exit()
 
     logger.info("All file processed")
