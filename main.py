@@ -1,48 +1,50 @@
 from utils.readWrite.read import *
 from utils.readWrite.write import *
 
+from semseg.semseg import *
+from estimate.estimation import estimate
+
 from utils.formatChange.pdf2xml import pdf2layout
 from utils.formatChange.pdf2image import pdf2image
 from utils.formatChange.result2json import rst2json
 from utils.formatChange.result2image import rst2image
 
-from semseg.semseg import *
-from estimate.estimation import estimate
-
 from logzero import logger
-import sys
 
 if __name__ == '__main__':
-    configList, fileFolder, fileList = config()
+    conf = Configuration()
 
-    for index in range(len(fileList)):
-        fileName = fileList[index]
+    for index in range(len(conf.fileList)):
+        fileName = conf.fileList[index]
 
         if not fileName.endswith('.pdf'):
-            logger.info('{} is skipped  ({}/{})'.format(fileName, index+1, len(fileList)))
+            logger.info('{} is skipped  ({}/{})'.format(fileName, index+1, len(conf.fileList)))
             continue
         else:
-            logger.info('Processing File {}  ({}/{})'.format(fileName, index+1, len(fileList)))
+            logger.info('Processing File {}  ({}/{})'.format(fileName, index+1, len(conf.fileList)))
 
-        filePath = fileFolder + fileName
+        filePath = conf.folder + fileName
         PagesImage  = pdf2image(filePath)
         PagesLayout = pdf2layout(filePath)
-        if not PagesLayout == None:
-            SemanticSegmentation(PagesImage, PagesLayout, configList)
 
-        if configList[2] == 'True':
-            annotateRead()
-            estimate()
-        else:
-            if configList[6] == 'True':
-                rst2image()
-                ImageWrite()
-            if configList[7] == 'True':
-                rst2json()
-                JsonWrite()
+        if not PagesLayout == None:
+            seg_rst = SemanticSegmentation(PagesImage, PagesLayout, conf)
+
+            if conf.evaluate == True:
+                Anno = annotation()
+                pre, rec, f1 = estimate(seg_rst, Anno)
+                EstimationWrite(pre, rec, f1, fileName, conf.eva_folder)
+            else:
+                if conf.save_image == True:
+                    ImageList = rst2image(seg_rst, PagesImage)
+                    ImageWrite(ImageList, fileName, conf.img_folder)
+                if conf.save_text == True:
+                    jsonFile = rst2json(seg_rst)
+                    JsonWrite(jsonFile, fileName, conf.json_folder)
 
         c = str(input())
         if c == 'q':
+            import sys
             sys.exit()
 
     logger.info("All file processed")

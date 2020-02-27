@@ -6,12 +6,18 @@ import cv2
 class PageVisualize():
     def __init__(self, Image, Layout):
         self.Image = Image
-        self.IMG_SIZE = Image.shape
+        self.Layout = Layout
         self.LayoutHeight = Layout.height
-        self.LayoutWidth  = Layout.width
-        self.liRatio = [self.LayoutWidth / self.IMG_SIZE[1], self.LayoutHeight / self.IMG_SIZE[0]]
+
+    def coordinateChange(self):
+        ImageSize = self.Image.shape
+        LayoutWidth = self.Layout.width
+        LayoutHeight = self.Layout.height
+        self.liRatio = [LayoutWidth / ImageSize[1], LayoutHeight / ImageSize[0]]
 
     def annotate(self, LTType, LTBBoxes):
+        self.coordinateChange()
+
         if LTType == LTTableNote or LTType == LTFigureNote:
             ImageBBoxes = self.NoteBBoxes(LTBBoxes)
         else:

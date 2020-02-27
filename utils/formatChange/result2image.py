@@ -1,3 +1,4 @@
 
-def rst2image(semseg):
-    pass
+def rst2image(semseg, PagesImage):
+
+    return PagesImage
