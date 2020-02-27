@@ -35,7 +35,7 @@ class TextExtraction():
                 Title, titleIndex = TitleExtraction(PageLayout)
                 Author = AuthorExtraction(PageLayout, titleIndex)
                 self.Title.append(Title)
-                self.Author.append(Author)
+                self.Author.append(Author) 
 
             Figure, FigNote, FileFNoteType = FigureNoteExtraction(PageLayout, FileFNoteType)
             TabNote, FileTNoteType = TableNoteExtraction(PageLayout, FileTNoteType)
