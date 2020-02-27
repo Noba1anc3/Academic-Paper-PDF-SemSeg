@@ -1,6 +1,5 @@
 
-from pdfminer.layout import *
-from semseg.text.tools import overlap
+from semseg.text.subExtract.tools import *
 
 def FigNoteTypeCheck(FileFNoteType, FigNoteType):
     if len(FileFNoteType) == 0:

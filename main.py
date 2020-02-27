@@ -28,7 +28,7 @@ if __name__ == '__main__':
         PagesLayout = pdf2layout(filePath)
 
         if not PagesLayout == None:
-            seg_rst = SemanticSegmentation(PagesImage, PagesLayout, conf)
+            seg_rst = SemanticSegmentation(conf, PagesImage, PagesLayout)
 
             if conf.evaluate == True:
                 Anno = annotation()

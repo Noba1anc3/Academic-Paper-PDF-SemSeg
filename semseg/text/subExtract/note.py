@@ -1,4 +1,4 @@
-from semseg.text.tools import *
+from semseg.text.subExtract.tools import *
 from pdfminer.layout import *
 
 def NoteExtraction(PageLayout, PageType):
