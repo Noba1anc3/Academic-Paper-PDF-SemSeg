@@ -1,12 +1,13 @@
-from semseg.text.subExtract.image_note import FigureNoteExtraction
-from semseg.text.subExtract.table_note import TableNoteExtraction
-from semseg.text.subExtract.author import AuthorExtraction
-from semseg.text.subExtract.title import TitleExtraction
-from semseg.text.subExtract.note import *
-from semseg.text.subExtract.tools import *
+from semseg.text.level_1.Leve1Extraction import Leve1Extraction
+from semseg.text.level_2.image_note import FigureNoteExtraction
+from semseg.text.level_2.table_note import TableNoteExtraction
+from semseg.text.level_2.author import AuthorExtraction
+from semseg.text.level_2.title import TitleExtraction
+from semseg.text.level_2.note import *
+from semseg.text.level_2.tools import *
 
 class TextExtraction():
-    def __init__(self, TextLevel, PagesImage, PagesLayout):
+    def __init__(self, TextLevel, PagesLayout):
         self.Text = []
         self.Title = []
         self.Author = []
@@ -16,7 +17,6 @@ class TextExtraction():
         self.TableNote = []
 
         self.TextLevel = TextLevel
-        self.PagesImage = PagesImage
         self.PagesLayout = PagesLayout
         self.Segmentation()
 
@@ -25,22 +25,29 @@ class TextExtraction():
         FileTNoteType = []
         PageType = half_full_judge(self.PagesLayout[0])
 
-        for PageNo in range(len(self.PagesImage)):
+        for PageNo in range(len(self.PagesLayout)):
             PageLayout = self.PagesLayout[PageNo]
 
-            Page, Note = NoteExtraction(PageLayout, PageType)
-            self.Page.append(Page)
-            self.Note.append(Note)
-            if PageNo == 0:
-                Title, titleIndex = TitleExtraction(PageLayout)
-                Author = AuthorExtraction(PageLayout, titleIndex)
-                self.Title.append(Title)
-                self.Author.append(Author) 
+            if self.TextLevel == 1:
+                Text = Leve1Extraction(PageLayout)
+                self.Text.append(Text)
+            else:
+                Page, Note = NoteExtraction(PageLayout, PageType)
+                FigNote, FileFNoteType = FigureNoteExtraction(PageLayout, FileFNoteType)
+                TabNote, FileTNoteType = TableNoteExtraction(PageLayout, FileTNoteType)
 
-            Figure, FigNote, FileFNoteType = FigureNoteExtraction(PageLayout, FileFNoteType)
-            TabNote, FileTNoteType = TableNoteExtraction(PageLayout, FileTNoteType)
-            self.FigureNote.append(FigNote)
-            self.TableNote.append(TabNote)
-            self.Title.append([])
-            self.Author.append([])
+                if PageNo == 0:
+                    Title, titleIndex = TitleExtraction(PageLayout)
+                    Author = AuthorExtraction(PageLayout, titleIndex)
+                    self.Title.append(Title)
+                    self.Author.append(Author)
+                else:
+                    self.Title.append([])
+                    self.Author.append([])
+
+                self.Page.append(Page)
+                self.Note.append(Note)
+                self.FigureNote.append(FigNote)
+                self.TableNote.append(TabNote)
+
 

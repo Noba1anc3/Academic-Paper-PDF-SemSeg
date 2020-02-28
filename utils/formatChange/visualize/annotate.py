@@ -30,7 +30,6 @@ class PageVisualize():
         size = (int(height * 0.8), int(width * 1.2))
         PageImage = cv2.resize(self.Image, size)
         cv2.imshow('img', PageImage)
-        cv2.waitKey(0)
 
     def NoteBBoxes(self, LTBBoxes):
         # 针对图注类型特殊处理的计算其BBoxes的方法，其中BBoxList的每一项为一个列表
@@ -134,6 +133,9 @@ class PageVisualize():
         elif LTType == LTTableNote:            #darkcyan
             color = (139, 139, 0)
             typeText = 'TableNote'
+        elif LTType == LTText:
+            color = (148, 238, 78)             #seagreen
+            typeText = 'Text'
 
         if LTType == LTFigureNote or LTType == LTTableNote:
             for Box in Boxes:

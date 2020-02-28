@@ -1,5 +1,5 @@
 
-from semseg.text.subExtract.tools import *
+from semseg.text.level_2.tools import *
 
 def FigNoteTypeCheck(FileFNoteType, FigNoteType):
     if len(FileFNoteType) == 0:
@@ -138,4 +138,4 @@ def FigureNoteExtraction(PageLayout, FileFNoteType):
                                             FigureNote.append(AggFigNote)
                                             FileFNoteType = FNoteType.copy()
 
-    return Figure, FigureNote, FileFNoteType
+    return FigureNote, FileFNoteType

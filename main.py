@@ -36,16 +36,16 @@ if __name__ == '__main__':
                 EstimationWrite(pre, rec, f1, fileName, conf.eva_folder)
 
             if conf.save_image == True:
-                ImageList = rst2image(seg_rst, PagesImage, PagesLayout)
+                ImageList = rst2image(conf, seg_rst, PagesImage, PagesLayout)
                 ImageWrite(ImageList, fileName, conf.img_folder)
 
             if conf.save_text == True:
                 jsonFile = rst2json(seg_rst)
                 JsonWrite(jsonFile, fileName, conf.json_folder)
 
-        # c = str(input())
-        # if c == 'q':
-        #     import sys
-        #     sys.exit()
+        c = str(input())
+        if c == 'q':
+            import sys
+            sys.exit()
 
     logger.info("All file processed")
