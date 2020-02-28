@@ -1,3 +1,4 @@
+from utils.logging.syslog import *
 from utils.readWrite.read import *
 from utils.readWrite.write import *
 
@@ -13,6 +14,7 @@ from logzero import logger
 
 if __name__ == '__main__':
     conf = Configuration()
+    syslog()
 
     for index in range(len(conf.fileList)):
         fileName = conf.fileList[index]
