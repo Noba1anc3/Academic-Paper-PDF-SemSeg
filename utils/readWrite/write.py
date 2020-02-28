@@ -1,4 +1,5 @@
 import cv2
+
 def ImageWrite(ImageList, fileName, fileFolder):
     for index in range(len(ImageList)):
         Image = ImageList[index]
