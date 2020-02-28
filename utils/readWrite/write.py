@@ -1,5 +1,9 @@
-def ImageWrite(Image, fileName, fileFolder):
-    pass
+import cv2
+def ImageWrite(ImageList, fileName, fileFolder):
+    for index in range(len(ImageList)):
+        Image = ImageList[index]
+        imgName = fileName[:-4] + '_' + str(index) + '.jpg'
+        cv2.imwrite(fileFolder + imgName, Image)
 
 def JsonWrite(JsonFile, fileName, fileFolder):
     pass

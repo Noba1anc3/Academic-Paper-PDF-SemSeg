@@ -5,6 +5,7 @@ def rst2image(conf, semseg, PagesImage, PagesLayout):
     TIT = conf.tit_choice
     TextLevel = conf.text_level
     TableLevel = conf.table_level
+    ImageList = []
 
     if TIT == 0 or TIT == 1:
         if TextLevel == 1:
@@ -54,8 +55,9 @@ def rst2image(conf, semseg, PagesImage, PagesLayout):
                 pass
 
         PageVisualize.show(PV)
+        ImageList.append(PV.Image)
 
-        if index < len(PagesImage) - 1:
-            cv2.waitKey(0)
+        # if index < len(PagesImage) - 1:
+        #     cv2.waitKey(0)
 
-    return PagesImage
+    return ImageList
