@@ -4,29 +4,28 @@ from pdfminer.pdfparser import PDFParser, PDFDocument
 from pdfminer.converter import PDFPageAggregator
 from pdfminer.layout import *
 
+from utils.logging.syslog import Logger
 from binascii import b2a_hex
 import os
 
 def with_pdf (pdf_doc, pdf_pwd, fn, *args):
     result = None
-    try:
-        fp = open(pdf_doc, 'rb')
-        # create a parser object associated with the file object
-        parser = PDFParser(fp)
-        # create a PDFDocument object that stores the document structure
-        doc = PDFDocument()
-        # connect the parser and document objects
-        parser.set_document(doc)
-        doc.set_parser(parser)
-        # supply the password for initialization
-        doc.initialize(pdf_pwd)
-        if doc.is_extractable:
-            # apply the function and return the result
-            result = fn(doc, *args)
-        # close the pdf file
-        fp.close()
-    except Exception:
-        print("pdfminer Error:", Exception.mro())
+
+    fp = open(pdf_doc, 'rb')
+    # create a parser object associated with the file object
+    parser = PDFParser(fp)
+    # create a PDFDocument object that stores the document structure
+    doc = PDFDocument()
+    # connect the parser and document objects
+    parser.set_document(doc)
+    doc.set_parser(parser)
+    # supply the password for initialization
+    doc.initialize(pdf_pwd)
+    if doc.is_extractable:
+        # apply the function and return the result
+        result = fn(doc, *args)
+    # close the pdf file
+    fp.close()
 
     return result
 
@@ -113,5 +112,13 @@ def write_file (folder, filename, filedata, flags='w'):
     return result
 
 def pdf2layout(fileName):
-    PagesLayout = with_pdf(fileName, '', _parse_pages, *tuple(['/tmp']))
-    return PagesLayout
+    logging = Logger(__name__)
+    try:
+        PagesLayout = with_pdf(fileName, '', _parse_pages, *tuple(['/tmp']))
+        Logger.get_log(logging).info('pdf2xml Completed')
+        logging.logger.handlers.clear()
+        return PagesLayout
+    except Exception:
+        Logger.get_log(logging).critical('pdf2xml failed\n')
+
+        return None

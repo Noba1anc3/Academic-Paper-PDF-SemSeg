@@ -2,6 +2,8 @@ from semseg.text.textExtraction import TextExtraction
 from semseg.image.imageExtraction import ImageExtraction
 from semseg.table.tableExtraction import TableExtraction
 
+from utils.logging.syslog import Logger
+
 class SemanticSegmentation():
     def __init__(self, conf, PagesImage, PagesLayout):
         self.configList = conf
@@ -10,6 +12,10 @@ class SemanticSegmentation():
         self.Segmentation()
 
     def Segmentation(self):
+        logging = Logger(__name__)
+        Logger.get_log(logging).info('Segmentation Start\n')
+        logging.logger.handlers.clear()
+
         TextLevel = self.configList.text_level
         TableLevel = self.configList.table_level
 

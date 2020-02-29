@@ -1,9 +1,13 @@
 import os
 from configparser import ConfigParser
+from utils.logging.syslog import Logger
 
 class Configuration():
     def __init__(self):
+        logging = Logger(__name__)
+        Logger.get_log(logging).info('Start processing ConfigFile')
         self.config()
+        Logger.get_log(logging).info('ConfigFile Processed\n')
 
     def config(self):
         cp = ConfigParser()
