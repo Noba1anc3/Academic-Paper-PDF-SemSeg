@@ -9,6 +9,7 @@ class SemanticSegmentation():
         self.configList = conf
         self.PagesImage = PagesImage
         self.PagesLayout = PagesLayout
+        self.Page = len(PagesImage)
         self.Segmentation()
 
     def Segmentation(self):

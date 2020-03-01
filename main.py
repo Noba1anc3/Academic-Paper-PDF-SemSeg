@@ -29,19 +29,19 @@ if __name__ == '__main__':
         PagesLayout = pdf2layout(filePath)
 
         if not PagesLayout == None:
-            seg_rst = SemanticSegmentation(conf, PagesImage, PagesLayout)
+            semseg = SemanticSegmentation(conf, PagesImage, PagesLayout)
 
             if conf.evaluate == True:
                 Anno = annotation()
-                pre, rec, f1 = estimate(seg_rst, Anno)
+                pre, rec, f1 = estimate(semseg, Anno)
                 EstimationWrite(pre, rec, f1, fileName, conf.eva_folder)
 
             if conf.save_image == True:
-                ImageList = rst2image(conf, seg_rst, PagesImage, PagesLayout)
+                ImageList = rst2image(conf, semseg, PagesImage, PagesLayout)
                 ImageWrite(ImageList, fileName, conf.img_folder)
 
             if conf.save_text == True:
-                jsonFile = rst2json(seg_rst)
+                jsonFile = rst2json(conf, fileName, semseg, PagesImage, PagesLayout)
                 JsonWrite(jsonFile, fileName, conf.json_folder)
 
         c = str(input())
