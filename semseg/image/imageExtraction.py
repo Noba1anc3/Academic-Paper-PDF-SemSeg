@@ -1,4 +1,5 @@
 from semseg.image.image import ImgExtraction
+from utils.logging.syslog import Logger
 
 class ImageExtraction():
     def __init__(self, PagesLayout):
@@ -11,3 +12,8 @@ class ImageExtraction():
             PageLayout = self.PagesLayout[PageNo]
             Image = ImgExtraction(PageLayout)
             self.Image.append(Image)
+
+
+        logging = Logger(__name__)
+        Logger.get_log(logging).info('Image Segmentation Finished')
+        logging.logger.handlers.clear()

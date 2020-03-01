@@ -13,8 +13,7 @@ class SemanticSegmentation():
 
     def Segmentation(self):
         logging = Logger(__name__)
-        Logger.get_log(logging).info('Segmentation Start\n')
-        logging.logger.handlers.clear()
+        Logger.get_log(logging).info('Segmentation Start')
 
         TextLevel = self.configList.text_level
         TableLevel = self.configList.table_level
@@ -32,3 +31,6 @@ class SemanticSegmentation():
 
         else:
             self.Table = TableExtraction(TableLevel, self.PagesLayout)
+
+        Logger.get_log(logging).info('Segmentation Finished\n')
+        logging.logger.handlers.clear()

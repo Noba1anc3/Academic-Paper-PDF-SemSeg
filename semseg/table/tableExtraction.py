@@ -1,3 +1,4 @@
+from utils.logging.syslog import Logger
 
 class TableExtraction():
     def __init__(self, TableLevel, PagesLayout):
@@ -7,4 +8,7 @@ class TableExtraction():
         self.Segmentation()
 
     def Segmentation(self):
-        pass
+
+        logging = Logger(__name__)
+        Logger.get_log(logging).info('Table Segmentation Finished')
+        logging.logger.handlers.clear()

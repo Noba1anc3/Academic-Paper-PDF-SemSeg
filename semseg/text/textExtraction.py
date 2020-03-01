@@ -5,6 +5,7 @@ from semseg.text.level_2.author import AuthorExtraction
 from semseg.text.level_2.title import TitleExtraction
 from semseg.text.level_2.note import *
 from semseg.text.level_2.tools import *
+from utils.logging.syslog import Logger
 
 class TextExtraction():
     def __init__(self, TextLevel, PagesLayout):
@@ -50,4 +51,6 @@ class TextExtraction():
                 self.FigureNote.append(FigNote)
                 self.TableNote.append(TabNote)
 
-
+        logging = Logger(__name__)
+        Logger.get_log(logging).info('Text Segmentation Finished')
+        logging.logger.handlers.clear()
