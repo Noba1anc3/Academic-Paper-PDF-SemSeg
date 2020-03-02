@@ -12,3 +12,6 @@ class TableExtraction():
         logging = Logger(__name__)
         Logger.get_log(logging).info('Table Segmentation Finished')
         logging.logger.handlers.clear()
+
+    def test(self):
+        pass
