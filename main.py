@@ -49,4 +49,4 @@ if __name__ == '__main__':
             import sys
             sys.exit()
 
-    logger.info("All file processed")
+    Logger.get_log(logging).info("All file processed")

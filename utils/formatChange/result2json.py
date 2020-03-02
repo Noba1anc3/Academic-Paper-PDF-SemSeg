@@ -1,5 +1,5 @@
 import json
-from utils.formatChange.visualize.annotate import PageVisualize
+from utils.formatChange.coordinateChange import *
 
 def rst2json(conf, fileName, semseg, PagesImage, PagesLayout):
     TIT = conf.tit_choice
@@ -38,7 +38,9 @@ def rst2json(conf, fileName, semseg, PagesImage, PagesLayout):
         pass
 
     for page in range(semseg.Page):
-        PV = PageVisualize(PagesImage[page], PagesLayout[page])
+        Image = PagesImage[page]
+        Layout = PagesLayout[page]
+
         LTPage = {}
         LTPage['PageNo'] = page + 1
         LTPage['PageLayout'] = []
@@ -62,28 +64,31 @@ def rst2json(conf, fileName, semseg, PagesImage, PagesLayout):
             else:
                 if not Title[page] == []:
                     TitleItem = Title[page][0]
-                    Text = L2Text('Title', TitleItem, PV)
-                    PageLayout['Text'].append(Text)
+                    TitleJson = L2Text(Image, Layout, 'Title', TitleItem)
+                    PageLayout['Text'].append(TitleJson)
                 if not Author[page] == []:
                     AuthorItem = Author[page][0]
-                    Text = L2Text('Author', AuthorItem, PV)
-                    PageLayout['Text'].append(Text)
+                    AuthorJson = L2Text(Image, Layout, 'Author', AuthorItem)
+                    PageLayout['Text'].append(AuthorJson)
                 if not Page[page] == []:
                     PageItem = Page[page][0]
-                    Text = L2Text('Page', PageItem, PV)
-                    PageLayout['Text'].append(Text)
+                    PageJson = L2Text(Image, Layout, 'Page', PageItem)
+                    PageLayout['Text'].append(PageJson)
                 if not Note[page] == []:
                     NoteItem = Note[page][0]
-                    Text = L2Text('Note', NoteItem, PV)
-                    PageLayout['Text'].append(Text)
-                # if not FigureNote[page] == []:
-                #     FigureNote = FigureNote[page][0]
-                #     Text = L2FTNote('FigureNote', FigureNote)
-                #     PageLayout['Text'].append(Text)
-                # if not TableNote[page] == []:
-                #     TableNote = FigureNote[page][0]
-                #     Text = L2FTNote('TableNote', TableNote)
-                #     PageLayout['Text'].append(Text)
+                    NoteJson = L2Text(Image, Layout, 'Note', NoteItem)
+                    PageLayout['Text'].append(NoteJson)
+                if not FigureNote[page] == []:
+                    FigureNoteItem = FigureNote[page]
+                    FigureNoteJsonList = L2FTNote(Image, Layout, 'FigureNote', FigureNoteItem)
+                    for FigureNoteJson in FigureNoteJsonList:
+                        PageLayout['Text'].append(FigureNoteJson)
+                if not TableNote[page] == []:
+                    TableNoteItem = TableNote[page]
+                    TableNoteJsonList = L2FTNote(Image, Layout, 'TableNote', TableNoteItem)
+                    for TableNoteJson in TableNoteJsonList:
+                        PageLayout['Text'].append(TableNoteJson)
+
         if 'Image' in PageLayout.keys():
             pass
 
@@ -99,30 +104,45 @@ def rst2json(conf, fileName, semseg, PagesImage, PagesLayout):
 
     return JsonDict
 
-def L2Text(LTType, item, PV):
-    PV.coordinateChange()
-    XleftUp = int(item.x0 / PV.liRatio[0])
-    YleftUp = int((PV.LayoutHeight - item.y1) / PV.liRatio[1])
-    XrightDown = int(item.x1 / PV.liRatio[0])
-    YrightDown = int((PV.LayoutHeight - item.y0) / PV.liRatio[1])
+def L2Text(PageImage, PageLayout, LTType, item):
+    BBoxesList = getBBoxes(PageImage, PageLayout, item)
 
     Text = {}
-
     Text['SemanticType'] = LTType
-    Text['content'] = item.get_text()
-    Text['location'] = [XleftUp, YleftUp, XrightDown, YrightDown]
+    Text['content'] = item.get_text().replace("\n", " ")[:-1]
+    Text['location'] = BBoxesList[0]
     Text['TextLines'] = []
 
-    for line in item._objs:
+    for index in range(len(item._objs)):
+        line = item._objs[index]
         TextLine = {}
-        TextLine['content'] = line.get_text()[:-2]
-        TextLine['location'] = [int(line.x0), int(line.y0), int(line.x1), int(line.y1)]
+        TextLine['content'] = line.get_text()[:-1]
+        TextLine['location'] = [BBoxesList[index+1]]
         Text['TextLines'].append(TextLine)
 
     return Text
 
-# def L2FTNote(LTType, FTNote):
-#     Text = {}
-#     Text['SemanticType'] = LTType
-#
-#     for Line in FTNote:
+def L2FTNote(PageImage, PageLayout, LTType, FTNotes):
+    BBoxesList = NoteBBoxes(PageImage, PageLayout, FTNotes)
+    TextBlock = []
+
+    for index in range(len(FTNotes)):
+        FTNote = FTNotes[index]
+        Text = {}
+        Text['SemanticType'] = LTType
+        Text['location'] = BBoxesList[index][0]
+        content = ''
+        for FTNoteLine in FTNote:
+            content += FTNoteLine.get_text().replace("\n", " ")
+        Text['content'] = content[:-1]
+        Text['TextLines'] = []
+        for LineIndex in range(len(FTNote)):
+            FTNoteLine = FTNote[LineIndex]
+            TextLine = {}
+            TextLine['content'] = FTNoteLine.get_text()[:-1]
+            TextLine['location'] = BBoxesList[index][LineIndex+1]
+            Text['TextLines'].append(TextLine)
+
+        TextBlock.append(Text)
+
+    return TextBlock

@@ -1,5 +1,5 @@
-from pdfminer.layout import *
 from utils.formatChange.visualize.Layout import *
+from utils.formatChange.coordinateChange import *
 
 import cv2
 
@@ -7,21 +7,12 @@ class PageVisualize():
     def __init__(self, Image, Layout):
         self.Image = Image
         self.Layout = Layout
-        self.LayoutHeight = Layout.height
-
-    def coordinateChange(self):
-        ImageSize = self.Image.shape
-        LayoutWidth = self.Layout.width
-        LayoutHeight = self.Layout.height
-        self.liRatio = [LayoutWidth / ImageSize[1], LayoutHeight / ImageSize[0]]
 
     def annotate(self, LTType, LTBBoxes):
-        self.coordinateChange()
-
         if LTType == LTTableNote or LTType == LTFigureNote:
-            ImageBBoxes = self.NoteBBoxes(LTBBoxes)
+            ImageBBoxes = NoteBBoxes(self.Image, self.Layout, LTBBoxes)
         else:
-            ImageBBoxes = self.getBBoxes(LTBBoxes)
+            ImageBBoxes = getBBoxes(self.Image, self.Layout, LTBBoxes)
 
         self.drawBox(LTType, ImageBBoxes)
 
@@ -30,80 +21,7 @@ class PageVisualize():
         size = (int(height * 0.8), int(width * 1.2))
         PageImage = cv2.resize(self.Image, size)
         cv2.imshow('img', PageImage)
-
-    def NoteBBoxes(self, LTBBoxes):
-        # 针对图注类型特殊处理的计算其BBoxes的方法，其中BBoxList的每一项为一个列表
-        # 每一个列表都是一个图注，列表内部由若干个LTTextLineHorizontal组成
-        BBoxes = []
-        for index in range(len(LTBBoxes)):
-            Block = LTBBoxes[index]
-            SafeCheck = False
-            BBoxes.append([])
-            for Line in Block:
-                XleftUp = int(Line.x0 / self.liRatio[0])
-                YleftUp = int((self.LayoutHeight - Line.y1) / self.liRatio[1])
-                XrightDown = int(Line.x1 / self.liRatio[0])
-                YrightDown = int((self.LayoutHeight - Line.y0) / self.liRatio[1])
-
-                if SafeCheck:
-                    # 该目的为确定出所有LTTextBoxHorizontal所组成的大区域并置为该方法返回的BBoxes的第一项
-                    if XleftUp < BBoxes[index][0][0]:
-                        BBoxes[index][0][0] = XleftUp
-                    if YleftUp < BBoxes[index][0][1]:
-                        BBoxes[index][0][1] = YleftUp
-                    if XrightDown > BBoxes[index][0][2]:
-                        BBoxes[index][0][2] = XrightDown
-                    if YrightDown > BBoxes[index][0][3]:
-                        BBoxes[index][0][3] = YrightDown
-                else:
-                    SafeCheck = True
-                    BBoxes[index].append([XleftUp, YleftUp, XrightDown, YrightDown])
-
-                BBoxes[index].append([XleftUp, YleftUp, XrightDown, YrightDown])
-
-        return BBoxes
-
-    def getBBoxes(self, LTBBoxes):
-        # 根据Layout的高度和liRatio将从Layout提取出来的坐标转换为Image上的坐标
-        # 传入进来的BBoxList或者由若干个LTTextBoxHorizontal组成，或者由若干个LTTextLineHorizontal组成
-        # 该方法根据从Layout中提取出来的BBoxList生成用于标注图片的BBoxes列表并返回
-
-        BBoxes = []
-        SafeCheck = False
-
-        for BBox in LTBBoxes:
-            # 由于pdfminer的内部问题，Layout.Height - Box.y1才是该Box正确的左上角纵坐标
-            # 同理Box正确的右下角纵坐标为Layout.Height - Box.y0
-            XleftUp = int(BBox.x0 / self.liRatio[0])
-            YleftUp = int((self.LayoutHeight - BBox.y1) / self.liRatio[1])
-            XrightDown = int(BBox.x1 / self.liRatio[0])
-            YrightDown = int((self.LayoutHeight - BBox.y0) / self.liRatio[1])
-
-            if SafeCheck:
-                # 该目的为确定出所有LTTextBoxHorizontal所组成的大区域并置为该方法返回的BBoxes的第一项
-                if XleftUp < BBoxes[0][0]:
-                    BBoxes[0][0] = XleftUp
-                if YleftUp < BBoxes[0][1]:
-                    BBoxes[0][1] = YleftUp
-                if XrightDown > BBoxes[0][2]:
-                    BBoxes[0][2] = XrightDown
-                if YrightDown > BBoxes[0][3]:
-                    BBoxes[0][3] = YrightDown
-            else:
-                SafeCheck = True
-                BBoxes.append([XleftUp, YleftUp, XrightDown, YrightDown])
-
-            if isinstance(BBox, LTTextBoxHorizontal):
-                for Item in BBox:
-                    XleftUp = int(Item.x0 / self.liRatio[0])
-                    YleftUp = int((self.LayoutHeight- Item.y1) / self.liRatio[1])
-                    XrightDown = int(Item.x1 / self.liRatio[0])
-                    YrightDown = int((self.LayoutHeight - Item.y0) / self.liRatio[1])
-                    BBoxes.append([XleftUp, YleftUp, XrightDown, YrightDown])
-            else:
-                BBoxes.append([XleftUp, YleftUp, XrightDown, YrightDown])
-
-        return BBoxes
+        cv2.waitKey(0)
 
     def drawBox(self, LTType, Boxes):
         #在image图像上根据LTType绘制相应颜色的检测框，并在左上角附上其所属的类型
