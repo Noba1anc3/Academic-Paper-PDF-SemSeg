@@ -1,5 +1,7 @@
-
+import sys
 from pdfminer.layout import *
+
+sys.dont_write_bytecode = True
 
 def TableNoteTypeCheck(FileTNoteType, TableNoteType):
     if len(FileTNoteType) == 0:

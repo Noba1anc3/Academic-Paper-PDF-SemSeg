@@ -1,5 +1,7 @@
 from semseg.image.image import ImgExtraction
 from utils.logging.syslog import Logger
+import sys
+sys.dont_write_bytecode = True
 
 class ImageExtraction():
     def __init__(self, PagesLayout):

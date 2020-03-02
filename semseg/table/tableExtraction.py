@@ -1,4 +1,6 @@
 from utils.logging.syslog import Logger
+import sys
+sys.dont_write_bytecode = True
 
 class TableExtraction():
     def __init__(self, TableLevel, PagesLayout):

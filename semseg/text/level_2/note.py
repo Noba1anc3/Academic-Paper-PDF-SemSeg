@@ -1,6 +1,9 @@
 from semseg.text.level_2.tools import *
 from pdfminer.layout import *
 
+import sys
+sys.dont_write_bytecode = True
+
 def NoteExtraction(PageLayout, PageType):
     widthCheck = True
     PageHeight = PageLayout.height

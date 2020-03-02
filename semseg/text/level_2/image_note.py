@@ -1,5 +1,7 @@
-
+import sys
 from semseg.text.level_2.tools import *
+
+sys.dont_write_bytecode = True
 
 def FigNoteTypeCheck(FileFNoteType, FigNoteType):
     if len(FileFNoteType) == 0:

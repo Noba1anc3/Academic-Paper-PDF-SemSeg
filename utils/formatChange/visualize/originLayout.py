@@ -1,5 +1,8 @@
 from pdfminer.layout import *
 import cv2
+import sys
+
+sys.dont_write_bytecode = True
 
 def add_box(image, LTType, item_boxes, li_ratio_h, li_ratio_w):
     if LTType == LTTextBoxHorizontal:      #red

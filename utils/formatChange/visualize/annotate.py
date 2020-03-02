@@ -2,6 +2,9 @@ from utils.formatChange.visualize.Layout import *
 from utils.formatChange.coordinateChange import *
 
 import cv2
+import sys
+
+sys.dont_write_bytecode = True
 
 class PageVisualize():
     def __init__(self, Image, Layout):

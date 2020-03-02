@@ -7,6 +7,9 @@ from semseg.text.level_2.note import *
 from semseg.text.level_2.tools import *
 from utils.logging.syslog import Logger
 
+import sys
+sys.dont_write_bytecode = True
+
 class TextExtraction():
     def __init__(self, TextLevel, PagesLayout):
         self.Text = []
