@@ -21,7 +21,7 @@ class PageVisualize():
         size = (int(height * 0.8), int(width * 1.2))
         PageImage = cv2.resize(self.Image, size)
         cv2.imshow('img', PageImage)
-        cv2.waitKey(0)
+        #cv2.waitKey(0)
 
     def drawBox(self, LTType, Boxes):
         #在image图像上根据LTType绘制相应颜色的检测框，并在左上角附上其所属的类型

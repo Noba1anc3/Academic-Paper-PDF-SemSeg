@@ -1,4 +1,4 @@
-import json
+
 from utils.formatChange.coordinateChange import *
 
 def rst2json(conf, fileName, semseg, PagesImage, PagesLayout):
@@ -99,8 +99,6 @@ def rst2json(conf, fileName, semseg, PagesImage, PagesLayout):
 
         LTPage['PageLayout'].append(PageLayout)
         JsonDict['Pages'].append(LTPage)
-
-    print(JsonDict)
 
     return JsonDict
 

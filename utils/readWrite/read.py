@@ -7,7 +7,7 @@ class Configuration():
         logging = Logger(__name__)
         Logger.get_log(logging).info('Start processing ConfigFile')
         self.config()
-        Logger.get_log(logging).info('ConfigFile Processed\n')
+        Logger.get_log(logging).info('ConfigFile Processed')
 
     def config(self):
         cp = ConfigParser()

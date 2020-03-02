@@ -33,5 +33,5 @@ class SemanticSegmentation():
         else:
             self.Table = TableExtraction(TableLevel, self.PagesLayout)
 
-        Logger.get_log(logging).info('Segmentation Finished\n')
+        Logger.get_log(logging).info('Segmentation Finished')
         logging.logger.handlers.clear()

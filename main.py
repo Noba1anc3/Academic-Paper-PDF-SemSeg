@@ -44,6 +44,8 @@ if __name__ == '__main__':
                 jsonFile = rst2json(conf, fileName, semseg, PagesImage, PagesLayout)
                 JsonWrite(jsonFile, fileName, conf.json_folder)
 
+            Logger.get_log(logging).info("File - {} Processed\n".format(fileName))
+
         c = str(input())
         if c == 'q':
             import sys
