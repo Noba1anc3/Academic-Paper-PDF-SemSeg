@@ -15,7 +15,7 @@ def ImageWrite(ImageList, fileName, fileFolder):
 
     for index in range(len(ImageList)):
         Image = ImageList[index]
-        imgName = fileName[:-4] + '_' + str(index) + '.jpg'
+        imgName = fileName[:-4] + '_p' + str(index+1) + '.jpg'
         cv2.imwrite(imgFolder + imgName, Image)
 
     logging = Logger(__name__)

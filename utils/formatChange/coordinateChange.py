@@ -22,6 +22,7 @@ def NoteBBoxes(Image, Layout, LTBBoxes):
     # 每一个列表都是一个图注，列表内部由若干个LTTextLineHorizontal组成
 
     BBoxes = []
+
     for index in range(len(LTBBoxes)):
         Block = LTBBoxes[index]
         SafeCheck = False

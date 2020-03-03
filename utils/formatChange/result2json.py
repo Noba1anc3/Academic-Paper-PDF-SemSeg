@@ -7,7 +7,7 @@ def rst2json(conf, fileName, semseg, PagesImage, PagesLayout):
     TIT = conf.tit_choice
     TextLevel = conf.text_level
 
-    Text = None
+    L1Text = None
     Title = None
     Author = None
     Page = None
@@ -62,7 +62,10 @@ def rst2json(conf, fileName, semseg, PagesImage, PagesLayout):
             Text = {}
 
             if TextLevel == 1:
-                Text['SemanticType'] = 'L1Text'
+                if not L1Text[page] == []:
+                    TextItem = L1Text[page]
+                    TextJson = L1TexT(Image, Layout, 'L1Text', TextItem)
+                    PageLayout['Text'].append(TextJson)
             else:
                 if not Title[page] == []:
                     TitleItem = Title[page][0]
@@ -104,10 +107,35 @@ def rst2json(conf, fileName, semseg, PagesImage, PagesLayout):
 
     return JsonDict
 
+def L1TexT(PageImage, PageLayout, LTType, L1Text):
+    BBoxesList = NoteBBoxes(PageImage, PageLayout, L1Text)
+    TextBlock = []
+
+    for index in range(len(L1Text)):
+        L1TextBlock = L1Text[index]
+        Text = {}
+
+        Text['SemanticType'] = LTType
+        Text['location'] = BBoxesList[index][0]
+        Text['content'] = L1TextBlock.get_text().replace("\n", " ")[:-1]
+
+        Text['TextLines'] = []
+        for LineIndex in range(len(L1TextBlock)):
+            L1TextLine = L1TextBlock._objs[LineIndex]
+            TextLine = {}
+            TextLine['content'] = L1TextLine.get_text()[:-1]
+            TextLine['location'] = BBoxesList[index][LineIndex+1]
+            Text['TextLines'].append(TextLine)
+
+        TextBlock.append(Text)
+
+    return TextBlock
+
 def L2Text(PageImage, PageLayout, LTType, item):
     BBoxesList = getBBoxes(PageImage, PageLayout, item)
 
     Text = {}
+
     Text['SemanticType'] = LTType
     Text['content'] = item.get_text().replace("\n", " ")[:-1]
     Text['location'] = BBoxesList[0]
