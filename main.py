@@ -27,6 +27,7 @@ if __name__ == '__main__':
             continue
         else:
             Logger.get_log(logging).info('Processing File - {}  ({}/{})'.format(fileName, index+1, len(conf.fileList)))
+
         filePath = conf.folder + fileName
         PagesImage  = pdf2image(filePath)
         PagesLayout = pdf2layout(filePath)

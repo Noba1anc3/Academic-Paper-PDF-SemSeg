@@ -15,7 +15,7 @@ def rst2json(conf, fileName, semseg, PagesImage, PagesLayout):
     FigureNote = None
     TableNote = None
 
-    Image = None
+    Figure = None
     Table = None
 
     JsonDict = {}
@@ -33,9 +33,9 @@ def rst2json(conf, fileName, semseg, PagesImage, PagesLayout):
             FigureNote = semseg.Text.FigureNote
             TableNote = semseg.Text.TableNote
         if TIT == 0:
-            Image = semseg.Image.Image
+            Figure = semseg.Image.Image
     elif TIT == 2:
-        Image = semseg.Image.Image
+        Figure = semseg.Image.Image
     else:
         pass
 
@@ -51,16 +51,14 @@ def rst2json(conf, fileName, semseg, PagesImage, PagesLayout):
         if TIT == 0 or TIT == 1:
             PageLayout['Text'] = []
             if TIT == 0:
-                PageLayout['Image'] = []
+                PageLayout['Figure'] = []
                 PageLayout['Table'] = []
         elif TIT == 2:
-            PageLayout['Image'] = []
+            PageLayout['Figure'] = []
         else:
             PageLayout['Table'] = []
 
         if 'Text' in PageLayout.keys():
-            Text = {}
-
             if TextLevel == 1:
                 if not L1Text[page] == []:
                     TextItem = L1Text[page]
@@ -94,13 +92,12 @@ def rst2json(conf, fileName, semseg, PagesImage, PagesLayout):
                     for TableNoteJson in TableNoteJsonList:
                         PageLayout['Text'].append(TableNoteJson)
 
-        if 'Image' in PageLayout.keys():
-            pass
-
-        if Text == None:
-            pass
-        if not Title == None:
-            pass
+        if 'Figure' in PageLayout.keys():
+            if not Figure[page] == []:
+                FigureItem = Figure[page]
+                FigureJsonList = Fig2Json(Image, Layout, FigureItem)
+                for FigureJson in FigureJsonList:
+                    PageLayout['Figure'].append(FigureJson)
 
         LTPage['PageLayout'].append(PageLayout)
         JsonDict['Pages'].append(LTPage)
@@ -174,3 +171,14 @@ def L2FTNote(PageImage, PageLayout, LTType, FTNotes):
         TextBlock.append(Text)
 
     return TextBlock
+
+def Fig2Json(PageImage, PageLayout, Figure):
+    FigureJsonList = []
+
+    for fig in Figure:
+        Text = {}
+        location = coordinateChange(PageImage, PageLayout, fig)
+        Text["location"] = location
+        FigureJsonList.append(Text)
+
+    return FigureJsonList

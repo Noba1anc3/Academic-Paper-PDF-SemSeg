@@ -2,6 +2,7 @@ import sys
 from pdfminer.layout import *
 
 sys.dont_write_bytecode = True
+
 def coordinateChange(Image, Layout, item):
     ImageSize = Image.shape
     LayoutWidth = Layout.width
