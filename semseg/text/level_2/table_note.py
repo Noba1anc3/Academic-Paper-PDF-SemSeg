@@ -58,7 +58,7 @@ def NoteAggregation(PageHeight, Line, Box):
 
     return AggFigNote
 
-def TableNoteExtraction(PageLayout, FileTNoteType):
+def TableNoteExtraction(PageLayout):
     LineList = []
     TableNote = []
     PageHeight = PageLayout.height
@@ -93,9 +93,8 @@ def TableNoteExtraction(PageLayout, FileTNoteType):
                             TNoteType.append(-1)
                             AggTableNote = NoteAggregation(PageHeight, Line, Box)
                             if LineCheck(AggTableNote, LineList, PageHeight):
-                                if TableNoteTypeCheck(FileTNoteType, TNoteType):
-                                    TableNote.append(AggTableNote)
-                                    FileTNoteType = TNoteType.copy()
+                                TableNote.append(AggTableNote)
+                                FileTNoteType = TNoteType.copy()
                         else:
                             colon = LineText[6:].find(':')
                             point = LineText[6:].find('.')
@@ -137,9 +136,8 @@ def TableNoteExtraction(PageLayout, FileTNoteType):
                                         TNoteType.append(0)
                             AggTableNote = NoteAggregation(PageHeight, Line, Box)
                             if LineCheck(AggTableNote, LineList, PageHeight):
-                                if TableNoteTypeCheck(FileTNoteType, TNoteType):
-                                    TableNote.append(AggTableNote)
-                                    FileTNoteType = TNoteType.copy()
+                                TableNote.append(AggTableNote)
+                                FileTNoteType = TNoteType.copy()
 
 
-    return TableNote, FileTNoteType
+    return TableNote

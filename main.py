@@ -50,9 +50,9 @@ if __name__ == '__main__':
 
             Logger.get_log(logging).info("File - {} Processed\n".format(fileName))
 
-        c = str(input())
-        if c == 'q':
-            import sys
-            sys.exit()
+        # c = str(input())
+        # if c == 'q':
+        #     import sys
+        #     sys.exit()
 
     Logger.get_log(logging).info("All file processed")

@@ -1,38 +1,151 @@
-import sys
 from semseg.text.level_2.tools import *
+from utils.logging.syslog import Logger
+#　同样类型的假图注混迹在其中，一个在文字里，一个在图片下
 
 sys.dont_write_bytecode = True
 
-def FigNoteTypeCheck(FileFNoteType, FigNoteType):
-    if len(FileFNoteType) == 0:
-        return True
-    for index in range(0,3):
-        if not FileFNoteType[index] == FigNoteType[index]:
-            return False
-    return True
+def FigNotePostProcess(FigNoteList):
+    FNoteType = FigNoteTypeCheck(FigNoteList)
 
-def FLRC_Check(figNote, Figure, LRC, PageHeight):
-    LineHeight = figNote.height
-    figNoteUpY = PageHeight - figNote.y1
-    figNotelrX = [figNote.x0, figNote.x1]
+    if not FNoteType == None:
+        for pgNum in range(len(FigNoteList)):
+            PageFigNote = FigNoteList[pgNum]
+            for figNoteIndex in range(len(PageFigNote) - 1, -1, -1):
+                figNote = PageFigNote[figNoteIndex]
+                figNoteText = figNote[0].get_text()[:-1].lower().replace(" ", "")
+                Type = TypeCalculate(figNoteText)
+                if not Type == FNoteType:
+                    PageFigNote.remove(figNote)
 
-    for fig in Figure:
-        figDownY = PageHeight - fig.y0
-        figlrX = [fig.x0, fig.x1]
-        diff = figNoteUpY - figDownY
-        if diff < 5 * LineHeight and diff > 0:
-            if overlap(figNotelrX, figlrX) > 0:
-                return True
+        FNoteList = []
+        for pgNum in range(len(FigNoteList)):
+            FNoteList.append([])
+            PageFigNote = FigNoteList[pgNum]
+            for figNoteIndex in range(len(PageFigNote)):
+                figNote = PageFigNote[figNoteIndex]
+                AggFigNote = NoteAggregation(figNote[2], figNote[0], figNote[1])
+                FNoteList[pgNum].append(AggFigNote)
 
-    for lrc in LRC:
-        lrcDownY = PageHeight - lrc.y0
-        lrclrX = [lrc.x0, lrc.x1]
-        diff = figNoteUpY - lrcDownY
-        if diff < 5 * LineHeight and diff > 0:
-            if overlap(figNotelrX, lrclrX) > 0:
-                return True
+        return FNoteList
+    else:
+        return FigNoteList
 
-    return False
+def FigNoteTypeCheck(FigNoteList):
+    TypeList = []
+    TypeCountList = []
+
+    for pgNum in range(len(FigNoteList)):
+        PageFigNote = FigNoteList[pgNum]
+        for figNoteIndex in range(len(PageFigNote)):
+            figNote = PageFigNote[figNoteIndex]
+            figNoteText = figNote[0].get_text()[:-1].lower().replace(" ", "")
+            Type = TypeCalculate(figNoteText)
+            TypeList.append(Type)
+
+    if not TypeList == []:
+        while True:
+            Type = TypeList[0]
+            TypeCount = TypeList.count(Type)
+            TypeCountList.append([Type, TypeCount])
+            for index in range(len(TypeList) - 1, -1, -1):
+                item = TypeList[index]
+                if item == Type:
+                    TypeList.remove(item)
+            if len(TypeList) == 0:
+                break
+
+        MaxTypeCount = [[None, -1]]
+        for index in range(len(TypeCountList)):
+            TCPair = TypeCountList[index]
+            count = TCPair[1]
+            if count > MaxTypeCount[0][1]:
+                MaxTypeCount[0][0] = TCPair[0]
+                MaxTypeCount[0][1] = count
+
+        for index in range(len(TypeCountList)):
+            TCPair = TypeCountList[index]
+            type = TCPair[0]
+            count = TCPair[1]
+            if count == MaxTypeCount[0][1] and not type == MaxTypeCount[0][0]:
+                MaxTypeCount.append([TCPair[0], count])
+
+        if len(MaxTypeCount) == 2:
+            T1 = MaxTypeCount[0][0]
+            T2 = MaxTypeCount[1][0]
+
+            logging = Logger(__name__)
+            Logger.get_log(logging).critical('Same Type of ImageNote　{} and {}'.format(T1, T2))
+            logging.logger.handlers.clear()
+
+            if T1[0] > T2[0]:
+                return T1
+            elif T1[0] < T2[0]:
+                return T2
+            else:
+                if T1[1] > T2[1]:
+                    return T1
+                elif T1[1] < T2[1]:
+                    return T2
+                else:
+                    if T1[2] > T2[2]:
+                        return T1
+                    elif T1[2] < T2[2]:
+                        return T2
+        else:
+            return MaxTypeCount[0][0]
+    else:
+        logging = Logger(__name__)
+        Logger.get_log(logging).critical('No ImageNote')
+        logging.logger.handlers.clear()
+        return None
+
+def TypeCalculate(figNoteText):
+    # figure1: / figure1. / figure1
+    # fig.1 / fig.1. / fig.1:
+    # figure (1) / fig (0)
+    # with . (1) / without . (0)
+    # : (2) / . (1) / alpha (0)
+
+    Type = ''
+    digitIndex = None
+
+    for char in figNoteText:
+        if char.isdigit():
+            digitIndex = figNoteText.find(char)
+            break
+
+    if not digitIndex == None:
+        if digitIndex == 6 or digitIndex == 7:
+            Type += '1'
+        elif digitIndex == 3 or digitIndex == 4:
+            Type += '0'
+        else:
+            # Error
+            Type += 'E'
+
+        if figNoteText[digitIndex - 1] == '.':
+            Type += '1'
+        elif figNoteText[digitIndex - 1] == 'g' or figNoteText[digitIndex - 1] == 'e':
+            Type += '0'
+        else:
+            # Error
+            Type += 'E'
+
+        if len(figNoteText) > digitIndex + 1:
+            if figNoteText[digitIndex + 1] == ':':
+                Type += '2'
+            elif figNoteText[digitIndex + 1] == '.':
+                Type += '1'
+            elif figNoteText[digitIndex + 1].isalpha():
+                Type += '0'
+            else:
+                Type += 'E'
+        else:
+            Type += 'E'
+    else:
+        Type += 'EEE'
+
+    return Type
 
 def NoteAggregation(PageHeight, Line, Box):
     fNoteLX = Line.x0
@@ -59,85 +172,59 @@ def NoteAggregation(PageHeight, Line, Box):
 
     return AggFigNote
 
-def FigureNoteExtraction(PageLayout, FileFNoteType):
+def FigureNoteExtraction(PageLayout):
     FigureNote = []
-    Figure = []
-    LRC = []  #Line / Rect / Curve
-    LineList = []
-
     PageHeight = PageLayout.height
 
-    for Box in PageLayout:
-        if isinstance(Box, LTFigure):
-            Figure.append(Box)
-        elif isinstance(Box, LTLine):
-            LineList.append(Box)
-            LRC.append(Box)
-        elif isinstance(Box, LTRect) or isinstance(Box, LTCurve):
-            LRC.append(Box)
+    # Figure = []
+    # LRC = []  #Line / Rect / Curve
+    #
+    # for Box in PageLayout:
+    #     if isinstance(Box, LTFigure):
+    #         Figure.append(Box)
+    #     elif isinstance(Box, LTLine):
+    #         LRC.append(Box)
+    #     elif isinstance(Box, LTRect) or isinstance(Box, LTCurve):
+    #         LRC.append(Box)
 
     for Box in PageLayout:
         if isinstance(Box, LTTextBoxHorizontal):
             for Line in Box:
                 LineText = Line.get_text()[:-1].lower().replace(' ', '')
                 figPos = LineText.find('fig')
-                tabPos = LineText.find('table')
                 if figPos == 0:
-                    FNoteType = []
-                    # FNoteType[321]
-                    # 3: figure(1) / fig(0)
-                    # 2: with .(1) / without .(0)
-                    # 1: :(2) / .(1) / alpha(0)
-                    # fig. 1 / fig. 1. / fig. 1:
-                    if len(LineText) > 6:
-                        if LineText[3] == '.' and LineText[4].isdigit():
-                            FNoteType.append(0)
-                            FNoteType.append(1)
-                            colon = LineText[5:7].find(':')
-                            point = LineText[5:7].find('.')
+                    # fig.1 / fig 2
+                    if len(LineText) > 3 and (LineText[3] == '.' or LineText[3].isdigit()):
+                        #if FLRC_Check(Line, Figure, LRC, PageHeight):
+                        FigureNote.append([Line, Box, PageHeight])
+                    else:
+                        # figure 1 / figure. 2
+                        if len(LineText) > 6 and LineText[3:6] == 'ure' and (LineText[6].isdigit() or LineText[6] == '.'):
+                            #if FLRC_Check(Line, Figure, LRC, PageHeight):
+                            FigureNote.append([Line, Box, PageHeight])
 
-                            if colon >= 0 and point < 0:
-                                FNoteType.append(2)
-                            elif colon < 0 and point >= 0:
-                                FNoteType.append(1)
-                            elif colon >= 0 and point >= 0:
-                                if colon < point:
-                                    FNoteType.append(2)
-                                else:
-                                    FNoteType.append(1)
-                            else:
-                                FNoteType.append(0)
+    return FigureNote
 
-                            if FLRC_Check(Line, Figure, LRC, PageHeight):
-                                if FigNoteTypeCheck(FileFNoteType, FNoteType):
-                                    AggFigNote = NoteAggregation(PageHeight, Line, Box)
-                                    FigureNote.append(AggFigNote)
-                                    FileFNoteType = FNoteType.copy()
-                        else:
-                            # figure 1: / figure 5.
-                            if len(LineText) > 8 and LineText[3:6] == 'ure':
-                                if LineText[6].isdigit():
-                                    FNoteType.append(1)
-                                    FNoteType.append(0)
-                                    colon = LineText[7:9].find(':')
-                                    point = LineText[7:9].find('.')
 
-                                    if colon >= 0 and point < 0:
-                                        FNoteType.append(2)
-                                    elif colon < 0 and point >= 0:
-                                        FNoteType.append(1)
-                                    elif colon >= 0 and point >= 0:
-                                        if colon < point:
-                                            FNoteType.append(2)
-                                        else:
-                                            FNoteType.append(1)
-                                    else:
-                                        FNoteType.append(0)
-
-                                    if FLRC_Check(Line, Figure, LRC, PageHeight):
-                                        if FigNoteTypeCheck(FileFNoteType, FNoteType):
-                                            AggFigNote = NoteAggregation(PageHeight, Line, Box)
-                                            FigureNote.append(AggFigNote)
-                                            FileFNoteType = FNoteType.copy()
-
-    return FigureNote, FileFNoteType
+# def FLRC_Check(figNote, Figure, LRC, PageHeight):
+#     LineHeight = figNote.height
+#     figNoteUpY = PageHeight - figNote.y1
+#     figNotelrX = [figNote.x0, figNote.x1]
+#
+#     for fig in Figure:
+#         figDownY = PageHeight - fig.y0
+#         figlrX = [fig.x0, fig.x1]
+#         diff = figNoteUpY - figDownY
+#         if diff < 5 * LineHeight and diff > 0:
+#             if overlap(figNotelrX, figlrX) > 0:
+#                 return True
+#
+#     for lrc in LRC:
+#         lrcDownY = PageHeight - lrc.y0
+#         lrclrX = [lrc.x0, lrc.x1]
+#         diff = figNoteUpY - lrcDownY
+#         if diff < 5 * LineHeight and diff > 0:
+#             if overlap(figNotelrX, lrclrX) > 0:
+#                 return True
+#
+#     return False
