@@ -28,6 +28,12 @@ def FigNotePostProcess(FigNoteList):
 
         return FNoteList
     else:
+        pgNum = len(FigNoteList)
+
+        FigNoteList = []
+        for index in range(pgNum):
+            FigNoteList.append([])
+
         return FigNoteList
 
 def FigNoteTypeCheck(FigNoteList):
@@ -41,6 +47,11 @@ def FigNoteTypeCheck(FigNoteList):
             figNoteText = figNote[0].get_text()[:-1].lower().replace(" ", "")
             Type = TypeCalculate(figNoteText)
             TypeList.append(Type)
+
+    for index in range(len(TypeList) - 1, -1, -1):
+        item = TypeList[index]
+        if item.find('E') >= 0:
+            TypeList.remove(item)
 
     if not TypeList == []:
         while True:
@@ -69,28 +80,18 @@ def FigNoteTypeCheck(FigNoteList):
             if count == MaxTypeCount[0][1] and not type == MaxTypeCount[0][0]:
                 MaxTypeCount.append([TCPair[0], count])
 
-        if len(MaxTypeCount) == 2:
-            T1 = MaxTypeCount[0][0]
-            T2 = MaxTypeCount[1][0]
+        if len(MaxTypeCount) > 1:
+            MaxType = '000'
+            for item in MaxTypeCount:
+                if item[0] > MaxType:
+                    MaxType = item[0]
 
             logging = Logger(__name__)
-            Logger.get_log(logging).critical('Same Type of ImageNote　{} and {}'.format(T1, T2))
+            Logger.get_log(logging).critical('Same Type of ImageNote:　{}'.format(MaxTypeCount))
             logging.logger.handlers.clear()
 
-            if T1[0] > T2[0]:
-                return T1
-            elif T1[0] < T2[0]:
-                return T2
-            else:
-                if T1[1] > T2[1]:
-                    return T1
-                elif T1[1] < T2[1]:
-                    return T2
-                else:
-                    if T1[2] > T2[2]:
-                        return T1
-                    elif T1[2] < T2[2]:
-                        return T2
+            return MaxType
+
         else:
             return MaxTypeCount[0][0]
     else:

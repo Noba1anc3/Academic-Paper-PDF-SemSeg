@@ -1,37 +1,159 @@
+import re
 import sys
 from pdfminer.layout import *
+from utils.logging.syslog import Logger
 
 sys.dont_write_bytecode = True
 
-def TableNoteTypeCheck(FileTNoteType, TableNoteType):
-    if len(FileTNoteType) == 0:
-        return True
-    for index in range(0,2):
-        if not FileTNoteType[index] == TableNoteType[index]:
-            return False
-    return True
+def TabNotePostProcess(TabNoteList):
+    TNoteType = TabNoteTypeCheck(TabNoteList)
 
-def LineCheck(TableNote, Line, PageHeight):
-    LineHeight = TableNote[0].height
-    NoteYTop = PageHeight
-    NoteYDown = 0
+    if not TNoteType == None:
+        for pgNum in range(len(TabNoteList)):
+            PageTabNote = TabNoteList[pgNum]
+            for tabNoteIndex in range(len(PageTabNote) - 1, -1, -1):
+                tabNote = PageTabNote[tabNoteIndex]
+                tabNoteText = tabNote[1].get_text()[:-1].lower()
+                Type = TypeCalculate(tabNoteText)
+                if not Type == TNoteType:
+                    PageTabNote.remove(tabNote)
 
-    for NoteLine in TableNote:
-        YTop = PageHeight - NoteLine.y1
-        YDown = PageHeight - NoteLine.y0
-        if YTop < NoteYTop:
-            NoteYTop = YTop
-        if YDown > NoteYDown:
-            NoteYDown = YDown
+        TNoteList = []
+        for pgNum in range(len(TabNoteList)):
+            TNoteList.append([])
+            PageTabNote = TabNoteList[pgNum]
+            for tabNoteIndex in range(len(PageTabNote)):
+                tabNote = PageTabNote[tabNoteIndex]
+                AggTabNote = NoteAggregation(tabNote[0], tabNote[1], tabNote[2])
+                TNoteList[pgNum].append(AggTabNote)
 
-    for line in Line:
-        if line.y0 == line.y1:
-            lineY = PageHeight - line.y1
-            if NoteYTop - lineY > 0 and NoteYTop - lineY < 12*LineHeight:
-                return True
-            if lineY - NoteYDown > 0 and lineY - NoteYDown < 12*LineHeight:
-                return True
-    return False
+        return TNoteList
+
+    else:
+        pgNum = len(TabNoteList)
+
+        TabNoteList = []
+        for index in range(pgNum):
+            TabNoteList.append([])
+
+        return TabNoteList
+
+
+def TabNoteTypeCheck(TabNoteList):
+    TypeList = []
+    TypeCountList = []
+
+    for pgNum in range(len(TabNoteList)):
+        PageTabNote = TabNoteList[pgNum]
+        for tabNoteIndex in range(len(PageTabNote)):
+            tabNoteText = PageTabNote[tabNoteIndex][1].get_text()[:-1].lower()
+            Type = TypeCalculate(tabNoteText)
+            TypeList.append(Type)
+
+    for index in range(len(TypeList) - 1, -1, -1):
+        item = TypeList[index]
+        if item.find('E') >= 0:
+            TypeList.remove(item)
+
+    if not TypeList == []:
+        while True:
+            Type = TypeList[0]
+            TypeCount = TypeList.count(Type)
+            TypeCountList.append([Type, TypeCount])
+            for index in range(len(TypeList) - 1, -1, -1):
+                item = TypeList[index]
+                if item == Type:
+                    TypeList.remove(item)
+            if len(TypeList) == 0:
+                break
+
+        MaxTypeCount = [[None, -1]]
+        for index in range(len(TypeCountList)):
+            TCPair = TypeCountList[index]
+            count = TCPair[1]
+            if count > MaxTypeCount[0][1]:
+                MaxTypeCount[0][0] = TCPair[0]
+                MaxTypeCount[0][1] = count
+
+        for index in range(len(TypeCountList)):
+            TCPair = TypeCountList[index]
+            type = TCPair[0]
+            count = TCPair[1]
+            if count == MaxTypeCount[0][1] and not type == MaxTypeCount[0][0]:
+                MaxTypeCount.append([TCPair[0], count])
+
+        if len(MaxTypeCount) > 1:
+            MaxType = '000'
+            for item in MaxTypeCount:
+                if item[0] > MaxType:
+                    MaxType = item[0]
+
+            logging = Logger(__name__)
+            Logger.get_log(logging).critical('Same Type of TableNote　{}'.format(MaxTypeCount))
+            logging.logger.handlers.clear()
+
+            return MaxType
+
+        else:
+            return MaxTypeCount[0][0]
+    else:
+        logging = Logger(__name__)
+        Logger.get_log(logging).critical('No TableNote')
+        logging.logger.handlers.clear()
+        return None
+
+def TypeCalculate(tabNoteText):
+    Type = ''
+    NoSpaceText = tabNoteText.replace(" ", "")
+
+    if NoSpaceText[5].isdigit():
+        # greek numeral
+        Type += '0'
+        numEndIndex = 5
+        if len(NoSpaceText) > 6:
+            for numEndIndex in range(numEndIndex+1, len(NoSpaceText)):
+                if not NoSpaceText[numEndIndex].isdigit():
+                    break
+            if NoSpaceText[numEndIndex].isdigit() or NoSpaceText[numEndIndex].isalpha():
+                # table12
+                Type += '0'
+            elif NoSpaceText[numEndIndex] == ':':
+                Type += '2'
+            elif NoSpaceText[numEndIndex] == '.':
+                Type += '1'
+            else:
+                Type += 'E'
+        else:
+            Type += '0'
+    else:
+        # i  ii  iii  iv  v  vi  vii  viii  ix  x  xi
+        firstSpace = tabNoteText.find(" ")
+        lastSpace = tabNoteText.rfind(" ")
+
+        if firstSpace < 0:
+            Type += 'EE'
+        elif firstSpace == lastSpace:
+            GreekText = tabNoteText.split(" ")[1]
+            if GreekText[-1] == ':' and not re.match(r'(l?x{0,3}|x[lc])(v?i{0,3}|i[vx])$', GreekText[:-1]) == None:
+                Type += '12'
+            elif GreekText[-1] == '.' and not re.match(r'(l?x{0,3}|x[lc])(v?i{0,3}|i[vx])$', GreekText[:-1]) == None:
+                Type += '11'
+            elif not re.match(r'(l?x{0,3}|x[lc])(v?i{0,3}|i[vx])$', GreekText) == None:
+                Type += '10'
+            else:
+                Type += 'EE'
+        else:
+            GreekText = tabNoteText.split(" ")[1].split(" ")[0]
+            if GreekText[-1] == ':' and not re.match(r'(l?x{0,3}|x[lc])(v?i{0,3}|i[vx])$', GreekText[:-1]) == None:
+                Type += '12'
+            elif GreekText[-1] == '.' and not re.match(r'(l?x{0,3}|x[lc])(v?i{0,3}|i[vx])$', GreekText[:-1]) == None:
+                Type += '11'
+            elif not re.match(r'(l?x{0,3}|x[lc])(v?i{0,3}|i[vx])$', GreekText) == None:
+                Type += '10'
+            else:
+                Type += 'EE'
+
+    return Type
 
 def NoteAggregation(PageHeight, Line, Box):
     fNoteLX = Line.x0
@@ -59,85 +181,15 @@ def NoteAggregation(PageHeight, Line, Box):
     return AggFigNote
 
 def TableNoteExtraction(PageLayout):
-    LineList = []
     TableNote = []
     PageHeight = PageLayout.height
-
-    for Box in PageLayout:
-        if isinstance(Box, LTLine):
-            LineList.append(Box)
 
     for Box in PageLayout:
         if isinstance(Box, LTTextBoxHorizontal):
             for Line in Box:
                 LineText = Line.get_text()[:-1].lower().replace(' ', '')
                 tabPos = LineText.find('table')
-                if tabPos == 0:
-                    TNoteType = []
-                    # TNoteType[21]
-                    # 2: arabic numerals(1) / greek numerals(0)
-                    # 1: :(2) / .(1) / alpha(0) / NULL(-1) for the situation:[Table I]
-                    # table 1   (1 -1)
-                    # table 1:  (1  2)
-                    # table 4.  (1  1)
-                    # table I   (0 -1)
-                    # table II: (0  1)
-                    if len(LineText) > 5:
-                        digit = LineText[5]
-                        if digit.isdigit():
-                            TNoteType.append(1)
-                        elif digit == 'i' or digit == 'v' or digit == 'x':
-                            TNoteType.append(0)
-                    if len(TNoteType) == 1:
-                        if len(LineText) == 6:
-                            TNoteType.append(-1)
-                            AggTableNote = NoteAggregation(PageHeight, Line, Box)
-                            if LineCheck(AggTableNote, LineList, PageHeight):
-                                TableNote.append(AggTableNote)
-                                FileTNoteType = TNoteType.copy()
-                        else:
-                            colon = LineText[6:].find(':')
-                            point = LineText[6:].find('.')
-                            if colon >= 0 and point < 0:
-                                TNoteType.append(2)
-                            elif point >= 0 and colon < 0:
-                                TNoteType.append(1)
-                            elif colon >= 0 and point >= 0:
-                                if colon > point:
-                                    TNoteType.append(1)
-                                else:
-                                    TNoteType.append(2)
-                            else:
-                                if TNoteType[0] == 0:
-                                    if len(LineText) == 7:
-                                        if LineText[5:7] == 'ii' or LineText[5:7] == 'iv'\
-                                                or LineText[5:7] == 'vi' or LineText[5:7] == 'ix'\
-                                                or LineText[5:7] == 'xi':
-                                            TNoteType.append(-1)
-                                        else:
-                                            TNoteType.append(0)
-                                    elif len(LineText) == 8:
-                                        if LineText[5:8] == 'iii' or LineText[5:8] == 'vii'\
-                                                or LineText[5:8] == 'xii':
-                                            TNoteType.append(-1)
-                                        else:
-                                            TNoteType.append(0)
-                                    elif len(LineText) == 9:
-                                        if LineText[5:9] == 'viii':
-                                            TNoteType.append(-1)
-                                        else:
-                                            TNoteType.append(0)
-                                    else:
-                                        TNoteType.append(0)
-                                else:
-                                    if len(LineText) == 7 and LineText[6].isdigit():
-                                        TNoteType.append(-1)
-                                    else:
-                                        TNoteType.append(0)
-                            AggTableNote = NoteAggregation(PageHeight, Line, Box)
-                            if LineCheck(AggTableNote, LineList, PageHeight):
-                                TableNote.append(AggTableNote)
-                                FileTNoteType = TNoteType.copy()
-
+                if tabPos == 0 and len(LineText) > 5:
+                    TableNote.append([PageHeight, Line, Box])
 
     return TableNote
