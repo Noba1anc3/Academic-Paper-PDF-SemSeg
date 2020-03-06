@@ -29,14 +29,14 @@ class TextExtraction():
         FigNoteList = []
         TabNoteList = []
 
-        for PageNo in range(1):#len(self.PagesLayout)):
+        for PageNo in range(len(self.PagesLayout)):
             PageLayout = self.PagesLayout[PageNo]
 
             if self.TextLevel == 1:
                 Text = Leve1Extraction(PageLayout)
                 self.Text.append(Text)
             elif self.TextLevel == 2:
-                # Page, Note = NoteExtraction(PageLayout, PageType)
+                Page, Note = NoteExtraction(PageLayout, PageType)
                 # FigNoteList.append(FigureNoteExtraction(PageLayout))
                 # TabNoteList.append( TableNoteExtraction(PageLayout))
 
@@ -49,9 +49,9 @@ class TextExtraction():
                     self.Title.append([])
                     self.Author.append([])
 
-        #         self.Page.append(Page)
-        #         self.Note.append(Note)
-        #
+                self.Page.append(Page)
+                self.Note.append(Note)
+
         # self.FigureNote = FigNotePostProcess(FigNoteList)
         # self.TableNote  = TabNotePostProcess(TabNoteList)
 
