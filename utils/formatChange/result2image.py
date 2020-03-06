@@ -26,7 +26,7 @@ def rst2image(conf, semseg, PagesImage, PagesLayout):
     else:
         pass
 
-    for index in range(len(PagesImage)):
+    for index in range(1):#len(PagesImage)):
         PageImage = PagesImage[index]
         PageLayout = PagesLayout[index]
 
@@ -38,10 +38,10 @@ def rst2image(conf, semseg, PagesImage, PagesLayout):
             else:
                 PageVisualize.annotate(PV, LTTitle, Title[index])
                 PageVisualize.annotate(PV, LTAuthor, Author[index])
-                PageVisualize.annotate(PV, LTPageNo, Page[index])
-                PageVisualize.annotate(PV, LTNote, Note[index])
-                PageVisualize.annotate(PV, LTFigureNote, FigureNote[index])
-                PageVisualize.annotate(PV, LTTableNote, TableNote[index])
+                # PageVisualize.annotate(PV, LTPageNo, Page[index])
+                # PageVisualize.annotate(PV, LTNote, Note[index])
+                # PageVisualize.annotate(PV, LTFigureNote, FigureNote[index])
+                # PageVisualize.annotate(PV, LTTableNote, TableNote[index])
             if TIT == 0:
                 PageVisualize.annotate(PV, LTFigure, Image[index])
                 if TableLevel == 1:

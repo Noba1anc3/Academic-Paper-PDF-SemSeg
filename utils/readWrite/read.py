@@ -8,10 +8,10 @@ sys.dont_write_bytecode = True
 
 class Configuration():
     def __init__(self):
-        logging = Logger(__name__)
-        Logger.get_log(logging).info('Start processing ConfigFile')
+        self.logging = Logger(__name__)
+        Logger.get_log(self.logging).info('Start processing ConfigFile')
         self.config()
-        Logger.get_log(logging).info('ConfigFile Processed\n')
+        Logger.get_log(self.logging).info('ConfigFile Processed\n')
 
     def config(self):
         cp = ConfigParser()
@@ -24,6 +24,8 @@ class Configuration():
         self.evaluate = cp.getboolean('configuration', 'evaluate')
         self.save_text = cp.getboolean('configuration', 'save_text')
         self.save_image = cp.getboolean('configuration', 'save_image')
+
+        self.configCheck()
 
         seg_result_folder = 'example/seg_result/'
         if not os.path.exists(seg_result_folder):
@@ -48,6 +50,48 @@ class Configuration():
             self.fileList = sorted(os.listdir(self.folder))
         else:
             self.fileList = [self.filename]
+
+    def configCheck(self):
+        if not self.folder[-1] == '/':
+            Logger.get_log(self.logging).critical('Configuration - Folder Not End With / ')
+            y_n = input("Do you want system add '/' to the end of folder ? (Y/N)\n")
+            if y_n.lower() == 'y' or y_n.lower() == 'yes':
+                self.folder += '/'
+            else:
+                sys.exit()
+
+        if not self.filename == 'all' and not self.filename[-4:] == '.pdf':
+            Logger.get_log(self.logging).critical('Configuration - FileName Not End With .pdf ')
+            y_n = input("Do you want system add '.pdf' to the end of filename ? (Y/N)\n")
+            if y_n.lower() == 'y' or y_n.lower() == 'yes':
+                self.filename += '.pdf'
+            else:
+                sys.exit()
+
+        if not (self.tit_choice == 0 or self.tit_choice == 1 or self.tit_choice == 2 or self.tit_choice == 3):
+            Logger.get_log(self.logging).critical('Configuration - tit_choice Format Error ')
+            while True:
+                tit_choice = input("Please press 0/1/2/3 to specify a tit_choice \n")
+                if tit_choice == '0' or tit_choice == '1' or tit_choice == '2' or tit_choice == '3':
+                    self.tit_choice = tit_choice
+                    break
+
+        if not (self.text_level == 1 or self.text_level == 2):
+            Logger.get_log(self.logging).critical('Configuration - text_level Format Error ')
+            while True:
+                text_level = input("Please press 1/2 to specify a text_level \n")
+                if text_level == '1' or text_level == '2':
+                    self.text_level = text_level
+                    break
+
+        if not (self.table_level == 1 or self.table_level == 2):
+            Logger.get_log(self.logging).critical('Configuration - table_level Format Error ')
+            while True:
+                table_level = input("Please press 1/2 to specify a table_level \n")
+                if table_level == '1' or table_level == '2':
+                    self.text_level = table_level
+                    break
+
 
 class annotation():
     def __init__(self):

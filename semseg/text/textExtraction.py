@@ -29,31 +29,31 @@ class TextExtraction():
         FigNoteList = []
         TabNoteList = []
 
-        for PageNo in range(len(self.PagesLayout)):
+        for PageNo in range(1):#len(self.PagesLayout)):
             PageLayout = self.PagesLayout[PageNo]
 
             if self.TextLevel == 1:
                 Text = Leve1Extraction(PageLayout)
                 self.Text.append(Text)
-            else:
-                Page, Note = NoteExtraction(PageLayout, PageType)
-                FigNoteList.append(FigureNoteExtraction(PageLayout))
-                TabNoteList.append( TableNoteExtraction(PageLayout))
+            elif self.TextLevel == 2:
+                # Page, Note = NoteExtraction(PageLayout, PageType)
+                # FigNoteList.append(FigureNoteExtraction(PageLayout))
+                # TabNoteList.append( TableNoteExtraction(PageLayout))
 
                 if PageNo == 0:
-                    Title, titleIndex = TitleExtraction(PageLayout)
-                    Author = AuthorExtraction(PageLayout, titleIndex)
+                    Title, TitleIndex = TitleExtraction(PageLayout)
+                    Author = AuthorExtraction(PageLayout, TitleIndex)
                     self.Title.append(Title)
                     self.Author.append(Author)
                 else:
                     self.Title.append([])
                     self.Author.append([])
 
-                self.Page.append(Page)
-                self.Note.append(Note)
-
-        self.FigureNote = FigNotePostProcess(FigNoteList)
-        self.TableNote  = TabNotePostProcess(TabNoteList)
+        #         self.Page.append(Page)
+        #         self.Note.append(Note)
+        #
+        # self.FigureNote = FigNotePostProcess(FigNoteList)
+        # self.TableNote  = TabNotePostProcess(TabNoteList)
 
         logging = Logger(__name__)
         Logger.get_log(logging).info('Text Segmentation Finished')

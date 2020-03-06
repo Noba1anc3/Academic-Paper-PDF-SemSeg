@@ -33,7 +33,7 @@ class SemanticSegmentation():
         elif self.configList.tit_choice == 2:
             self.Image = ImageExtraction(self.PagesLayout)
 
-        else:
+        elif self.configList.tit_choice == 3:
             self.Table = TableExtraction(TableLevel, self.PagesLayout)
 
         Logger.get_log(logging).info('Segmentation Finished')
