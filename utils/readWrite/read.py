@@ -53,8 +53,9 @@ class Configuration():
 
     def configCheck(self):
         if not self.folder[-1] == '/':
-            Logger.get_log(self.logging).critical('Configuration - Folder Not End With / ')
-            y_n = input("Do you want system add '/' to the end of folder ? (Y/N)\n")
+            Logger.get_log(self.logging).critical('Configuration - Folder Format Error')
+            print("Configuration - Folder may loss '/' to the end of the path")
+            y_n = input("Do you want system add '/' to the end of path ? (Y/N)\n")
             if y_n.lower() == 'y' or y_n.lower() == 'yes':
                 self.folder += '/'
             else:
@@ -62,6 +63,7 @@ class Configuration():
 
         if not self.filename == 'all' and not self.filename[-4:] == '.pdf':
             Logger.get_log(self.logging).critical('Configuration - FileName Not End With .pdf ')
+            print('Configuration - FileName Not End With \'.pdf\'')
             y_n = input("Do you want system add '.pdf' to the end of filename ? (Y/N)\n")
             if y_n.lower() == 'y' or y_n.lower() == 'yes':
                 self.filename += '.pdf'
@@ -71,6 +73,7 @@ class Configuration():
         if not (self.tit_choice == 0 or self.tit_choice == 1 or self.tit_choice == 2 or self.tit_choice == 3):
             Logger.get_log(self.logging).critical('Configuration - tit_choice Format Error ')
             while True:
+                print('Configuration - tit_choice Format Error')
                 tit_choice = input("Please press 0/1/2/3 to specify a tit_choice \n")
                 if tit_choice == '0' or tit_choice == '1' or tit_choice == '2' or tit_choice == '3':
                     self.tit_choice = tit_choice
@@ -79,6 +82,7 @@ class Configuration():
         if not (self.text_level == 1 or self.text_level == 2):
             Logger.get_log(self.logging).critical('Configuration - text_level Format Error ')
             while True:
+                print('Configuration - text_level Format Error ')
                 text_level = input("Please press 1/2 to specify a text_level \n")
                 if text_level == '1' or text_level == '2':
                     self.text_level = text_level
@@ -87,6 +91,7 @@ class Configuration():
         if not (self.table_level == 1 or self.table_level == 2):
             Logger.get_log(self.logging).critical('Configuration - table_level Format Error ')
             while True:
+                print('Configuration - table_level Format Error ')
                 table_level = input("Please press 1/2 to specify a table_level \n")
                 if table_level == '1' or table_level == '2':
                     self.text_level = table_level
