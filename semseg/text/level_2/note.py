@@ -16,23 +16,23 @@ def NoteExtraction(PageLayout):
                 linePageRatio = (layoutItem.x1 - layoutItem.x0) / PageLayout.x1
                 if linePageRatio > 0.085 and linePageRatio < 0.115:
                     LineLX = layoutItem.x0
-                    if abs(LineLX - LBlock) < 5 or abs(LineLX - RBlock) < 5:
+                    if abs(LineLX - LBlock) < 10 or abs(LineLX - RBlock) < 10:
                         NoteLine.append(layoutItem)
                 elif linePageRatio > 0.14 and linePageRatio < 0.17:
                     LineLX = layoutItem.x0
-                    if abs(LineLX - LBlock) < 5 or abs(LineLX - RBlock) < 5:
+                    if abs(LineLX - LBlock) < 10 or abs(LineLX - RBlock) < 10:
                         NoteLine.append(layoutItem)
 
     for Box in PageLayout:
         if isinstance(Box, LTTextBoxHorizontal):
             for Line in NoteLine:
                 if Line.x0 < PageLayout.width / 4 and Box.x0 < PageLayout.width / 4:
-                    if Box.y1 < Line.y0:
+                    if Box.y1 <= Line.y0 + 10:
                         for line in Box:
                             Note[0].append(line)
 
                 if Line.x0 > PageLayout.width / 2 and Box.x0 > PageLayout.width / 2:
-                    if Box.y1 < Line.y0:
+                    if Box.y1 <= Line.y0 + 10:
                         for line in Box:
                             Note[1].append(line)
 

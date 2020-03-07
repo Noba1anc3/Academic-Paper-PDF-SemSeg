@@ -51,6 +51,7 @@ def layoutImage(PageImage, PageLayout, liRatio):
             PageImage = add_box(PageImage, LTTextBoxHorizontal, BoundingBox, liRatioH, liRatioW)
 
         if isinstance(layoutItem, LTLine):
+            #PageImage = add_box(PageImage, LTLine, BoundingBox, liRatioH, liRatioW)
             if layoutItem.y0 == layoutItem.y1 and layoutItem.y0 < 0.18*LAYOUT_H:
                 linePageRatio = (layoutItem.x1 - layoutItem.x0) / PageLayout.x1
                 if linePageRatio > 0.085 and linePageRatio < 0.115:
