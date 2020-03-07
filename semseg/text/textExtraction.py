@@ -3,7 +3,8 @@ from semseg.text.level_2.image_note import *
 from semseg.text.level_2.table_note import *
 from semseg.text.level_2.author import AuthorExtraction
 from semseg.text.level_2.title import TitleExtraction
-from semseg.text.level_2.note import *
+from semseg.text.level_2.page import PageExtraction
+from semseg.text.level_2.note import NoteExtraction
 from semseg.text.level_2.tools import *
 from utils.logging.syslog import Logger
 
@@ -25,7 +26,6 @@ class TextExtraction():
         self.Segmentation()
 
     def Segmentation(self):
-        PageType = half_full_judge(self.PagesLayout[0])
         FigNoteList = []
         TabNoteList = []
 
@@ -36,9 +36,11 @@ class TextExtraction():
                 Text = Leve1Extraction(PageLayout)
                 self.Text.append(Text)
             elif self.TextLevel == 2:
-                Page, Note = NoteExtraction(PageLayout, PageType)
-                # FigNoteList.append(FigureNoteExtraction(PageLayout))
-                # TabNoteList.append( TableNoteExtraction(PageLayout))
+                Page = PageExtraction(PageLayout)
+                Note = NoteExtraction(PageLayout)
+
+                FigNoteList.append(FigureNoteExtraction(PageLayout))
+                TabNoteList.append( TableNoteExtraction(PageLayout))
 
                 if PageNo == 0:
                     Title, TitleIndex = TitleExtraction(PageLayout)
@@ -52,8 +54,8 @@ class TextExtraction():
                 self.Page.append(Page)
                 self.Note.append(Note)
 
-        # self.FigureNote = FigNotePostProcess(FigNoteList)
-        # self.TableNote  = TabNotePostProcess(TabNoteList)
+        self.FigureNote = FigNotePostProcess(FigNoteList)
+        self.TableNote  = TabNotePostProcess(TabNoteList)
 
         logging = Logger(__name__)
         Logger.get_log(logging).info('Text Segmentation Finished')

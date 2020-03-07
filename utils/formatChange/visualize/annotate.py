@@ -12,7 +12,7 @@ class PageVisualize():
         self.Layout = Layout
 
     def annotate(self, LTType, LTBBoxes):
-        if LTType == LTTableNote or LTType == LTFigureNote or LTType == LTText:
+        if LTType == LTTableNote or LTType == LTFigureNote or LTType == LTText or LTType == LTNote:
             ImageBBoxes = NoteBBoxes(self.Image, self.Layout, LTBBoxes)
         else:
             ImageBBoxes = getBBoxes(self.Image, self.Layout, LTBBoxes)
@@ -58,7 +58,7 @@ class PageVisualize():
             color = (148, 238, 78)             #seagreen
             typeText = 'Text'
 
-        if LTType == LTFigureNote or LTType == LTTableNote or LTType == LTText:
+        if LTType == LTFigureNote or LTType == LTTableNote or LTType == LTText or LTType == LTNote:
             for Box in Boxes:
                 Text = False
                 for Line in Box:

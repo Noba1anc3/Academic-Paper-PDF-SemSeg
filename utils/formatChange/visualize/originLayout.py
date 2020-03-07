@@ -42,30 +42,36 @@ def layoutImage(PageImage, PageLayout, liRatio):
         BoundingBox = [XleftUp, YleftUp, XrightDown, YrightDown]
 
         if isinstance(layoutItem, LTTextBoxHorizontal):
-            for textline in layoutItem:
-                if isinstance(textline, LTTextLineHorizontal):
-                    TextLine = [textline.x0, LAYOUT_H - textline.y0, textline.x1, LAYOUT_H - textline.y1]
-                    PageImage = add_box(PageImage, LTTextLineHorizontal, TextLine, liRatioH, liRatioW)
-                else:
-                    print(str(type(textline)) + 'in LTTextBoxHorizontal')
+        #     for textline in layoutItem:
+        #         if isinstance(textline, LTTextLineHorizontal):
+        #             TextLine = [textline.x0, LAYOUT_H - textline.y0, textline.x1, LAYOUT_H - textline.y1]
+        #             PageImage = add_box(PageImage, LTTextLineHorizontal, TextLine, liRatioH, liRatioW)
+        #         else:
+        #             print(str(type(textline)) + 'in LTTextBoxHorizontal')
             PageImage = add_box(PageImage, LTTextBoxHorizontal, BoundingBox, liRatioH, liRatioW)
 
-        elif isinstance(layoutItem, LTLine):
-            PageImage = add_box(PageImage, LTLine, BoundingBox, liRatioH, liRatioW)
+        if isinstance(layoutItem, LTLine):
+            if layoutItem.y0 == layoutItem.y1 and layoutItem.y0 < 0.18*LAYOUT_H:
+                linePageRatio = (layoutItem.x1 - layoutItem.x0) / PageLayout.x1
+                if linePageRatio > 0.085 and linePageRatio < 0.115:
+                    print(layoutItem.x0)
+                    PageImage = add_box(PageImage, LTLine, BoundingBox, liRatioH, liRatioW)
+                elif linePageRatio > 0.14 and linePageRatio < 0.17:
+                    print(layoutItem.x0)
+                    PageImage = add_box(PageImage, LTLine, BoundingBox, liRatioH, liRatioW)
+        # elif isinstance(layoutItem, LTTextLineHorizontal):
+        #     PageImage = add_box(PageImage, LTTextLineHorizontal, BoundingBox, liRatioH, liRatioW)
 
-        elif isinstance(layoutItem, LTTextLineHorizontal):
-            PageImage = add_box(PageImage, LTTextLineHorizontal, BoundingBox, liRatioH, liRatioW)
+        # elif isinstance(layoutItem, LTFigure):
+        #     PageImage = add_box(PageImage, LTFigure, BoundingBox, liRatioH, liRatioW)
 
-        elif isinstance(layoutItem, LTFigure):
-            PageImage = add_box(PageImage, LTFigure, BoundingBox, liRatioH, liRatioW)
+        # elif isinstance(layoutItem, LTRect):
+        #     PageImage = add_box(PageImage, LTRect, BoundingBox, liRatioH, liRatioW)
+        #
+        # elif isinstance(layoutItem, LTCurve):
+        #     PageImage = add_box(PageImage, LTCurve, BoundingBox, liRatioH, liRatioW)
 
-        elif isinstance(layoutItem, LTRect):
-            PageImage = add_box(PageImage, LTRect, BoundingBox, liRatioH, liRatioW)
-
-        elif isinstance(layoutItem, LTCurve):
-            PageImage = add_box(PageImage, LTCurve, BoundingBox, liRatioH, liRatioW)
-
-        else:
-            print(str(type(layoutItem)) + 'in LTPage')
+        # else:
+        #     print(str(type(layoutItem)) + 'in LTPage')
 
     return PageImage

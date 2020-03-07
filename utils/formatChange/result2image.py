@@ -40,8 +40,8 @@ def rst2image(conf, semseg, PagesImage, PagesLayout):
                 PageVisualize.annotate(PV, LTAuthor, Author[index])
                 PageVisualize.annotate(PV, LTPageNo, Page[index])
                 PageVisualize.annotate(PV, LTNote, Note[index])
-                # PageVisualize.annotate(PV, LTFigureNote, FigureNote[index])
-                # PageVisualize.annotate(PV, LTTableNote, TableNote[index])
+                PageVisualize.annotate(PV, LTFigureNote, FigureNote[index])
+                PageVisualize.annotate(PV, LTTableNote, TableNote[index])
             if TIT == 0:
                 PageVisualize.annotate(PV, LTFigure, Image[index])
                 if TableLevel == 1:

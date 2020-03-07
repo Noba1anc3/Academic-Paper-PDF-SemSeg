@@ -22,6 +22,30 @@ class SemanticSegmentation():
         TextLevel = self.configList.text_level
         TableLevel = self.configList.table_level
 
+        # for index in range(self.Page):
+        #     PageImage = self.PagesImage[index]
+        #     PageLayout = self.PagesLayout[index]
+
+            # from semseg.text.level_2.tools import half_full_judge, BlockStartX
+            # hf = half_full_judge(PageLayout)
+            # BlockStartX(PageLayout, hf)
+            #
+            # from utils.formatChange.visualize.originLayout import layoutImage
+            # import cv2
+            # ImageSize = PageImage.shape
+            # LayoutWidth = PageLayout.width
+            # LayoutHeight = PageLayout.height
+            # liRatio = [LayoutWidth / ImageSize[1], LayoutHeight / ImageSize[0]]
+            #
+            # image = layoutImage(PageImage,PageLayout,liRatio)
+            #
+            # height, width = image.shape[:2]
+            # size = (int(height * 0.8), int(width * 1.2))
+            # PageImage = cv2.resize(image, size)
+            #
+            # cv2.imshow('1', PageImage)
+            # cv2.waitKey(0)
+
         if not self.configList.tit_choice:
             self.Text = TextExtraction(TextLevel, self.PagesLayout)
             self.Image = ImageExtraction(self.PagesLayout)

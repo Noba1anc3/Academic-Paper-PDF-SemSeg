@@ -77,4 +77,49 @@ def overlap(lineA, lineB):
         lap = lineB[1] - lineA[0]
         return lap/min(lengthA, lengthB)
 
+def BlockRange(PageLayout):
+    PageWidth = PageLayout.width
+    HF = half_full_judge(PageLayout)
+
+    longestLHeight = -1
+    longestRHeight = -1
+    longestLBox = None
+    longestRBox = None
+
+    LBOX_LeftX = -1
+    RBOX_LeftX = -1
+    LBOX_RightX = -1
+    RBOX_RightX = -1
+
+    for Box in PageLayout:
+        if HF == HALF:
+            if Box.width*3 > PageWidth and Box.width*2 < PageWidth:
+                if Box.x0 < PageWidth/4:
+                    BoxHeight = Box.height
+                    if BoxHeight > longestLHeight:
+                        longestLHeight = BoxHeight
+                        longestLBox = Box
+                if Box.x1 > 3*PageWidth/4:
+                    BoxHeight = Box.height
+                    if BoxHeight > longestRHeight:
+                        longestRHeight = BoxHeight
+                        longestRBox = Box
+        else:
+            if Box.width*2 > PageWidth:
+                BoxHeight = Box.height
+                if BoxHeight > longestLHeight:
+                    longestLHeight = BoxHeight
+                    longestLBox = Box
+                    longestRBox = Box
+
+    if not longestLBox == None:
+        LBOX_LeftX = int(longestLBox.x0)
+        LBOX_RightX = int(longestLBox.x1)
+
+    if not longestRBox == None:
+        RBOX_LeftX = int(longestRBox.x0)
+        RBOX_RightX = int(longestRBox.x1)
+
+    return [LBOX_LeftX, LBOX_RightX, RBOX_LeftX, RBOX_RightX]
+
 

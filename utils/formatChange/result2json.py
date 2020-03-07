@@ -66,7 +66,7 @@ def rst2json(conf, fileName, semseg, PagesImage, PagesLayout):
                     PageLayout['Text'].append(TextJson)
             else:
                 if not Title[page] == []:
-                    TitleItem = Title[page][0]
+                    TitleItem = Title[page]
                     TitleJson = L2Text(Image, Layout, 'Title', TitleItem)
                     PageLayout['Text'].append(TitleJson)
                 if not Author[page] == []:
@@ -78,9 +78,10 @@ def rst2json(conf, fileName, semseg, PagesImage, PagesLayout):
                     PageJson = L2Text(Image, Layout, 'Page', PageItem)
                     PageLayout['Text'].append(PageJson)
                 if not Note[page] == []:
-                    NoteItem = Note[page][0]
-                    NoteJson = L2Text(Image, Layout, 'Note', NoteItem)
-                    PageLayout['Text'].append(NoteJson)
+                    NoteItem = Note[page]
+                    NoteJsonList = L2FTNote(Image, Layout, 'Note', NoteItem)
+                    for NoteJson in NoteJsonList:
+                        PageLayout['Text'].append(NoteJson)
                 if not FigureNote[page] == []:
                     FigureNoteItem = FigureNote[page]
                     FigureNoteJsonList = L2FTNote(Image, Layout, 'FigureNote', FigureNoteItem)
@@ -158,7 +159,11 @@ def L2FTNote(PageImage, PageLayout, LTType, FTNotes):
         Text['location'] = BBoxesList[index][0]
         content = ''
         for FTNoteLine in FTNote:
-            content += FTNoteLine.get_text().replace("\n", " ")
+            text = FTNoteLine.get_text().replace("\n", "")
+            if text[-1] == '-':
+                content += text[:-1]
+            else:
+                content += text + ' '
         Text['content'] = content[:-1]
         Text['TextLines'] = []
         for LineIndex in range(len(FTNote)):

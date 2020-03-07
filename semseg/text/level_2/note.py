@@ -1,43 +1,46 @@
-from semseg.text.level_2.tools import *
 from pdfminer.layout import *
+from semseg.text.level_2.tools import BlockRange
 
-import sys
-sys.dont_write_bytecode = True
 
-def NoteExtraction(PageLayout, PageType):
-    widthCheck = True
-    PageHeight = PageLayout.height
-    PageWidth = PageLayout.width
+def NoteExtraction(PageLayout):
+    Note = [[],[]]
+    NoteLine = []
 
-    Page = []
-    Note = []
+    Blocks = BlockRange(PageLayout)
+    LBlock = Blocks[0]
+    RBlock = Blocks[2]
+
+    for layoutItem in PageLayout:
+        if isinstance(layoutItem, LTLine):
+            if layoutItem.y0 == layoutItem.y1 and layoutItem.y0 < 0.2 * PageLayout.height:
+                linePageRatio = (layoutItem.x1 - layoutItem.x0) / PageLayout.x1
+                if linePageRatio > 0.085 and linePageRatio < 0.115:
+                    LineLX = layoutItem.x0
+                    if abs(LineLX - LBlock) < 5 or abs(LineLX - RBlock) < 5:
+                        NoteLine.append(layoutItem)
+                elif linePageRatio > 0.14 and linePageRatio < 0.17:
+                    LineLX = layoutItem.x0
+                    if abs(LineLX - LBlock) < 5 or abs(LineLX - RBlock) < 5:
+                        NoteLine.append(layoutItem)
 
     for Box in PageLayout:
-        if isinstance(Box, LTTextBoxHorizontal) and PageHeight > 5*Box.y1:
-            for item in Box:
-                itemText = item.get_text()[:-1].replace(' ', '')
-                if itemText.isdigit():
-                    Page.append(Box)
-                else:
-                    itemWidth = item.width
-                    if PageType == HALF:
-                        if 2*itemWidth >= PageWidth:
-                            widthCheck = False
-                    if widthCheck:
-                        if len(itemText) > 2 and itemText[0].isdigit() and not itemText[1] == '.' and itemText[2].isalpha():
-                            Note.append(Box)
-                            break
+        if isinstance(Box, LTTextBoxHorizontal):
+            for Line in NoteLine:
+                if Line.x0 < PageLayout.width / 4 and Box.x0 < PageLayout.width / 4:
+                    if Box.y1 < Line.y0:
+                        for line in Box:
+                            Note[0].append(line)
 
-    if len(Page) > 1:
-        smallestY = PageHeight
-        smallestIndex = -1
-        for index in range(len(Page)):
-            LeftUpY = Page[index].y1
-            if LeftUpY < smallestY:
-                smallestY = LeftUpY
-                smallestIndex = index
-        realPage = Page[smallestIndex]
-        Page = []
-        Page.append(realPage)
+                if Line.x0 > PageLayout.width / 2 and Box.x0 > PageLayout.width / 2:
+                    if Box.y1 < Line.y0:
+                        for line in Box:
+                            Note[1].append(line)
 
-    return Page, Note
+    if Note[0] == [] and Note[1] == []:
+        return []
+    elif (not Note[0] == []) and Note[1] == []:
+        return [Note[0]]
+    elif (not Note[1] == []) and Note[0] == []:
+        return [Note[1]]
+    else:
+        return Note

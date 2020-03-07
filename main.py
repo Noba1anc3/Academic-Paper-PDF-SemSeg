@@ -14,7 +14,6 @@ import sys
 sys.dont_write_bytecode = True
 
 if __name__ == '__main__':
-
     logging = Logger(__name__)
     Logger.get_log(logging).info('System Start\n')
 
