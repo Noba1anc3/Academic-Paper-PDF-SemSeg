@@ -75,7 +75,7 @@ def rst2json(conf, fileName, semseg, PagesImage, PagesLayout):
                     PageLayout['Text'].append(AuthorJson)
                 if not Page[page] == []:
                     PageItem = Page[page][0]
-                    PageJson = L2Text(Image, Layout, 'Page', PageItem)
+                    PageJson = L2Page(Image, Layout, 'Page', PageItem)
                     PageLayout['Text'].append(PageJson)
                 if not Note[page] == []:
                     NoteItem = Note[page]
@@ -148,6 +148,31 @@ def L2Text(PageImage, PageLayout, LTType, item):
 
     return Text
 
+def L2Page(PageImage, PageLayout, LTType, item):
+    BBoxesList = getBBoxes(PageImage, PageLayout, item)
+
+    Text = {}
+
+    Text['SemanticType'] = LTType
+    Text['content'] = ''
+    Text['location'] = BBoxesList[0]
+    Text['TextLines'] = []
+
+    if isinstance(item, LTFigure):
+        for char in item:
+            Text['content'] += char._text
+    else:
+        Text['content'] = item.get_text().replace("\n", " ")[:-1]
+
+    for index in range(len(item._objs)):
+        line = item._objs[index]
+        TextLine = {}
+        TextLine['content'] = line.get_text()
+        TextLine['location'] = [BBoxesList[index+1]]
+        Text['TextLines'].append(TextLine)
+
+    return Text
+
 def L2FTNote(PageImage, PageLayout, LTType, FTNotes):
     BBoxesList = NoteBBoxes(PageImage, PageLayout, FTNotes)
     TextBlock = []
@@ -156,7 +181,6 @@ def L2FTNote(PageImage, PageLayout, LTType, FTNotes):
         FTNote = FTNotes[index]
         Text = {}
         Text['SemanticType'] = LTType
-        Text['location'] = BBoxesList[index][0]
         content = ''
         for FTNoteLine in FTNote:
             text = FTNoteLine.get_text().replace("\n", "")
@@ -165,6 +189,7 @@ def L2FTNote(PageImage, PageLayout, LTType, FTNotes):
             else:
                 content += text + ' '
         Text['content'] = content[:-1]
+        Text['location'] = BBoxesList[index][0]
         Text['TextLines'] = []
         for LineIndex in range(len(FTNote)):
             FTNoteLine = FTNote[LineIndex]

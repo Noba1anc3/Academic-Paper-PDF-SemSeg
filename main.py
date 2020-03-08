@@ -32,6 +32,7 @@ if __name__ == '__main__':
         PagesImage  = pdf2image(filePath)
         PagesLayout = pdf2layout(filePath)
 
+
         if not PagesLayout == None:
             semseg = SemanticSegmentation(conf, PagesImage, PagesLayout)
 
@@ -56,3 +57,5 @@ if __name__ == '__main__':
         #     sys.exit()
 
     Logger.get_log(logging).info("All file processed")
+
+

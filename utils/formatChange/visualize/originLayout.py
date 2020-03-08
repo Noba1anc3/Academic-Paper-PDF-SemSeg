@@ -50,8 +50,8 @@ def layoutImage(PageImage, PageLayout, liRatio):
         #             print(str(type(textline)) + 'in LTTextBoxHorizontal')
             PageImage = add_box(PageImage, LTTextBoxHorizontal, BoundingBox, liRatioH, liRatioW)
 
-        if isinstance(layoutItem, LTLine):
-            #PageImage = add_box(PageImage, LTLine, BoundingBox, liRatioH, liRatioW)
+        elif isinstance(layoutItem, LTLine):
+            PageImage = add_box(PageImage, LTLine, BoundingBox, liRatioH, liRatioW)
             if layoutItem.y0 == layoutItem.y1 and layoutItem.y0 < 0.18*LAYOUT_H:
                 linePageRatio = (layoutItem.x1 - layoutItem.x0) / PageLayout.x1
                 if linePageRatio > 0.085 and linePageRatio < 0.115:
@@ -60,19 +60,40 @@ def layoutImage(PageImage, PageLayout, liRatio):
                 elif linePageRatio > 0.14 and linePageRatio < 0.17:
                     print(layoutItem.x0)
                     PageImage = add_box(PageImage, LTLine, BoundingBox, liRatioH, liRatioW)
-        # elif isinstance(layoutItem, LTTextLineHorizontal):
-        #     PageImage = add_box(PageImage, LTTextLineHorizontal, BoundingBox, liRatioH, liRatioW)
+        elif isinstance(layoutItem, LTTextLineHorizontal):
+            PageImage = add_box(PageImage, LTTextLineHorizontal, BoundingBox, liRatioH, liRatioW)
 
-        # elif isinstance(layoutItem, LTFigure):
-        #     PageImage = add_box(PageImage, LTFigure, BoundingBox, liRatioH, liRatioW)
+        elif isinstance(layoutItem, LTFigure):
+            if isinstance(layoutItem._objs[0], LTImage):
+                PageImage = add_box(PageImage, LTFigure, BoundingBox, liRatioH, liRatioW)
 
-        # elif isinstance(layoutItem, LTRect):
-        #     PageImage = add_box(PageImage, LTRect, BoundingBox, liRatioH, liRatioW)
-        #
-        # elif isinstance(layoutItem, LTCurve):
-        #     PageImage = add_box(PageImage, LTCurve, BoundingBox, liRatioH, liRatioW)
+        elif isinstance(layoutItem, LTRect):
+            PageImage = add_box(PageImage, LTRect, BoundingBox, liRatioH, liRatioW)
 
-        # else:
-        #     print(str(type(layoutItem)) + 'in LTPage')
+        elif isinstance(layoutItem, LTCurve):
+            PageImage = add_box(PageImage, LTCurve, BoundingBox, liRatioH, liRatioW)
+
+        else:
+            print(str(type(layoutItem)) + 'in LTPage')
 
     return PageImage
+
+# for idx in range(len(PagesImage)):
+#    img = PagesImage[idx]
+#    lot = PagesLayout[idx]
+#    from utils.formatChange.visualize.originLayout import layoutImage
+#
+#    ImageSize = img.shape
+#    LayoutWidth = lot.width
+#    LayoutHeight = lot.height
+#    liRatio = [LayoutWidth / ImageSize[1], LayoutHeight / ImageSize[0]]
+#
+#    img = layoutImage(img, lot, liRatio)
+#
+#    height, width = img.shape[:2]
+#    size = (int(height * 0.8), int(width * 1.2))
+#    PageImage = cv2.resize(img, size)
+#    cv2.imshow('img', PageImage)
+#    cv2.waitKey(0)
+#
+#

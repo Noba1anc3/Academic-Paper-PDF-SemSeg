@@ -83,3 +83,4 @@ class PageVisualize():
                 if not Text or index == 1:
                     cv2.putText(self.Image, typeText, (Box[0], Box[1]), 0, 1.5, color, thickness=3)
                     Text = True
+
