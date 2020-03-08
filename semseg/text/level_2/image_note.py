@@ -207,6 +207,7 @@ def FigureNoteExtraction(PageLayout):
     return FigureNote
 
 
+
 # def FLRC_Check(figNote, Figure, LRC, PageHeight):
 #     LineHeight = figNote.height
 #     figNoteUpY = PageHeight - figNote.y1

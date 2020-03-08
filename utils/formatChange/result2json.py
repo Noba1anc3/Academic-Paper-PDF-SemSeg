@@ -115,13 +115,13 @@ def L1TexT(PageImage, PageLayout, LTType, L1Text):
 
         Text['SemanticType'] = LTType
         Text['location'] = BBoxesList[index][0]
-        Text['content'] = L1TextBlock.get_text().replace("\n", " ")[:-1]
+        Text['content'] = L1TextBlock.get_text().replace("\n", " ").replace("- ", "")[:-1]
 
         Text['TextLines'] = []
         for LineIndex in range(len(L1TextBlock)):
             L1TextLine = L1TextBlock._objs[LineIndex]
             TextLine = {}
-            TextLine['content'] = L1TextLine.get_text()[:-1]
+            TextLine['content'] = L1TextLine.get_text().replace("-\n", "").replace("\n", "")
             TextLine['location'] = BBoxesList[index][LineIndex+1]
             Text['TextLines'].append(TextLine)
 
@@ -135,14 +135,14 @@ def L2Text(PageImage, PageLayout, LTType, item):
     Text = {}
 
     Text['SemanticType'] = LTType
-    Text['content'] = item.get_text().replace("\n", " ")[:-1]
+    Text['content'] = item.get_text().replace("\n", " ").replace("- ", "")[:-1]
     Text['location'] = BBoxesList[0]
     Text['TextLines'] = []
 
     for index in range(len(item._objs)):
         line = item._objs[index]
         TextLine = {}
-        TextLine['content'] = line.get_text()[:-1]
+        TextLine['content'] = line.get_text().replace("-\n", "").replace("\n", "")
         TextLine['location'] = [BBoxesList[index+1]]
         Text['TextLines'].append(TextLine)
 

@@ -1,6 +1,7 @@
 from semseg.text.level_1.Leve1Extraction import Leve1Extraction
 from semseg.text.level_2.image_note import *
 from semseg.text.level_2.table_note import *
+from semseg.text.level_2.maintext import Level2Extraction
 from semseg.text.level_2.author import AuthorExtraction
 from semseg.text.level_2.title import TitleExtraction
 from semseg.text.level_2.page import PageExtraction
@@ -35,24 +36,30 @@ class TextExtraction():
             if self.TextLevel == 1:
                 Text = Leve1Extraction(PageLayout)
                 self.Text.append(Text)
+
             elif self.TextLevel == 2:
-                Page = PageExtraction(PageLayout)
-                Note = NoteExtraction(PageLayout)
+                Page, pgIndex = PageExtraction(PageLayout)
+                Note, ntIndex = NoteExtraction(PageLayout)
 
                 FigNoteList.append(FigureNoteExtraction(PageLayout))
                 TabNoteList.append( TableNoteExtraction(PageLayout))
 
                 if PageNo == 0:
-                    Title, TitleIndex = TitleExtraction(PageLayout)
-                    Author = AuthorExtraction(PageLayout, TitleIndex)
+                    Title,  ttIndex = TitleExtraction(PageLayout)
+                    Author, auIndex = AuthorExtraction(PageLayout, ttIndex)
                     self.Title.append(Title)
                     self.Author.append(Author)
                 else:
+                    ttIndex = -1
+                    auIndex = []
                     self.Title.append([])
                     self.Author.append([])
 
+                Text = Level2Extraction(PageLayout, pgIndex, ntIndex, ttIndex, auIndex)
+
                 self.Page.append(Page)
                 self.Note.append(Note)
+                self.Text.append(Text)
 
         self.FigureNote = FigNotePostProcess(FigNoteList)
         self.TableNote  = TabNotePostProcess(TabNoteList)

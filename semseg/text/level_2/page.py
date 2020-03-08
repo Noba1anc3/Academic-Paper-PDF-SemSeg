@@ -7,9 +7,12 @@ sys.dont_write_bytecode = True
 def PageExtraction(PageLayout):
     PageHeight = PageLayout.height
     PageWidth = PageLayout.width
-    Page = []
 
-    for Box in PageLayout:
+    Page = []
+    pgIndex = []
+
+    for Bindex in range(len(PageLayout)):
+        Box = PageLayout._objs[Bindex]
         if isinstance(Box, LTTextBoxHorizontal) and PageHeight > 6*Box.y1:
             for index in range(len(Box._objs)):
                 line = Box._objs[index]
@@ -20,6 +23,7 @@ def PageExtraction(PageLayout):
                     lineText = line.get_text()[:-1].replace(' ', '')
                     if lineText.isdigit() and 0.4 <= lineXmid/PageWidth and lineXmid/PageWidth <= 0.6:
                         Page.append(Box)
+                        pgIndex.append(Bindex)
 
         elif isinstance(Box, LTFigure) and PageHeight > 6*Box.y1:
             pg = True
@@ -40,8 +44,7 @@ def PageExtraction(PageLayout):
                 smallestY = LeftUpY
                 smallestIndex = index
 
-        realPage = Page[smallestIndex]
-        Page = []
-        Page.append(realPage)
+        Page = [Page[smallestIndex]]
+        pgIndex = [pgIndex[smallestIndex]]
 
-    return Page
+    return Page, pgIndex
