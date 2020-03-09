@@ -26,6 +26,7 @@ def rst2json(conf, fileName, semseg, PagesImage, PagesLayout):
         if TextLevel == 1:
             L1Text = semseg.Text.Text
         else:
+            Text = semseg.Text.Text
             Title = semseg.Text.Title
             Author = semseg.Text.Author
             Page = semseg.Text.Page
@@ -92,6 +93,11 @@ def rst2json(conf, fileName, semseg, PagesImage, PagesLayout):
                     TableNoteJsonList = L2FTNote(Image, Layout, 'TableNote', TableNoteItem)
                     for TableNoteJson in TableNoteJsonList:
                         PageLayout['Text'].append(TableNoteJson)
+                if not Text[page] == []:
+                    TextItem = Text[page]
+                    TextJsonList = L2MainText(Image, Layout, 'Text', TextItem)
+                    for TextJson in TextJsonList:
+                        PageLayout['Text'].append(TextJson)
 
         if 'Figure' in PageLayout.keys():
             if not Figure[page] == []:
@@ -195,6 +201,36 @@ def L2FTNote(PageImage, PageLayout, LTType, FTNotes):
             FTNoteLine = FTNote[LineIndex]
             TextLine = {}
             TextLine['content'] = FTNoteLine.get_text()[:-1]
+            TextLine['location'] = BBoxesList[index][LineIndex+1]
+            Text['TextLines'].append(TextLine)
+
+        TextBlock.append(Text)
+
+    return TextBlock
+
+def L2MainText(PageImage, PageLayout, LTType, MainTexts):
+    BBoxesList = NoteBBoxes(PageImage, PageLayout, MainTexts)
+    TextBlock = []
+
+    for index in range(len(MainTexts)):
+        MainText = MainTexts[index]
+        Text = {}
+        Text['SemanticType'] = LTType
+        content = ''
+        for MainTextLine in MainText:
+            text = MainTextLine.get_text().replace("\n", "")
+            if text[-1] == '-':
+                content += text[:-1]
+            else:
+                content += text + ' '
+        Text['content'] = content[:-1]
+        Text['location'] = BBoxesList[index][0]
+        Text['TextLines'] = []
+
+        for LineIndex in range(len(MainText._objs)):
+            MainTextLine = MainText._objs[LineIndex]
+            TextLine = {}
+            TextLine['content'] = MainTextLine.get_text()[:-1]
             TextLine['location'] = BBoxesList[index][LineIndex+1]
             Text['TextLines'].append(TextLine)
 
