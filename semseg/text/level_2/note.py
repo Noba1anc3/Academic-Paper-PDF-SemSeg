@@ -24,20 +24,21 @@ def NoteExtraction(PageLayout):
                     if abs(LineLX - LBlock) < 10 or abs(LineLX - RBlock) < 10:
                         NoteLine.append(layoutItem)
 
-    for Bindex in range(len(PageLayout)):
+    for Bindex in range(len(PageLayout._objs)):
         Box = PageLayout._objs[Bindex]
         if isinstance(Box, LTTextBoxHorizontal):
-            for Lindex in range(len(NoteLine)):
-                Line = NoteLine[Lindex]
+            for Line in NoteLine:
                 if Line.x0 < PageLayout.width / 4 and Box.x0 < PageLayout.width / 4:
                     if Box.y1 <= Line.y0 + 10:
-                        for line in Box:
+                        for Lindex in range(len(Box._objs)):
+                            line = Box._objs[Lindex]
                             Note[0].append(line)
                             ntIndex.append([Bindex, Lindex])
 
                 if Line.x0 > PageLayout.width / 2 and Box.x0 > PageLayout.width / 2:
                     if Box.y1 <= Line.y0 + 10:
-                        for line in Box:
+                        for Lindex in range(len(Box._objs)):
+                            line = Box._objs[Lindex]
                             Note[1].append(line)
                             ntIndex.append([Bindex, Lindex])
 

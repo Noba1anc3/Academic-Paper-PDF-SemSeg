@@ -1,7 +1,7 @@
 from semseg.text.level_1.Leve1Extraction import Leve1Extraction
 from semseg.text.level_2.image_note import *
 from semseg.text.level_2.table_note import *
-from semseg.text.level_2.maintext import Level2Extraction
+from semseg.text.level_2.maintext import *
 from semseg.text.level_2.author import AuthorExtraction
 from semseg.text.level_2.title import TitleExtraction
 from semseg.text.level_2.page import PageExtraction
@@ -63,6 +63,8 @@ class TextExtraction():
 
         self.FigureNote = FigNotePostProcess(FigNoteList)
         self.TableNote  = TabNotePostProcess(TabNoteList)
+
+        self.Text = FigTabNoteOut(self.Text, self.TableNote, self.FigureNote)
 
         logging = Logger(__name__)
         Logger.get_log(logging).info('Text Segmentation Finished')

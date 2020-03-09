@@ -13,6 +13,7 @@ def rst2image(conf, semseg, PagesImage, PagesLayout):
         if TextLevel == 1:
             Text = semseg.Text.Text
         else:
+            Text = semseg.Text.Text
             Title = semseg.Text.Title
             Author = semseg.Text.Author
             Page = semseg.Text.Page
@@ -36,6 +37,7 @@ def rst2image(conf, semseg, PagesImage, PagesLayout):
             if TextLevel == 1:
                 PageVisualize.annotate(PV, LTText, Text[index])
             else:
+                PageVisualize.annotate(PV, LTText, Text[index])
                 PageVisualize.annotate(PV, LTTitle, Title[index])
                 PageVisualize.annotate(PV, LTAuthor, Author[index])
                 PageVisualize.annotate(PV, LTPageNo, Page[index])
