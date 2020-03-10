@@ -35,12 +35,11 @@ def Level2Extraction(PageLayout, pgIndex, ntIndex, ttIndex, auIndex):
             if LTBox._objs == []:
                 PageLayout._objs.remove(LTBox)
 
-    for index in range(len(PageLayout._objs)-1, -1, -1):
-        Box = PageLayout._objs[index]
-        if not isinstance(Box, LTTextBoxHorizontal):
-            PageLayout._objs.remove(Box)
+    for Box in PageLayout._objs:
+        if isinstance(Box, LTTextBoxHorizontal):
+            Text.append(Box)
 
-    return PageLayout._objs
+    return Text
 
 def FigTabNoteOut(Text, TabNote, FigNote):
     for index in range(len(Text)):

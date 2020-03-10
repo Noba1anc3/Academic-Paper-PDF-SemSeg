@@ -32,7 +32,6 @@ if __name__ == '__main__':
         PagesImage  = pdf2image(filePath)
         PagesLayout = pdf2layout(filePath)
 
-
         if not PagesLayout == None:
             semseg = SemanticSegmentation(conf, PagesImage, PagesLayout)
 

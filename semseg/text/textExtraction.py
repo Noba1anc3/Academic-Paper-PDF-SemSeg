@@ -10,6 +10,7 @@ from semseg.text.level_2.tools import *
 from utils.logging.syslog import Logger
 
 import sys
+import copy
 sys.dont_write_bytecode = True
 
 class TextExtraction():
