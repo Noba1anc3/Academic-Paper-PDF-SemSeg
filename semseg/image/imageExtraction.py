@@ -1,3 +1,4 @@
+from semseg.text.level_2.image_note import *
 from semseg.image.image import ImgExtraction
 from utils.logging.syslog import Logger
 import sys
@@ -9,12 +10,24 @@ class ImageExtraction():
         self.PagesLayout = PagesLayout
         self.Segmentation()
 
-    def Segmentation(self):
+    def FNoteExtract(self):
+        FigNoteList = []
+
         for PageNo in range(len(self.PagesLayout)):
             PageLayout = self.PagesLayout[PageNo]
-            Image = ImgExtraction(PageLayout)
-            self.Image.append(Image)
+            FigNoteList.append(FigureNoteExtraction(PageLayout))
 
+        self.FigureNotes = FigNotePostProcess(FigNoteList)
+
+    def Segmentation(self):
+        self.FNoteExtract()
+
+        for PageNo in range(len(self.PagesLayout)):
+            PageLayout = self.PagesLayout[PageNo]
+            PageFNote = self.FigureNotes[PageNo]
+
+            Image = ImgExtraction(PageLayout, PageFNote)
+            self.Image.append(Image)
 
         logging = Logger(__name__)
         Logger.get_log(logging).info('Image Segmentation Finished')

@@ -23,8 +23,8 @@ class SemanticSegmentation():
         TableLevel = self.configList.table_level
 
         if not self.configList.tit_choice:
-            self.Text = TextExtraction(TextLevel, self.PagesLayout)
             self.Image = ImageExtraction(self.PagesLayout)
+            self.Text = TextExtraction(TextLevel, self.PagesLayout)
             self.Table = TableExtraction(TableLevel, self.PagesLayout)
 
         elif self.configList.tit_choice == 1:

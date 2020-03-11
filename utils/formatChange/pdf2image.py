@@ -5,9 +5,12 @@ import tempfile
 import cv2
 import sys
 
+from wand.image import Image
+
 sys.dont_write_bytecode = True
 
 def pdf2image(fileName):
+
     with tempfile.TemporaryDirectory() as path:
         PagesImage = convert_from_path(fileName, output_folder = path)
 
