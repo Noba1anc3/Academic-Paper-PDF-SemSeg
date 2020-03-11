@@ -11,14 +11,10 @@ def ImgExtraction(PageLayout, PageFNote):
     ImgFig = []
     Figure = []
 
-    if not PageFNote == []:
-        for FNote in PageFNote:
-            Region = potentialRegion(PageLayout, FNote)
-            Region = RegionContract(PageLayout, Region)
-            #和文字部分有交叉
-            #和文字部分重合
-            #空白部分能否去除
-            SemFig.append(Region)
+    for FNote in PageFNote:
+        Region = potentialRegion(PageLayout, FNote)
+        Region = RegionContract(PageLayout, Region)
+        SemFig.append(Region)
 
     for Box in PageLayout:
         if isinstance(Box, LTFigure):
@@ -124,7 +120,7 @@ def RegionContract(PageLayout, Region):
             if BoxYDn > ContractYDn:
                 ContractYDn = BoxYDn
 
-    if ContractXUp == 0:
+    if ContractXDn == 0:
         ContractLoc = RegionLoc
     else:
         ContractLoc = [ContractXUp, ContractYUp, ContractXDn, ContractYDn]

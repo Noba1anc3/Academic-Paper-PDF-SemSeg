@@ -1,3 +1,4 @@
+from semseg.text.ImageOut import ImageOut
 from semseg.text.textExtraction import TextExtraction
 from semseg.image.imageExtraction import ImageExtraction
 from semseg.table.tableExtraction import TableExtraction
@@ -12,6 +13,7 @@ class SemanticSegmentation():
         self.configList = conf
         self.PagesImage = PagesImage
         self.PagesLayout = PagesLayout
+        self.PgHeight = PagesLayout[0].height
         self.Page = len(PagesImage)
         self.Segmentation()
 
@@ -23,9 +25,10 @@ class SemanticSegmentation():
         TableLevel = self.configList.table_level
 
         if not self.configList.tit_choice:
+            self.Table = TableExtraction(TableLevel, self.PagesLayout)
             self.Image = ImageExtraction(self.PagesLayout)
             self.Text = TextExtraction(TextLevel, self.PagesLayout)
-            self.Table = TableExtraction(TableLevel, self.PagesLayout)
+            self.Text.Text = ImageOut(self.PgHeight, self.Text.Text, self.Image.Image)
 
         elif self.configList.tit_choice == 1:
             self.Text = TextExtraction(TextLevel, self.PagesLayout)

@@ -21,7 +21,8 @@ if __name__ == '__main__':
 
     for index in range(len(conf.fileList)):
         fileName = conf.fileList[index]
-
+        if fileName[:3] == 'Ans':
+            print(1)
         if not fileName.endswith('.pdf'):
             Logger.get_log(logging).info('{} is skipped  ({}/{})'.format(fileName, index+1, len(conf.fileList)))
             continue
