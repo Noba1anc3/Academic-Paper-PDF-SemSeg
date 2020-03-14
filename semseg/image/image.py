@@ -1,6 +1,5 @@
-from semseg.text.level_2.tools import *
 from semseg.image.cls import Region as RegionCls
-from semseg.image.tools import IOU
+from semseg.image.tools import *
 from pdfminer.layout import *
 
 import sys
@@ -12,12 +11,18 @@ def ImgExtraction(PageLayout, PageFNote):
     Figure = []
 
     for FNote in PageFNote:
+        # 图注之上的潜在区域搜索
         Region = potentialRegion(PageLayout, FNote)
+        # 潜在区域紧缩
         Region = RegionContract(PageLayout, Region)
+        # 边界交叉紧缩
+        Region = BorderContract(PageLayout, Region)
+
         SemFig.append(Region)
 
     for Box in PageLayout:
         if isinstance(Box, LTFigure):
+            Box = BorderContract(PageLayout, Box)
             ImgFig.append(Box)
 
     for SFig in SemFig:
@@ -127,9 +132,29 @@ def RegionContract(PageLayout, Region):
 
     return RegionCls(PgHeight, ContractLoc)
 
-def BoxInsideCheck(Box1, Box2):
-    # 检查Box2是否在Box1当中
-    if Box1[0] <= Box2[0] and Box1[2] >= Box2[2] and Box1[1] <= Box2[1] and Box1[3] >= Box2[3]:
-        return True
-    else:
-        return False
+def BorderContract(PageLayout, Region):
+    PgHeight = PageLayout.height
+
+    RegionXUp = Region.x0
+    RegionYUp = PgHeight - Region.y1
+    RegionXDn = Region.x1
+    RegionYDn = PgHeight - Region.y0
+    RegionLoc = [RegionXUp, RegionYUp, RegionXDn, RegionYDn]
+
+    for Box in PageLayout:
+        if isinstance(Box, LTTextBoxHorizontal):
+            BoxXUp = Box.x0
+            BoxYUp = PgHeight - Box.y1
+            BoxXDn = Box.x1
+            BoxYDn = PgHeight - Box.y0
+            BoxLoc = [BoxXUp, BoxYUp, BoxXDn, BoxYDn]
+
+            if BoxInterCheck(RegionLoc, BoxLoc):
+                if RegionYUp > BoxYUp and BoxYDn > RegionYUp:
+                    RegionYUp = BoxYDn
+                if RegionYDn < BoxYDn and BoxYUp < RegionYDn:
+                    RegionYDn = BoxYUp
+
+                RegionLoc = [RegionXUp, RegionYUp, RegionXDn, RegionYDn]
+
+    return RegionCls(PgHeight, RegionLoc)

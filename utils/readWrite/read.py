@@ -99,8 +99,22 @@ class Configuration():
 
 
 class annotation():
-    def __init__(self):
+    def __init__(self, fileName, PageNo):
+        self.annotateRoot = './estimate/annotation/'
+        self.fileName = fileName
+        self.PageNo = PageNo
+        self.Anno = []
         self.annotateRead()
 
     def annotateRead(self):
-        pass
+        if not os.path.exists(self.annotateRoot):
+            print("Annotation Folder Not Found")
+        else:
+            for pg in range(self.PageNo):
+                annoFile = self.annotateRoot + self.fileName[:-4] + '_' + str(pg) + '.txt'
+                if os.path.exists(annoFile):
+                    with open(annoFile, 'r') as file:
+                        content = file.read().split('\n')[:-1]
+                        self.Anno.append(content)
+                else:
+                    self.Anno.append([])
