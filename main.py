@@ -40,6 +40,11 @@ if __name__ == '__main__':
             pre, rec, f1 = estimate(semseg, Anno)
             EstimationWrite(pre, rec, f1, fileName, conf.eva_folder)
 
+            if conf.evaluate == True:
+                Anno = annotation(fileName, len(PagesLayout))
+                pre, rec, f1 = estimate(semseg, Anno)
+                EstimationWrite(pre, rec, f1, fileName, conf.eva_folder)
+
             if conf.save_image == True:
                 ImageList = rst2image(conf, semseg, PagesImage, PagesLayout)
                 ImageWrite(ImageList, fileName, conf.img_folder)
