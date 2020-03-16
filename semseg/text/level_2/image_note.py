@@ -156,20 +156,22 @@ def NoteAggregation(PageHeight, Line, Box):
     LineHeight = Line.height
     AggFigNote = [Line]
     # aggregation in the direction of Right and Down
-    for Line in Box:
-        if isinstance(Line, LTTextLineHorizontal):
-            LineLX = Line.x0
-            LineUY = PageHeight - Line.y1
-            LineDY = PageHeight - Line.y0
+    for BoxLine in Box:
+        if isinstance(BoxLine, LTTextLineHorizontal):
+            LineLX = BoxLine.x0
+            LineUY = PageHeight - BoxLine.y1
+            LineDY = PageHeight - BoxLine.y0
             if LineLX - fNoteRX > 0 and LineLX - fNoteRX < 2*LineHeight:
                 if LineUY - fNoteUY > -1*LineHeight and LineUY - fNoteUY < LineHeight:
                     if LineDY - fNoteDY > -1*LineHeight and LineDY - fNoteDY < LineHeight:
-                        fNoteRX = Line.x1
-                        AggFigNote.append(Line)
+                        fNoteRX = BoxLine.x1
+                        AggFigNote.append(BoxLine)
             if LineLX - fNoteLX > -0.5*LineHeight and LineLX - fNoteLX < 0.5*LineHeight:
                 if LineUY - fNoteUY > 0 and LineUY - fNoteUY < 1.5*LineHeight:
                     fNoteUY = LineUY
-                    AggFigNote.append(Line)
+                    # 上一行的处理已经结束，将fNoteRX置为该Line的右侧横坐标
+                    fNoteRX = BoxLine.x1
+                    AggFigNote.append(BoxLine)
 
     return AggFigNote
 

@@ -4,7 +4,6 @@ from utils.readWrite.write import *
 
 from semseg.semseg import *
 from estimate.estimation import estimate
-from estimate.jsonRead import jsonRead
 
 from utils.formatChange.pdf2xml import pdf2layout
 from utils.formatChange.pdf2image import pdf2image
