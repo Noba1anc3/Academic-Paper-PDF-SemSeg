@@ -71,8 +71,8 @@ def rst2json(conf, fileName, semseg, PagesImage, PagesLayout):
                     TitleJson = L2Text(Image, Layout, 'Title', TitleItem)
                     PageLayout['Text'].append(TitleJson)
                 if not Author[page] == []:
-                    AuthorItem = Author[page][0]
-                    AuthorJson = L2Text(Image, Layout, 'Author', AuthorItem)
+                    AuthorItem = [Author[page]]
+                    AuthorJson = L2FTNote(Image, Layout, 'Author', AuthorItem)
                     PageLayout['Text'].append(AuthorJson)
                 if not Page[page] == []:
                     PageItem = Page[page][0]

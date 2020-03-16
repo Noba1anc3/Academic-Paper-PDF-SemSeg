@@ -7,7 +7,7 @@ sys.dont_write_bytecode = True
 def TitleExtraction(PageLayout):
     title = []
     titleHeight = -1
-    titleIndex = -1
+    titleIndex = 0
     Height = PageLayout.height
 
     for index in range(len(PageLayout._objs)):

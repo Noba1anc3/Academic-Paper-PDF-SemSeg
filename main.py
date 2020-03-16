@@ -4,6 +4,7 @@ from utils.readWrite.write import *
 
 from semseg.semseg import *
 from estimate.estimation import estimate
+from estimate.jsonRead import jsonRead
 
 from utils.formatChange.pdf2xml import pdf2layout
 from utils.formatChange.pdf2image import pdf2image
@@ -21,8 +22,6 @@ if __name__ == '__main__':
 
     for index in range(len(conf.fileList)):
         fileName = conf.fileList[index]
-        if fileName[:3] == 'Ans':
-            print(1)
         if not fileName.endswith('.pdf'):
             Logger.get_log(logging).info('{} is skipped  ({}/{})'.format(fileName, index+1, len(conf.fileList)))
             continue
@@ -36,10 +35,10 @@ if __name__ == '__main__':
         if not PagesLayout == None:
             semseg = SemanticSegmentation(conf, PagesImage, PagesLayout)
 
-            if conf.evaluate == True:
-                Anno = annotation()
-                pre, rec, f1 = estimate(semseg, Anno)
-                EstimationWrite(pre, rec, f1, fileName, conf.eva_folder)
+        if conf.evaluate == True:
+            # Anno = annotation(fileName, len(PagesLayout))
+            # pre, rec, f1 = estimate(semseg, Anno)
+            # EstimationWrite(pre, rec, f1, fileName, conf.eva_folder)
 
             if conf.save_image == True:
                 ImageList = rst2image(conf, semseg, PagesImage, PagesLayout)
