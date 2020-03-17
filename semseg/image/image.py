@@ -5,7 +5,7 @@ from pdfminer.layout import *
 import sys
 sys.dont_write_bytecode = True
 
-def ImgExtraction(PageLayout, PageFNote):
+def ImgExtraction(PageImage, PageLayout, PageFNote):
     SemFig = []
     ImgFig = []
     Figure = []
@@ -17,12 +17,15 @@ def ImgExtraction(PageLayout, PageFNote):
         Region = RegionContract(PageLayout, Region)
         # 边界交叉紧缩
         Region = BorderContract(PageLayout, Region)
+        # 白色区域紧缩
+        Region = ColorContract(PageImage, Region, PageLayout.height)
 
         SemFig.append(Region)
 
     for Box in PageLayout:
         if isinstance(Box, LTFigure):
             Box = BorderContract(PageLayout, Box)
+            Box = ColorContract(PageImage, Box, PageLayout.height)
             ImgFig.append(Box)
 
     for SFig in SemFig:
@@ -157,4 +160,78 @@ def BorderContract(PageLayout, Region):
 
                 RegionLoc = [RegionXUp, RegionYUp, RegionXDn, RegionYDn]
 
+    return RegionCls(PgHeight, RegionLoc)
+
+def ColorContract(Image, Region, PgHeight):
+    # 判断Region区域内的一整行和一整列是否均为白色像素点，如是，则向内减去一行
+
+    ILRatio = Image.shape[0] / PgHeight
+    RegionXUp = int((Region.x0) * ILRatio)
+    RegionYUp = int((PgHeight - Region.y1) * ILRatio)
+    RegionXDn = int(Region.x1 * ILRatio)
+    RegionYDn = int((PgHeight - Region.y0) * ILRatio)
+
+    UpContract = 0
+    DnContract = 0
+    LtContract = 0
+    RtContract = 0
+
+    # 先Y后X
+    RegionImage = Image[RegionYUp:RegionYDn, RegionXUp:RegionXDn]
+
+    for i in range(RegionImage.shape[0]-1, -1, -1):
+        allWhite = True
+        for j in range(RegionImage.shape[1]):
+            if not (RegionImage[i,j][0] == 255 and RegionImage[i,j][1] == 255 and RegionImage[i,j][2] == 255):
+                allWhite = False
+                break
+        if not allWhite:
+            RegionImage = RegionImage[:i+1,:]
+            DnContract = RegionImage.shape[0] - 1 - i
+            break
+
+    for i in range(RegionImage.shape[0]):
+        allWhite = True
+        for j in range(RegionImage.shape[1]):
+            if not (RegionImage[i,j][0] == 255 and RegionImage[i,j][1] == 255 and RegionImage[i,j][2] == 255):
+                allWhite = False
+                break
+        if not allWhite:
+            RegionImage = RegionImage[i:,:]
+            UpContract = i
+            break
+
+    for i in range(RegionImage.shape[1]):
+        allWhite = True
+        for j in range(RegionImage.shape[0]):
+            if not (RegionImage[j,i][0] == 255 and RegionImage[j,i][1] == 255 and RegionImage[j,i][2] == 255):
+                allWhite = False
+                break
+        if not allWhite:
+            RegionImage = RegionImage[:,i:]
+            LtContract = i
+            break
+
+    for i in range(RegionImage.shape[1]-1, -1, -1):
+        allWhite = True
+        for j in range(RegionImage.shape[0]):
+            if not (RegionImage[j,i][0] == 255 and RegionImage[j,i][1] == 255 and RegionImage[j,i][2] == 255):
+                allWhite = False
+                break
+        if not allWhite:
+            RegionImage = RegionImage[:,:i+1]
+            RtContract = RegionImage.shape[1] - i - 1
+            break
+
+    RegionXUp += LtContract
+    RegionXDn -= RtContract
+    RegionYUp += UpContract
+    RegionYDn -= DnContract
+
+    RegionXUp /= ILRatio
+    RegionXDn /= ILRatio
+    RegionYUp /= ILRatio
+    RegionYDn /= ILRatio
+
+    RegionLoc = [RegionXUp, RegionYUp, RegionXDn, RegionYDn]
     return RegionCls(PgHeight, RegionLoc)

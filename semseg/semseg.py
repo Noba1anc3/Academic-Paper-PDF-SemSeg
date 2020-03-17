@@ -26,7 +26,7 @@ class SemanticSegmentation():
 
         if not self.configList.tit_choice:
             self.Table = TableExtraction(TableLevel, self.PagesLayout)
-            self.Image = ImageExtraction(self.PagesLayout)
+            self.Image = ImageExtraction(self.PagesImage, self.PagesLayout)
             self.Text = TextExtraction(TextLevel, self.PagesLayout)
             self.Text.Text = ImgTabOut(self.PgHeight, self.Text.Text, self.Image.Image, self.Table.Table)
             self.Text.TableNote = TableOut(self.PgHeight, self.Text.TableNote, self.Table.Table)

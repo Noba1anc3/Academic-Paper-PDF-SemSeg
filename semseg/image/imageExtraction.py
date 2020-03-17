@@ -6,8 +6,9 @@ import sys
 sys.dont_write_bytecode = True
 
 class ImageExtraction():
-    def __init__(self, PagesLayout):
+    def __init__(self, PagesImage, PagesLayout):
         self.Image = []
+        self.PagesImage = PagesImage
         self.PagesLayout = PagesLayout
         self.Segmentation()
 
@@ -15,10 +16,11 @@ class ImageExtraction():
         self.FNoteExtract()
 
         for PageNo in range(len(self.PagesLayout)):
+            PageImage = self.PagesImage[PageNo]
             PageLayout = self.PagesLayout[PageNo]
             PageFNote = self.FigureNotes[PageNo]
 
-            Image = ImgExtraction(PageLayout, PageFNote)
+            Image = ImgExtraction(PageImage, PageLayout, PageFNote)
             self.Image.append(Image)
 
         logging = Logger(__name__)

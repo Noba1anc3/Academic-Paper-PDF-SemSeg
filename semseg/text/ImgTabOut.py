@@ -65,7 +65,10 @@ def TableOut(PgHeight, TableNotes, Tables):
 
 def BoxInsideCheck(Box1, Box2):
     # 检查Box2是否在Box1当中
-    if Box1[0] <= Box2[0] and Box1[2] >= Box2[2] and Box1[1] <= Box2[1] and Box1[3] >= Box2[3]:
+    BoxXMid = (Box2[0] + Box2[2])/2
+    BoxYMid = (Box2[1] + Box2[3])/2
+
+    if Box1[0] <= BoxXMid and Box1[2] >= BoxXMid and Box1[1] <= BoxYMid and Box1[3] >= BoxYMid:
         return True
     else:
         return False
