@@ -43,6 +43,25 @@ def ImgTabOut(PgHeight, Text, Image, Table):
 
     return Text
 
+def TableOut(PgHeight, TableNotes, Tables):
+    # 剔除文字部分的正文部分当中在图片和表格内部的文字
+    for PageNo in range(len(TableNotes)):
+        PgTableNote = TableNotes[PageNo]
+        PgTable = Tables[PageNo]
+        if not PgTable == [] and not PgTableNote == []:
+            for tab in PgTable:
+                tabLoc = [tab.x0, PgHeight - tab.y1, tab.x1, PgHeight - tab.y0]
+                for index in range(len(PgTableNote)-1, -1, -1):
+                    TableNote = PgTableNote[index]
+                    for index in range(len(TableNote)-1, -1, -1):
+                        Line = TableNote[index]
+                        LineLoc = [Line.x0, PgHeight - Line.y1, Line.x1, PgHeight - Line.y0]
+                        if BoxInsideCheck(tabLoc, LineLoc):
+                            TableNote.remove(Line)
+                    if TableNote == []:
+                        TableNotes.remove(TableNote)
+
+    return TableNotes
 
 def BoxInsideCheck(Box1, Box2):
     # 检查Box2是否在Box1当中

@@ -55,7 +55,7 @@ def potentialRegion(PageLayout, FNote):
     if FNote[0].x0 * 2 > PageWidth:
         Right = True
 
-    RegionYDn = 0
+    RegionYUp = 0
 
     if Left or Right:
         for Box in PageLayout:
@@ -63,34 +63,34 @@ def potentialRegion(PageLayout, FNote):
                 # 横跨中央
                 if Box.x0 * 2 < PageWidth and Box.x1 * 2 > PageWidth:
                     BoxYDn = PageHeight - Box.y0
-                    if BoxYDn > RegionYDn and BoxYDn < FNoteYUp:
-                        RegionYDn = BoxYDn
+                    if BoxYDn > RegionYUp and BoxYDn < FNoteYUp:
+                        RegionYUp = BoxYDn
                 # 左右两侧
                 else:
                     # 各自寻找各自侧的Box
-                    if Box.width * 3 > PageWidth:
+                    if Box.width*3 > PageWidth:
                         if (Box.x1*2 < PageWidth and Left) or (Box.x0*2 > PageWidth and Right):
                             BoxYDn = PageHeight - Box.y0
-                            if BoxYDn > RegionYDn and BoxYDn < FNoteYUp:
-                                RegionYDn = BoxYDn
+                            if BoxYDn > RegionYUp and BoxYDn < FNoteYUp:
+                                RegionYUp = BoxYDn
 
         if Left:
-            location = [0, RegionYDn, PageWidth/2, FNoteYUp]
+            location = [0, RegionYUp, PageWidth/2, FNoteYUp]
             return RegionCls(PageHeight, location)
         else:
-            location = [PageWidth/2, RegionYDn, PageWidth, FNoteYUp]
+            location = [PageWidth/2, RegionYUp, PageWidth, FNoteYUp]
             return RegionCls(PageHeight, location)
 
     else:
         for Box in PageLayout:
             if isinstance(Box, LTTextBoxHorizontal):
                 BoxWidth = Box.width
-                if BoxWidth * 3 > PageWidth:
+                if BoxWidth * 3 > PageWidth or Box.get_text().find('Fig') == 0:
                     BoxYDn = PageHeight - Box.y0
-                    if BoxYDn > RegionYDn and BoxYDn < FNoteYUp:
-                        RegionYDn = BoxYDn
+                    if BoxYDn > RegionYUp and BoxYDn < FNoteYUp:
+                        RegionYUp = BoxYDn
 
-        location = [0, RegionYDn, PageWidth, FNoteYUp]
+        location = [0, RegionYUp, PageWidth, FNoteYUp]
         return RegionCls(PageHeight, location)
 
 def RegionContract(PageLayout, Region):
