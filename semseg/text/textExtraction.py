@@ -1,16 +1,13 @@
 from semseg.text.level_1.Leve1Extraction import Leve1Extraction
-from semseg.text.level_2.image_note import *
-from semseg.text.level_2.table_note import *
+from semseg.text.level_2.notetools import *
 from semseg.text.level_2.maintext import *
 from semseg.text.level_2.author import AuthorExtraction
 from semseg.text.level_2.title import TitleExtraction
 from semseg.text.level_2.page import PageExtraction
 from semseg.text.level_2.note import NoteExtraction
-from semseg.text.level_2.tools import *
 from utils.logging.syslog import Logger
 
 import sys
-import copy
 sys.dont_write_bytecode = True
 
 class TextExtraction():
@@ -62,8 +59,8 @@ class TextExtraction():
                 self.Note.append(Note)
                 self.Text.append(Text)
 
-        self.FigureNote = FigNotePostProcess(FigNoteList)
-        self.TableNote  = TabNotePostProcess(TabNoteList)
+        self.FigureNote = NotePostProcess(FigNoteList, "F")
+        self.TableNote  = NotePostProcess(TabNoteList, "T")
 
         self.Text = FigTabNoteOut(self.Text, self.TableNote, self.FigureNote)
 

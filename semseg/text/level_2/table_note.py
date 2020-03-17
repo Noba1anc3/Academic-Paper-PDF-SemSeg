@@ -1,45 +1,8 @@
 import re
-import sys
-from pdfminer.layout import *
-from utils.logging.syslog import Logger
-
+from semseg.text.level_2.notetools import *
 sys.dont_write_bytecode = True
 
-def TabNotePostProcess(TabNoteList):
-    TNoteType = TabNoteTypeCheck(TabNoteList)
-
-    if not TNoteType == None:
-        for pgNum in range(len(TabNoteList)):
-            PageTabNote = TabNoteList[pgNum]
-            for tabNoteIndex in range(len(PageTabNote) - 1, -1, -1):
-                tabNote = PageTabNote[tabNoteIndex]
-                tabNoteText = tabNote[1].get_text()[:-1].lower()
-                Type = TypeCalculate(tabNoteText)
-                if not Type == TNoteType:
-                    PageTabNote.remove(tabNote)
-
-        TNoteList = []
-        for pgNum in range(len(TabNoteList)):
-            TNoteList.append([])
-            PageTabNote = TabNoteList[pgNum]
-            for tabNoteIndex in range(len(PageTabNote)):
-                tabNote = PageTabNote[tabNoteIndex]
-                AggTabNote = NoteAggregation(tabNote[0], tabNote[1], tabNote[2])
-                TNoteList[pgNum].append(AggTabNote)
-
-        return TNoteList
-
-    else:
-        pgNum = len(TabNoteList)
-
-        TabNoteList = []
-        for index in range(pgNum):
-            TabNoteList.append([])
-
-        return TabNoteList
-
-
-def TabNoteTypeCheck(TabNoteList):
+def TNTypeCheck(TabNoteList):
     TypeList = []
     TypeCountList = []
 
@@ -47,7 +10,7 @@ def TabNoteTypeCheck(TabNoteList):
         PageTabNote = TabNoteList[pgNum]
         for tabNoteIndex in range(len(PageTabNote)):
             tabNoteText = PageTabNote[tabNoteIndex][1].get_text()[:-1].lower()
-            Type = TypeCalculate(tabNoteText)
+            Type = TNTypeCalculate(tabNoteText)
             TypeList.append(Type)
 
     for index in range(len(TypeList) - 1, -1, -1):
@@ -102,7 +65,7 @@ def TabNoteTypeCheck(TabNoteList):
         logging.logger.handlers.clear()
         return None
 
-def TypeCalculate(tabNoteText):
+def TNTypeCalculate(tabNoteText):
     Type = ''
     NoSpaceText = tabNoteText.replace(" ", "")
 
@@ -154,33 +117,6 @@ def TypeCalculate(tabNoteText):
                 Type += 'EE'
 
     return Type
-
-def NoteAggregation(PageHeight, Line, Box):
-    fNoteLX = Line.x0
-    fNoteRX = Line.x1
-    fNoteUY = PageHeight - Line.y1
-    fNoteDY = PageHeight - Line.y0
-    LineHeight = Line.height
-    AggFigNote = [Line]
-    # aggregation in the direction of Right and Down
-    for BoxLine in Box:
-        if isinstance(BoxLine, LTTextLineHorizontal):
-            LineLX = BoxLine.x0
-            LineUY = PageHeight - BoxLine.y1
-            LineDY = PageHeight - BoxLine.y0
-            if LineLX - fNoteRX > 0 and LineLX - fNoteRX < 2*LineHeight:
-                if LineUY - fNoteUY > -1*LineHeight and LineUY - fNoteUY < LineHeight:
-                    if LineDY - fNoteDY > -1*LineHeight and LineDY - fNoteDY < LineHeight:
-                        fNoteRX = BoxLine.x1
-                        AggFigNote.append(BoxLine)
-            if LineLX - fNoteLX > -0.5*LineHeight and LineLX - fNoteLX < 0.5*LineHeight:
-                if LineUY - fNoteUY > 0 and LineUY - fNoteUY < 1.5*LineHeight:
-                    fNoteUY = LineUY
-                    # 上一行的处理已经结束，将fNoteRX置为该Line的右侧横坐标
-                    fNoteRX = BoxLine.x1
-                    AggFigNote.append(BoxLine)
-
-    return AggFigNote
 
 def TableNoteExtraction(PageLayout):
     TableNote = []

@@ -1,7 +1,7 @@
 from pdfminer.layout import *
 
-contain_thres = 0.8  # 区域1中包含区域2的面积大于contain_thres，则认为区域2在区域1内部
-curve_thres = 1      # 考虑到表格线条可能倾斜，所以只要线条两端点的ｙ坐标相差不超过curve_thres，则认为是水平线条，竖直线条同理
+contain_thres = 0.7  # 区域1中包含区域2的面积大于contain_thres，则认为区域2在区域1内部
+curve_thres = 0.4      # 考虑到表格线条可能倾斜，所以只要线条两端点的ｙ坐标相差不超过curve_thres，则认为是水平线条，竖直线条同理
 
 
 def relation_between_regions(region1, region2, relation):
@@ -65,30 +65,3 @@ def get_text_lines(page_layout):
                 text_lines.append(line)
     return text_lines
 
-
-def get_figures(page_layout):
-    """
-    获取当前页面中的所有文字行
-    :param page_layout: 当前页面布局信息
-    :return: 图片的对象列表
-    """
-    figures = []
-    for box in page_layout:
-        if box.x0 == page_layout.x0 or box.y1 == page_layout.y1 or box.x1 == page_layout.x1 or box.y0 == page_layout.y0:
-            continue
-        if isinstance(box, LTFigure):
-            figures.append(box)
-    return figures
-
-
-def get_rects(page_layout):
-    """
-    获取当前页面中的所有矩形框
-    :param page_layout: 当前页面布局信息
-    :return: 矩形框的对象列表
-    """
-    rects = []
-    for box in page_layout:
-        if isinstance(box, LTRect):
-            rects.append(box)
-    return rects

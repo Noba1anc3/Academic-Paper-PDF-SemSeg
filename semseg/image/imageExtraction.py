@@ -1,4 +1,5 @@
 from semseg.text.level_2.image_note import *
+from semseg.text.level_2.notetools import NotePostProcess
 from semseg.image.image import ImgExtraction
 from utils.logging.syslog import Logger
 import sys
@@ -9,15 +10,6 @@ class ImageExtraction():
         self.Image = []
         self.PagesLayout = PagesLayout
         self.Segmentation()
-
-    def FNoteExtract(self):
-        FigNoteList = []
-
-        for PageNo in range(len(self.PagesLayout)):
-            PageLayout = self.PagesLayout[PageNo]
-            FigNoteList.append(FigureNoteExtraction(PageLayout))
-
-        self.FigureNotes = FigNotePostProcess(FigNoteList)
 
     def Segmentation(self):
         self.FNoteExtract()
@@ -32,3 +24,12 @@ class ImageExtraction():
         logging = Logger(__name__)
         Logger.get_log(logging).info('Image Segmentation Finished')
         logging.logger.handlers.clear()
+
+    def FNoteExtract(self):
+        FigNoteList = []
+
+        for PageNo in range(len(self.PagesLayout)):
+            PageLayout = self.PagesLayout[PageNo]
+            FigNoteList.append(FigureNoteExtraction(PageLayout))
+
+        self.FigureNotes = NotePostProcess(FigNoteList, 'F')

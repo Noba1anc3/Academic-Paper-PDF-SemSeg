@@ -35,10 +35,11 @@ def rst2json(conf, fileName, semseg, PagesImage, PagesLayout):
             TableNote = semseg.Text.TableNote
         if TIT == 0:
             Figure = semseg.Image.Image
+            Table = semseg.Table.Table
     elif TIT == 2:
         Figure = semseg.Image.Image
     else:
-        pass
+        Table = semseg.Table.Table
 
     for page in range(semseg.Page):
         Image = PagesImage[page]
@@ -76,7 +77,7 @@ def rst2json(conf, fileName, semseg, PagesImage, PagesLayout):
                     PageLayout['Text'].append(AuthorJson)
                 if not Page[page] == []:
                     PageItem = Page[page][0]
-                    PageJson = L2Page(Image, Layout, 'Page', PageItem)
+                    PageJson = L2Page(Image, Layout, 'PageNo', PageItem)
                     PageLayout['Text'].append(PageJson)
                 if not Note[page] == []:
                     NoteItem = Note[page]
@@ -105,6 +106,13 @@ def rst2json(conf, fileName, semseg, PagesImage, PagesLayout):
                 FigureJsonList = Fig2Json(Image, Layout, FigureItem)
                 for FigureJson in FigureJsonList:
                     PageLayout['Figure'].append(FigureJson)
+
+        if 'Table' in PageLayout.keys():
+            if not Table[page] == []:
+                TableItem = Table[page]
+                TableJsonList = Fig2Json(Image, Layout, TableItem)
+                for TableJson in TableJsonList:
+                    PageLayout['Table'].append(TableJson)
 
         LTPage['PageLayout'].append(PageLayout)
         JsonDict['Pages'].append(LTPage)

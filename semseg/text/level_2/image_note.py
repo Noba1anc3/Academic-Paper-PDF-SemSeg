@@ -1,42 +1,8 @@
-from semseg.text.level_2.tools import *
 from utils.logging.syslog import Logger
-#　同样类型的假图注混迹在其中，一个在文字里，一个在图片下
-
+from semseg.text.level_2.tools import *
 sys.dont_write_bytecode = True
 
-def FigNotePostProcess(FigNoteList):
-    FNoteType = FigNoteTypeCheck(FigNoteList)
-
-    if not FNoteType == None:
-        for pgNum in range(len(FigNoteList)):
-            PageFigNote = FigNoteList[pgNum]
-            for figNoteIndex in range(len(PageFigNote) - 1, -1, -1):
-                figNote = PageFigNote[figNoteIndex]
-                figNoteText = figNote[0].get_text()[:-1].lower().replace(" ", "")
-                Type = TypeCalculate(figNoteText)
-                if not Type == FNoteType:
-                    PageFigNote.remove(figNote)
-
-        FNoteList = []
-        for pgNum in range(len(FigNoteList)):
-            FNoteList.append([])
-            PageFigNote = FigNoteList[pgNum]
-            for figNoteIndex in range(len(PageFigNote)):
-                figNote = PageFigNote[figNoteIndex]
-                AggFigNote = NoteAggregation(figNote[2], figNote[0], figNote[1])
-                FNoteList[pgNum].append(AggFigNote)
-
-        return FNoteList
-    else:
-        pgNum = len(FigNoteList)
-
-        FigNoteList = []
-        for index in range(pgNum):
-            FigNoteList.append([])
-
-        return FigNoteList
-
-def FigNoteTypeCheck(FigNoteList):
+def FNTypeCheck(FigNoteList):
     TypeList = []
     TypeCountList = []
 
@@ -44,8 +10,9 @@ def FigNoteTypeCheck(FigNoteList):
         PageFigNote = FigNoteList[pgNum]
         for figNoteIndex in range(len(PageFigNote)):
             figNote = PageFigNote[figNoteIndex]
-            figNoteText = figNote[0].get_text()[:-1].lower().replace(" ", "")
-            Type = TypeCalculate(figNoteText)
+
+            figNoteText = figNote[1].get_text()[:-1].lower().replace(" ", "")
+            Type = FNTypeCalculate(figNoteText)
             TypeList.append(Type)
 
     for index in range(len(TypeList) - 1, -1, -1):
@@ -100,7 +67,7 @@ def FigNoteTypeCheck(FigNoteList):
         logging.logger.handlers.clear()
         return None
 
-def TypeCalculate(figNoteText):
+def FNTypeCalculate(figNoteText):
     # figure1: / figure1. / figure1
     # fig.1 / fig.1. / fig.1:
     # figure (1) / fig (0)
@@ -109,6 +76,7 @@ def TypeCalculate(figNoteText):
 
     Type = ''
     digitIndex = None
+    figNoteText = figNoteText.replace(" ", "")
 
     for char in figNoteText:
         if char.isdigit():
@@ -148,47 +116,9 @@ def TypeCalculate(figNoteText):
 
     return Type
 
-def NoteAggregation(PageHeight, Line, Box):
-    fNoteLX = Line.x0
-    fNoteRX = Line.x1
-    fNoteUY = PageHeight - Line.y1
-    fNoteDY = PageHeight - Line.y0
-    LineHeight = Line.height
-    AggFigNote = [Line]
-    # aggregation in the direction of Right and Down
-    for BoxLine in Box:
-        if isinstance(BoxLine, LTTextLineHorizontal):
-            LineLX = BoxLine.x0
-            LineUY = PageHeight - BoxLine.y1
-            LineDY = PageHeight - BoxLine.y0
-            if LineLX - fNoteRX > 0 and LineLX - fNoteRX < 2*LineHeight:
-                if LineUY - fNoteUY > -1*LineHeight and LineUY - fNoteUY < LineHeight:
-                    if LineDY - fNoteDY > -1*LineHeight and LineDY - fNoteDY < LineHeight:
-                        fNoteRX = BoxLine.x1
-                        AggFigNote.append(BoxLine)
-            if LineLX - fNoteLX > -0.5*LineHeight and LineLX - fNoteLX < 0.5*LineHeight:
-                if LineUY - fNoteUY > 0 and LineUY - fNoteUY < 1.5*LineHeight:
-                    fNoteUY = LineUY
-                    # 上一行的处理已经结束，将fNoteRX置为该Line的右侧横坐标
-                    fNoteRX = BoxLine.x1
-                    AggFigNote.append(BoxLine)
-
-    return AggFigNote
-
 def FigureNoteExtraction(PageLayout):
     FigureNote = []
     PageHeight = PageLayout.height
-
-    # Figure = []
-    # LRC = []  #Line / Rect / Curve
-    #
-    # for Box in PageLayout:
-    #     if isinstance(Box, LTFigure):
-    #         Figure.append(Box)
-    #     elif isinstance(Box, LTLine):
-    #         LRC.append(Box)
-    #     elif isinstance(Box, LTRect) or isinstance(Box, LTCurve):
-    #         LRC.append(Box)
 
     for Box in PageLayout:
         if isinstance(Box, LTTextBoxHorizontal):
@@ -198,37 +128,10 @@ def FigureNoteExtraction(PageLayout):
                 if figPos == 0:
                     # fig.1 / fig 2
                     if len(LineText) > 3 and (LineText[3] == '.' or LineText[3].isdigit()):
-                        #if FLRC_Check(Line, Figure, LRC, PageHeight):
-                        FigureNote.append([Line, Box, PageHeight])
+                        FigureNote.append([PageHeight, Line, Box])
                     else:
                         # figure 1 / figure. 2
                         if len(LineText) > 6 and LineText[3:6] == 'ure' and (LineText[6].isdigit() or LineText[6] == '.'):
-                            #if FLRC_Check(Line, Figure, LRC, PageHeight):
-                            FigureNote.append([Line, Box, PageHeight])
+                            FigureNote.append([PageHeight, Line, Box])
 
     return FigureNote
-
-
-
-# def FLRC_Check(figNote, Figure, LRC, PageHeight):
-#     LineHeight = figNote.height
-#     figNoteUpY = PageHeight - figNote.y1
-#     figNotelrX = [figNote.x0, figNote.x1]
-#
-#     for fig in Figure:
-#         figDownY = PageHeight - fig.y0
-#         figlrX = [fig.x0, fig.x1]
-#         diff = figNoteUpY - figDownY
-#         if diff < 5 * LineHeight and diff > 0:
-#             if overlap(figNotelrX, figlrX) > 0:
-#                 return True
-#
-#     for lrc in LRC:
-#         lrcDownY = PageHeight - lrc.y0
-#         lrclrX = [lrc.x0, lrc.x1]
-#         diff = figNoteUpY - lrcDownY
-#         if diff < 5 * LineHeight and diff > 0:
-#             if overlap(figNotelrX, lrclrX) > 0:
-#                 return True
-#
-#     return False

@@ -18,3 +18,6 @@ class LTTableNote:
 
 class LTFigureNote:
     pass
+
+class LTTable:
+    pass

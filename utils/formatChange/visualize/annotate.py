@@ -24,7 +24,7 @@ class PageVisualize():
         size = (int(height * 0.8), int(width * 1.2))
         PageImage = cv2.resize(self.Image, size)
         cv2.imshow('img', PageImage)
-        #cv2.waitKey(0)
+        cv2.waitKey(0)
 
     def drawBox(self, LTType, Boxes):
         #在image图像上根据LTType绘制相应颜色的检测框，并在左上角附上其所属的类型
@@ -57,6 +57,9 @@ class PageVisualize():
         elif LTType == LTText:
             color = (148, 238, 78)             #seagreen
             typeText = 'Text'
+        elif LTType == LTTable:
+            color = (0, 140, 255)              #darkorange
+            typeText = 'Table'
 
         if LTType == LTFigureNote or LTType == LTTableNote or LTType == LTText or LTType == LTNote:
             for Box in Boxes:
@@ -70,7 +73,7 @@ class PageVisualize():
                         Text = True
 
         else:
-            if LTType == LTFigure:
+            if LTType == LTFigure or LTType == LTTable:
                 index = 1
             else:
                 index = 0

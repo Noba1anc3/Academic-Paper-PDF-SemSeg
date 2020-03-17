@@ -33,11 +33,7 @@ if __name__ == '__main__':
 
         if not PagesLayout == None:
             semseg = SemanticSegmentation(conf, PagesImage, PagesLayout)
-
-        if conf.evaluate == True:
-            Anno = annotation(fileName, len(PagesLayout))
-            pre, rec, f1 = estimate(semseg, Anno)
-            EstimationWrite(pre, rec, f1, fileName, conf.eva_folder)
+            jsonFile = rst2json(conf, fileName, semseg, PagesImage, PagesLayout)
 
             if conf.evaluate == True:
                 Anno = annotation(fileName, len(PagesLayout))
@@ -49,7 +45,6 @@ if __name__ == '__main__':
                 ImageWrite(ImageList, fileName, conf.img_folder)
 
             if conf.save_text == True:
-                jsonFile = rst2json(conf, fileName, semseg, PagesImage, PagesLayout)
                 JsonWrite(jsonFile, fileName, conf.json_folder)
 
             Logger.get_log(logging).info("File - {} Processed\n".format(fileName))

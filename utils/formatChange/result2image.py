@@ -22,10 +22,12 @@ def rst2image(conf, semseg, PagesImage, PagesLayout):
             TableNote = semseg.Text.TableNote
         if TIT == 0:
             Image = semseg.Image.Image
+            Table = semseg.Table.Table
+
     elif TIT == 2:
         Image = semseg.Image.Image
     else:
-        pass
+        Table = semseg.Table.Table
 
     for index in range(len(PagesImage)):
         PageImage = PagesImage[index]
@@ -47,18 +49,18 @@ def rst2image(conf, semseg, PagesImage, PagesLayout):
             if TIT == 0:
                 PageVisualize.annotate(PV, LTFigure, Image[index])
                 if TableLevel == 1:
-                    pass
+                    PageVisualize.annotate(PV, LTTable, Table[index])
                 else:
                     pass
         elif TIT == 2:
             PageVisualize.annotate(PV, LTFigure, Image[index])
         else:
             if TableLevel == 1:
-                pass
+                PageVisualize.annotate(PV, LTTable, Table[index])
             else:
                 pass
 
-        PageVisualize.show(PV)
+        #PageVisualize.show(PV)
         ImageList.append(PV.Image)
 
         # if index < len(PagesImage) - 1:

@@ -1,4 +1,4 @@
-from semseg.text.ImageOut import ImageOut
+from semseg.text.ImgTabOut import ImgTabOut
 from semseg.text.textExtraction import TextExtraction
 from semseg.image.imageExtraction import ImageExtraction
 from semseg.table.tableExtraction import TableExtraction
@@ -28,7 +28,7 @@ class SemanticSegmentation():
             self.Table = TableExtraction(TableLevel, self.PagesLayout)
             self.Image = ImageExtraction(self.PagesLayout)
             self.Text = TextExtraction(TextLevel, self.PagesLayout)
-            self.Text.Text = ImageOut(self.PgHeight, self.Text.Text, self.Image.Image)
+            self.Text.Text = ImgTabOut(self.PgHeight, self.Text.Text, self.Image.Image, self.Table.Table)
 
         elif self.configList.tit_choice == 1:
             self.Text = TextExtraction(TextLevel, self.PagesLayout)
