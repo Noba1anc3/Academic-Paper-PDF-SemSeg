@@ -64,53 +64,53 @@ def rst2json(conf, fileName, semseg, PagesImage, PagesLayout):
             if TextLevel == 1:
                 if not L1Text[page] == []:
                     TextItem = L1Text[page]
-                    TextJson = L1TexT(Image, Layout, 'L1Text', TextItem)
+                    TextJson = L1TexT(Layout, 'L1Text', TextItem)
                     PageLayout['Text'].append(TextJson)
             else:
                 if not Title[page] == []:
                     TitleItem = Title[page]
-                    TitleJson = L2Text(Image, Layout, 'Title', TitleItem)
+                    TitleJson = L2Text(Layout, 'Title', TitleItem)
                     PageLayout['Text'].append(TitleJson)
                 if not Author[page] == []:
                     AuthorItem = [Author[page]]
-                    AuthorJson = L2FTNote(Image, Layout, 'Author', AuthorItem)[0]
+                    AuthorJson = L2FTNote(Layout, 'Author', AuthorItem)[0]
                     PageLayout['Text'].append(AuthorJson)
                 if not Page[page] == []:
                     PageItem = Page[page][0]
-                    PageJson = L2Page(Image, Layout, 'PageNo', PageItem)
+                    PageJson = L2Page(Layout, 'PageNo', PageItem)
                     PageLayout['Text'].append(PageJson)
                 if not Note[page] == []:
                     NoteItem = Note[page]
-                    NoteJsonList = L2FTNote(Image, Layout, 'Note', NoteItem)
+                    NoteJsonList = L2FTNote(Layout, 'Note', NoteItem)
                     for NoteJson in NoteJsonList:
                         PageLayout['Text'].append(NoteJson)
                 if not FigureNote[page] == []:
                     FigureNoteItem = FigureNote[page]
-                    FigureNoteJsonList = L2FTNote(Image, Layout, 'FigureNote', FigureNoteItem)
+                    FigureNoteJsonList = L2FTNote(Layout, 'FigureNote', FigureNoteItem)
                     for FigureNoteJson in FigureNoteJsonList:
                         PageLayout['Text'].append(FigureNoteJson)
                 if not TableNote[page] == []:
                     TableNoteItem = TableNote[page]
-                    TableNoteJsonList = L2FTNote(Image, Layout, 'TableNote', TableNoteItem)
+                    TableNoteJsonList = L2FTNote(Layout, 'TableNote', TableNoteItem)
                     for TableNoteJson in TableNoteJsonList:
                         PageLayout['Text'].append(TableNoteJson)
                 if not Text[page] == []:
                     TextItem = Text[page]
-                    TextJsonList = L2MainText(Image, Layout, 'Text', TextItem)
+                    TextJsonList = L2MainText(Layout, 'Text', TextItem)
                     for TextJson in TextJsonList:
                         PageLayout['Text'].append(TextJson)
 
         if 'Figure' in PageLayout.keys():
             if not Figure[page] == []:
                 FigureItem = Figure[page]
-                FigureJsonList = Fig2Json(Image, Layout, FigureItem)
+                FigureJsonList = Fig2Json(Layout, FigureItem)
                 for FigureJson in FigureJsonList:
                     PageLayout['Figure'].append(FigureJson)
 
         if 'Table' in PageLayout.keys():
             if not Table[page] == []:
                 TableItem = Table[page]
-                TableJsonList = Fig2Json(Image, Layout, TableItem)
+                TableJsonList = Fig2Json(Layout, TableItem)
                 for TableJson in TableJsonList:
                     PageLayout['Table'].append(TableJson)
 
@@ -119,8 +119,8 @@ def rst2json(conf, fileName, semseg, PagesImage, PagesLayout):
 
     return JsonDict
 
-def L1TexT(PageImage, PageLayout, LTType, L1Text):
-    BBoxesList = NoteBBoxes(PageImage, PageLayout, L1Text)
+def L1TexT(PageLayout, LTType, L1Text):
+    BBoxesList = NoteBBoxes(PageLayout, L1Text)
     TextBlock = []
 
     for index in range(len(L1Text)):
@@ -143,8 +143,8 @@ def L1TexT(PageImage, PageLayout, LTType, L1Text):
 
     return TextBlock
 
-def L2Text(PageImage, PageLayout, LTType, item):
-    BBoxesList = getBBoxes(PageImage, PageLayout, item)
+def L2Text(PageLayout, LTType, item):
+    BBoxesList = getBBoxes(PageLayout, item)
 
     Text = {}
 
@@ -162,8 +162,8 @@ def L2Text(PageImage, PageLayout, LTType, item):
 
     return Text
 
-def L2Page(PageImage, PageLayout, LTType, item):
-    BBoxesList = getBBoxes(PageImage, PageLayout, item)
+def L2Page(PageLayout, LTType, item):
+    BBoxesList = getBBoxes(PageLayout, item)
 
     Text = {}
 
@@ -187,8 +187,8 @@ def L2Page(PageImage, PageLayout, LTType, item):
 
     return Text
 
-def L2FTNote(PageImage, PageLayout, LTType, FTNotes):
-    BBoxesList = NoteBBoxes(PageImage, PageLayout, FTNotes)
+def L2FTNote(PageLayout, LTType, FTNotes):
+    BBoxesList = NoteBBoxes(PageLayout, FTNotes)
     TextBlock = []
 
     for index in range(len(FTNotes)):
@@ -216,8 +216,8 @@ def L2FTNote(PageImage, PageLayout, LTType, FTNotes):
 
     return TextBlock
 
-def L2MainText(PageImage, PageLayout, LTType, MainTexts):
-    BBoxesList = NoteBBoxes(PageImage, PageLayout, MainTexts)
+def L2MainText(PageLayout, LTType, MainTexts):
+    BBoxesList = NoteBBoxes(PageLayout, MainTexts)
     TextBlock = []
 
     for index in range(len(MainTexts)):
@@ -246,12 +246,12 @@ def L2MainText(PageImage, PageLayout, LTType, MainTexts):
 
     return TextBlock
 
-def Fig2Json(PageImage, PageLayout, Figure):
+def Fig2Json(PageLayout, Figure):
     FigureJsonList = []
 
     for fig in Figure:
         Text = {}
-        location = coordinateChange(PageImage, PageLayout, fig)
+        location = coordinateChange(PageLayout, fig)
         Text["location"] = location
         FigureJsonList.append(Text)
 

@@ -3,22 +3,20 @@ from pdfminer.layout import *
 
 sys.dont_write_bytecode = True
 
-def coordinateChange(Image, Layout, item):
-    ImageSize = Image.shape
-    LayoutWidth = Layout.width
-    LayoutHeight = Layout.height
-    liRatio = [LayoutWidth / ImageSize[1], LayoutHeight / ImageSize[0]]
+def coordinateChange(Layout, item):
 
-    XleftUp = int(item.x0 / liRatio[0])
-    YleftUp = int((LayoutHeight - item.y1) / liRatio[1])
-    XrightDown = int(item.x1 / liRatio[0])
-    YrightDown = int((LayoutHeight - item.y0) / liRatio[1])
+    LayoutHeight = Layout.height
+
+    XleftUp = int(item.x0 / 0.36)
+    YleftUp = int((LayoutHeight - item.y1) / 0.36)
+    XrightDown = int(item.x1 / 0.36)
+    YrightDown = int((LayoutHeight - item.y0) / 0.36)
 
     location = [XleftUp, YleftUp, XrightDown, YrightDown]
 
     return location
 
-def NoteBBoxes(Image, Layout, LTBBoxes):
+def NoteBBoxes(Layout, LTBBoxes):
     # 针对图注类型特殊处理的计算其BBoxes的方法，其中LTBBoxes的每一项为一个列表
     # 每一个列表都是一个图注，列表内部由若干个LTTextLineHorizontal组成
 
@@ -29,7 +27,7 @@ def NoteBBoxes(Image, Layout, LTBBoxes):
         SafeCheck = False
         BBoxes.append([])
         for Line in Block:
-            location = coordinateChange(Image, Layout, Line)
+            location = coordinateChange(Layout, Line)
             XleftUp = location[0]
             YleftUp = location[1]
             XrightDown = location[2]
@@ -53,7 +51,7 @@ def NoteBBoxes(Image, Layout, LTBBoxes):
 
     return BBoxes
 
-def getBBoxes(Image, Layout, LTBBoxes):
+def getBBoxes(Layout, LTBBoxes):
     # 根据Layout的高度和liRatio将从Layout提取出来的坐标转换为Image上的坐标
     # 传入进来的LTBBoxes或者由若干个LTTextBoxHorizontal组成，或者由若干个LTTextLineHorizontal组成
 
@@ -61,7 +59,7 @@ def getBBoxes(Image, Layout, LTBBoxes):
     SafeCheck = False
 
     for BBox in LTBBoxes:
-        location = coordinateChange(Image, Layout, BBox)
+        location = coordinateChange(Layout, BBox)
         XleftUp = location[0]
         YleftUp = location[1]
         XrightDown = location[2]
@@ -83,7 +81,7 @@ def getBBoxes(Image, Layout, LTBBoxes):
 
         if isinstance(BBox, LTTextBoxHorizontal):
             for Line in BBox:
-                location = coordinateChange(Image, Layout, Line)
+                location = coordinateChange(Layout, Line)
                 BBoxes.append(location)
         else:
             BBoxes.append(location.copy())

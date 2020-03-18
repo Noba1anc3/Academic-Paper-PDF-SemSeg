@@ -13,9 +13,9 @@ class PageVisualize():
 
     def annotate(self, LTType, LTBBoxes):
         if LTType == LTTableNote or LTType == LTFigureNote or LTType == LTText or LTType == LTNote:
-            ImageBBoxes = NoteBBoxes(self.Image, self.Layout, LTBBoxes)
+            ImageBBoxes = NoteBBoxes(self.Layout, LTBBoxes)
         else:
-            ImageBBoxes = getBBoxes(self.Image, self.Layout, LTBBoxes)
+            ImageBBoxes = getBBoxes(self.Layout, LTBBoxes)
 
         self.drawBox(LTType, ImageBBoxes)
 

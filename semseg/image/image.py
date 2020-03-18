@@ -164,12 +164,11 @@ def BorderContract(PageLayout, Region):
 
 def ColorContract(Image, Region, PgHeight):
     # 判断Region区域内的一整行和一整列是否均为白色像素点，如是，则向内减去一行
-
-    ILRatio = Image.shape[0] / PgHeight
-    RegionXUp = int((Region.x0) * ILRatio)
-    RegionYUp = int((PgHeight - Region.y1) * ILRatio)
-    RegionXDn = int(Region.x1 * ILRatio)
-    RegionYDn = int((PgHeight - Region.y0) * ILRatio)
+    ILRatio = 2.78
+    RegionXUp = max(int((Region.x0) * ILRatio), 0)
+    RegionYUp = max(int((PgHeight - Region.y1) * ILRatio), 0)
+    RegionXDn = max(int(Region.x1 * ILRatio)+1, 0)
+    RegionYDn = max(int((PgHeight - Region.y0) * ILRatio)+1, 0)
 
     UpContract = 0
     DnContract = 0
@@ -186,8 +185,8 @@ def ColorContract(Image, Region, PgHeight):
                 allWhite = False
                 break
         if not allWhite:
-            RegionImage = RegionImage[:i+1,:]
             DnContract = RegionImage.shape[0] - 1 - i
+            RegionImage = RegionImage[:i+1,:]
             break
 
     for i in range(RegionImage.shape[0]):
@@ -219,8 +218,9 @@ def ColorContract(Image, Region, PgHeight):
                 allWhite = False
                 break
         if not allWhite:
+            # 先计算后裁剪！
+            RtContract = RegionImage.shape[1] - 1 - i
             RegionImage = RegionImage[:,:i+1]
-            RtContract = RegionImage.shape[1] - i - 1
             break
 
     RegionXUp += LtContract
