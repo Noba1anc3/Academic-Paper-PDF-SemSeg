@@ -10,7 +10,7 @@ from utils.formatChange.pdf2image import pdf2image
 from utils.formatChange.result2json import rst2json
 from utils.formatChange.result2image import rst2image
 
-import sys
+import sys 
 sys.dont_write_bytecode = True
 
 if __name__ == '__main__':
