@@ -100,7 +100,7 @@ class Configuration():
 
 class annotation():
     def __init__(self, fileName, PageNo):
-        self.annotateRoot = './estimate/annotation/'
+        self.annotateRoot = './example/annotation/'
         self.fileName = fileName
         self.PageNo = PageNo
         self.Anno = []
@@ -111,7 +111,7 @@ class annotation():
             print("Annotation Folder Not Found")
         else:
             for pg in range(self.PageNo):
-                annoFile = self.annotateRoot + self.fileName[:-4] + '_' + str(pg) + '.txt'
+                annoFile = self.annotateRoot + self.fileName[:-4] + '_' + str(pg+1) + '.txt'
                 if os.path.exists(annoFile):
                     with open(annoFile, 'r') as file:
                         content = file.read().split('\n')[:-1]
