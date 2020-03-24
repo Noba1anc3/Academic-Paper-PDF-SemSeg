@@ -1,7 +1,0 @@
-
-测试：
-在测试时，请把pdf文件和标注文件分别放到./example下的annotation文件夹和pdf_file文件夹下，即可通过配置文件启动测试功能。
-标注文件所在目录：
-https://bhpan.buaa.edu.cn:443/link/93D4553382FD4F984E6EB270AE7142E7
-pdf文件所在目录：
-https://bhpan.buaa.edu.cn:443/link/92598A40D3D902B217C407A3CF8C636C
