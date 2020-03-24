@@ -1,3 +1,4 @@
+from pdfminer.layout import *
 
 from semseg.table.table_utils import *
 
@@ -122,32 +123,58 @@ def merge_curves(curves):
     return merged_curves, isolated_curves
 
 
-def extend_table_region(tables, vertical_curves, fake_vertical_curves):
+def find_cells_in_region(region, text_lines):
+    """
+    找到指定区域内的所有文字航
+    :param region: 制定区域
+    :param text_lines: 当前页面的所有文字行
+    :return: 指定区域内的所有文字行
+    """
+    res = []
+    for line in text_lines:
+        line_region = [line.x0, line.y1, line.x1, line.y0]
+        if relation_between_regions(region, line_region, 'CONTAIN'):
+            res.append(line)
+
+    return res
+
+
+def extend_table_region(regions, vertical_curves, fake_vertical_curves, text_lines):
     """
     通过竖直线条进一步扩大表格范围
-    :param tables: 初始的表格范围
+    :param regions: 初始的表格范围
     :param vertical_curves: 竖直线条
     :param fake_vertical_curves: 空白分隔符
+    :param text_lines: 当前页面的所有文字行
     :return: 扩大后的表格范围
     """
     extended_tables = []
-    for table in tables:
+    for region in regions:
         related_vertical_curves = []
 
         # 处理fake_vertical_curves
         for curve in fake_vertical_curves:
-            if table[0] < curve.x0 < table[2] and \
-                    (min(curve.y1, table[1]) - max(curve.y0, table[3])) / (curve.y1 - curve.y0) > 0.5:
+            if region[0] < curve.x0 < region[2] and \
+                    (min(curve.y1, region[1]) - max(curve.y0, region[3])) / (curve.y1 - curve.y0) > 0.5:
                 related_vertical_curves.append(curve)
 
         # 处理vertical_curves
         for curve in vertical_curves:
-            if table[0] < curve.x0 < table[2] and min(curve.y1, table[1]) - max(curve.y0, table[3]) > -0.3:
+            if region[0] < curve.x0 < region[2] and min(curve.y1, region[1]) - max(curve.y0, region[3]) > -0.3:
                 related_vertical_curves.append(curve)
 
+        extended_region = region.copy()
         for curve in related_vertical_curves:
-            table = [table[0], max(table[1], curve.y1), table[2], min(table[3], curve.y0)]
-        extended_tables.append(table)
+            extended_region = [extended_region[0], max(extended_region[1], curve.y1), extended_region[2],
+                               min(extended_region[3], curve.y0)]
+
+        # 如果通过扩展使得整个表格只增加了一个文字行，则不承认此次扩展
+        pre_text_lines = find_cells_in_region(region, text_lines)
+        pro_text_lines = find_cells_in_region(extended_region, text_lines)
+        if len(pro_text_lines) - len(pre_text_lines) <= 1:
+            extended_tables.append(region)
+        else:
+            extended_tables.append(extended_region)
     return extended_tables
 
 
@@ -203,20 +230,22 @@ def detect_tables_with_single_horizontal_line(isolated_horizontal_curves, vertic
     return tables
 
 
-def detect_table_with_horizontal_lines(regions, algorithm_lines, vertical_curves, fake_vertical_curves):
+def detect_table_with_horizontal_lines(regions, algorithm_lines, vertical_curves, fake_vertical_curves, text_lines):
     """
     检测出含有多条水平线条的表格
     :param regions: 可能的表格区域
     :param algorithm_lines: 含有算法字样的文字行
     :param vertical_curves: 当前页面内的竖直线条
     :param fake_vertical_curves: 当前页面内的虚拟竖直线条
+    :param text_lines: 当前页面下的所有文字行
     :return:
     """
     # 去除算法块
     regions_without_algorithm_lines = exclude_algorithms(regions, algorithm_lines)
 
     # 利用竖直线条对表格范围进行进一步扩展
-    extended_regions = extend_table_region(regions_without_algorithm_lines, vertical_curves, fake_vertical_curves)
+    extended_regions = extend_table_region(regions_without_algorithm_lines, vertical_curves, fake_vertical_curves,
+                                           text_lines)
 
     return extended_regions
 
@@ -252,7 +281,7 @@ def detetct_singal_column(sorted_curves, elements_dict):
             isolated_horizontal_curves.append(group[0])
 
     # 对两种情况分开检测表格区域
-    t1 = detect_table_with_horizontal_lines(regions, algorithm_lines, vertical_curves, fake_vertical_curves)
+    t1 = detect_table_with_horizontal_lines(regions, algorithm_lines, vertical_curves, fake_vertical_curves, text_lines)
     t2 = detect_tables_with_single_horizontal_line(isolated_horizontal_curves, vertical_curves, fake_vertical_curves)
     tables = t1 + t2
 
