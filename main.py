@@ -44,42 +44,41 @@ if __name__ == '__main__':
                 'Processing File - {}  ({}/{})'.format(fileName, index + 1, len(conf.fileList)))
 
         filePath = conf.folder + fileName
-        # PagesImage  = pdf2image(filePath)
-        PagesLayout = pdf2layout(filePath)
+        PagesImage  = pdf2image(filePath)
+        #PagesLayout = pdf2layout(filePath)
 
-        # if not PagesLayout == None:
-        #     semseg = SemanticSegmentation(conf, PagesImage, PagesLayout)
+        if not 1 == None:
+            # semseg = SemanticSegmentation(conf, PagesImage, PagesLayout)
+            # jsonFile = rst2json(conf, fileName, semseg, PagesImage, PagesLayout)
 
-        if conf.evaluate == True:
-            semseg = jsonRead(fileName)
-            Anno = annotation(fileName, len(PagesLayout))
-            pre_num, rec_num, f1_num, pre_area, rec_area, f1_area = estimate(semseg, Anno)
-            EstimationWrite(pre_num, rec_num, f1_num, pre_area, rec_area, f1_area, fileName, conf.eva_folder)
-            for key in pre_num.keys():
-                if pre_num[key] != 'NaN':
-                    validnum[key] += 1
-                    total_pre_num[key] += pre_num[key]
-                    total_rec_num[key] += rec_num[key]
-                    total_f1_num[key] += f1_num[key]
-                    total_pre_area[key] += pre_area[key]
-                    total_rec_area[key] += rec_area[key]
-                    total_f1_area[key] += f1_area[key]
+            if conf.evaluate == True:
+                jsonFile = jsonRead(fileName)
+                Anno = annotation(fileName, len(PagesImage))
 
-            #
+                pre_num, rec_num, f1_num, pre_area, rec_area, f1_area = \
+                    estimate(PagesImage, jsonFile, Anno, conf.eva_img_folder)
+                EstimationWrite(pre_num, rec_num, f1_num,
+                                pre_area, rec_area, f1_area,
+                                fileName, conf.eva_doc_folder)
+
+                for key in pre_num.keys():
+                    if pre_num[key] != 'NaN':
+                        validnum[key] += 1
+                        total_pre_num[key] += pre_num[key]
+                        total_rec_num[key] += rec_num[key]
+                        total_f1_num[key] += f1_num[key]
+                        total_pre_area[key] += pre_area[key]
+                        total_rec_area[key] += rec_area[key]
+                        total_f1_area[key] += f1_area[key]
+
             # if conf.save_image == True:
             #     ImageList = rst2image(conf, semseg, PagesImage, PagesLayout)
             #     ImageWrite(ImageList, fileName, conf.img_folder)
             #
             # if conf.save_text == True:
-            #     jsonFile = rst2json(conf, fileName, semseg, PagesImage, PagesLayout)
             #     JsonWrite(jsonFile, fileName, conf.json_folder)
 
             Logger.get_log(logging).info("File - {} Processed\n".format(fileName))
-
-        # c = str(input())
-        # if c == 'q':
-        #     import sys
-        #     sys.exit()
 
     for key in total_pre_num.keys():
         if validnum[key] == 0:
@@ -103,7 +102,7 @@ if __name__ == '__main__':
             total_rec_area[key] = float(format(total_rec_area[key], '.2f'))
             total_f1_area[key] = float(format(total_f1_area[key], '.2f'))
 
-    EstimationWrite(total_pre_num, total_rec_num, total_f1_num, total_pre_area, total_rec_area, total_f1_area, 'AAAAA',
-                    conf.eva_folder)
+    EstimationWrite(total_pre_num, total_rec_num, total_f1_num, total_pre_area,
+                    total_rec_area, total_f1_area, 'Average.pdf', conf.eva_folder)
 
     Logger.get_log(logging).info("All file processed")

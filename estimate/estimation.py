@@ -2,6 +2,8 @@ import sys
 import cv2
 import numpy as np
 from semseg.image.tools import IOU
+from utils.readWrite.write import ImageWrite
+
 sys.dont_write_bytecode = True
 
 
@@ -26,8 +28,8 @@ def get_annonum(annotate):
 
 def get_annoarea(annoline):
 
-    return (int(annoline.split(' ')[3]) - int(annoline.split(' ')[1])) * (int(annoline.split(' ')[4]) -
-                                                                          int(annoline.split(' ')[2]))
+    return (int(annoline.split(' ')[3]) - int(annoline.split(' ')[1]))\
+           * (int(annoline.split(' ')[4]) - int(annoline.split(' ')[2]))
 
 
 def get_boxarea(box):
@@ -35,12 +37,14 @@ def get_boxarea(box):
 
 
 def numcalculate(total, true, anno):
+
     p = {'Title': 0.0, 'Author': 0.0, 'Text': 0.0, 'FigureNote': 0.0, 'TableNote': 0.0, 'Note': 0.0, 'PageNo': 0.0,
          'Figure': 0.0, 'Table': 0.0, 'Cell': 0.0}
     r = {'Title': 0.0, 'Author': 0.0, 'Text': 0.0, 'FigureNote': 0.0, 'TableNote': 0.0, 'Note': 0.0, 'PageNo': 0.0,
          'Figure': 0.0, 'Table': 0.0, 'Cell': 0.0}
     f = {'Title': 0.0, 'Author': 0.0, 'Text': 0.0, 'FigureNote': 0.0, 'TableNote': 0.0, 'Note': 0.0, 'PageNo': 0.0,
          'Figure': 0.0, 'Table': 0.0, 'Cell': 0.0}
+
     for key, value in anno.items():
         if value == 'NaN':
             p[key] = 'NaN'
@@ -92,12 +96,10 @@ def areacalculate(total, prearea, recarea, anno):
     return p, r, f
 
 
-def estimate(segment, annotate):
-    ImgPath = 'F:/PyCharm/pywork/PDF_parsing/pdfimg/'
-    Error_Save_Path = 'F:/PyCharm/pywork/pdf_analysis/estimate/error/'
-    pdfname = segment['FileName']
-
+def estimate(PagesImage, segment, annotate, img_folder):
+    Images = []
     annonum, annoarea = get_annonum(annotate)
+
     pdftotalnum = {'Title': 0, 'Author': 0, 'Text': 0, 'FigureNote': 0, 'TableNote': 0, 'Note': 0, 'PageNo': 0,
                    'Figure': 0, 'Table': 0, 'Cell': 0}
     pdftruenum = {'Title': 0, 'Author': 0, 'Text': 0, 'FigureNote': 0, 'TableNote': 0, 'Note': 0, 'PageNo': 0,
@@ -112,8 +114,8 @@ def estimate(segment, annotate):
     pages = segment['Pages']
     for pageindex in range(len(pages)):
         page = pages[pageindex]
-        imgname = pdfname.split('.')[0] + '_' + str(pageindex + 1) + '.PNG'
         anno = annotate.Anno[pageindex]
+        image = PagesImage[pageindex]
         layout = page['PageLayout']
         for key, value in layout[0].items():
             if key == 'Text':
@@ -137,17 +139,16 @@ def estimate(segment, annotate):
             prearea = get_boxarea(prebox)
             pdftotalarea[semtype] += prearea
             if semtype == 'Text':
-                anbox = []
-                semerror.append(text)
-                print('text estimation')
+                #semerror.append(text)
+                pass
             else:
                 for annoindex in range(len(anno)):
-                    anbox = []
                     if anno[annoindex].split(' ')[0] == semtype:
+                        anbox = []
                         for i in range(4):
                             anbox.append(int(anno[annoindex].split(' ')[i+1]))
                         Iou = IOU(prebox, anbox)
-                        if Iou > 0.7:
+                        if Iou > 0.7 or (Iou > 0.5 and semtype == 'PageNo'):
                             threshold = True
                             pdftruenum[semtype] += 1
                             pdfprearea[semtype] += prearea
@@ -167,8 +168,8 @@ def estimate(segment, annotate):
             prearea = get_boxarea(prebox)
             pdftotalarea[semtype] += prearea
             for annoindex in range(len(anno)):
-                anbox = []
                 if anno[annoindex].split(' ')[0] == semtype:
+                    anbox = []
                     for i in range(4):
                         anbox.append(int(anno[annoindex].split(' ')[i + 1]))
                     Iou = IOU(prebox, anbox)
@@ -193,8 +194,8 @@ def estimate(segment, annotate):
             prearea = get_boxarea(prebox)
             pdftotalarea[semtype] += prearea
             for annoindex in range(len(anno)):
-                anbox = []
                 if anno[annoindex].split(' ')[0] == semtype:
+                    anbox = []
                     for i in range(4):
                         anbox.append(int(anno[annoindex].split(' ')[i + 1]))
                     Iou = IOU(prebox, anbox)
@@ -213,30 +214,41 @@ def estimate(segment, annotate):
         for i in range(len(anno)):
             if anno[i] not in annofound:
                 anno_notfound.append(anno[i])
-        if (len(anno_notfound) + len(semerror)) > 0:
-            img = cv2.imdecode(np.fromfile(ImgPath + imgname, dtype=np.uint8), -1)
+
+        if len(anno_notfound) + len(semerror) > 0:
+            image = np.array(image)
+
             for i in range(len(anno_notfound)):
                 error = anno_notfound[i]
                 semtype = error.split(' ')[0]
+
                 x1 = int(error.split(' ')[1])
                 y1 = int(error.split(' ')[2])
                 x2 = int(error.split(' ')[3])
                 y2 = int(error.split(' ')[4])
-                cv2.rectangle(img, (x1, y1),
-                              (x2, y2), (220, 20, 60), 2)
-                cv2.putText(img, semtype, (x1, y1), cv2.FONT_HERSHEY_COMPLEX, 1, (220, 20, 60), 1)
+
+                cv2.rectangle(image, (x1, y1), (x2, y2), (255, 140, 0), 3)
+                cv2.putText(image, semtype, (x1, y1), 0, 1.5, (255, 140, 0), 2)
+
             for i in range(len(semerror)):
                 error = semerror[i]
                 semtype = error['SemanticType']
+
                 x1 = error['location'][0]
                 y1 = error['location'][1]
                 x2 = error['location'][2]
                 y2 = error['location'][3]
-                cv2.rectangle(img, (x1, y1),
-                              (x2, y2), (0, 0, 255), 2)
-                cv2.putText(img, semtype, (x1, y1), cv2.FONT_HERSHEY_COMPLEX, 1, (0, 0, 255), 1)
-            cv2.imencode('.jpg', img)[1].tofile(Error_Save_Path + imgname)
+
+                cv2.rectangle(image, (x1, y1), (x2, y2), (122, 103, 238), 3)
+                cv2.putText(image, semtype, (x1, y1), 0, 1.5, (122, 103, 238), 2)
+
+                Images.append(image)
+        else:
+            Images.append(None)
+
+    ImageWrite(Images, segment['FileName'], img_folder)
 
     p_num, r_num, f_num = numcalculate(pdftotalnum, pdftruenum, annonum)
     p_area, r_area, f_area = areacalculate(pdftotalarea, pdfprearea, pdfrecarea, annoarea)
+
     return p_num, r_num, f_num, p_area, r_area, f_area

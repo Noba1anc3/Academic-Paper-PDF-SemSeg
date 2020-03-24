@@ -1,5 +1,3 @@
 /utils/logging/out.log
 /example/
 *.pyc
-/.idea/workspace.xml
-/.idea/

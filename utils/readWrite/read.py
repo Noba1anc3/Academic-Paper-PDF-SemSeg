@@ -33,8 +33,15 @@ class Configuration():
 
         if self.evaluate == True:
             self.eva_folder = seg_result_folder + 'evaluation/'
+            self.eva_img_folder = self.eva_folder + 'image/'
+            self.eva_doc_folder = self.eva_folder + 'doc/'
+
             if not os.path.exists(self.eva_folder):
                 os.mkdir(self.eva_folder)
+            if not os.path.exists(self.eva_img_folder):
+                os.mkdir(self.eva_img_folder)
+            if not os.path.exists(self.eva_doc_folder):
+                os.mkdir(self.eva_doc_folder)
 
         if self.save_text == True:
             self.json_folder = seg_result_folder + 'json/'

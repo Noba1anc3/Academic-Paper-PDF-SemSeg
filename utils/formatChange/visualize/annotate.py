@@ -69,7 +69,7 @@ class PageVisualize():
                     rightDown = (Line[2], Line[3])
                     cv2.rectangle(self.Image, leftTop, rightDown, color, 3)
                     if not Text:
-                        cv2.putText(self.Image, typeText, (Line[0], Line[1]), 0, 1.5, color, thickness=3)
+                        cv2.putText(self.Image, typeText, leftTop, 0, 1.5, color, thickness=3)
                         Text = True
 
         else:

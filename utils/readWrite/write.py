@@ -2,7 +2,7 @@ import os
 import cv2
 import sys
 import json
-
+import numpy as np
 from utils.logging.syslog import Logger
 
 sys.dont_write_bytecode = True
@@ -17,7 +17,8 @@ def ImageWrite(ImageList, fileName, fileFolder):
     for index in range(len(ImageList)):
         Image = ImageList[index]
         imgName = fileName[:-4] + '_p' + str(index+1) + '.jpg'
-        cv2.imwrite(imgFolder + imgName, Image)
+        if isinstance(Image, np.ndarray):
+            cv2.imwrite(imgFolder + imgName, Image)
 
     logging = Logger(__name__)
     Logger.get_log(logging).info('Image Saved')
@@ -35,8 +36,10 @@ def JsonWrite(JsonFile, fileName, fileFolder):
 
 
 def EstimationWrite(p_num, r_num, f_num, p_area, r_area, f_area, fileName, fileFolder):
-    SemType = {'Title': '标题', 'Author': '作者', 'FigureNote': '图注', 'TableNote': '表注', 'Note': '注释', 'PageNo': '页码',
-               'Text': '正文', 'Figure': '图', 'Table': '表', 'Cell': '单元格'}
+    SemType = {'Title': '标题', 'Author': '作者', 'FigureNote': '图注',
+               'TableNote': '表注', 'Note': '注释', 'PageNo': '页码',
+               'Text': '正文', 'Figure': '图片', 'Table': '表格', 'Cell': '单元格'}
+
     estFile = fileFolder + fileName[:-4] + '.txt'
     Precision_Num = 0.0
     Recall_Num = 0.0
