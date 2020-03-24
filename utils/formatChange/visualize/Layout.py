@@ -21,3 +21,6 @@ class LTFigureNote:
 
 class LTTable:
     pass
+
+class LTCell:
+    pass

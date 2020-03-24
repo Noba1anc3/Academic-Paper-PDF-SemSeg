@@ -7,6 +7,8 @@ def coordinateChange(Layout, item):
 
     LayoutHeight = Layout.height
 
+    if isinstance(item, list):
+        item = item[0]
     XleftUp = int(item.x0 / 0.36)
     YleftUp = int((LayoutHeight - item.y1) / 0.36)
     XrightDown = int(item.x1 / 0.36)
@@ -87,4 +89,3 @@ def getBBoxes(Layout, LTBBoxes):
             BBoxes.append(location.copy())
 
     return BBoxes
-

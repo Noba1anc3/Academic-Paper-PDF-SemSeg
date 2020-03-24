@@ -17,6 +17,9 @@ def rst2json(conf, fileName, semseg, PagesImage, PagesLayout):
 
     Figure = None
     Table = None
+    Column_Header = None
+    Row_Header = None
+    Body = None
 
     JsonDict = {}
     JsonDict['FileName'] = fileName
@@ -36,13 +39,19 @@ def rst2json(conf, fileName, semseg, PagesImage, PagesLayout):
         if TIT == 0:
             Figure = semseg.Image.Image
             Table = semseg.Table.Table
+            Column_Header = semseg.Table.Column_Header
+            Row_Header = semseg.Table.Row_Header
+            Body = semseg.Table.Body
+
     elif TIT == 2:
         Figure = semseg.Image.Image
     else:
         Table = semseg.Table.Table
+        Column_Header = semseg.Table.Column_Header
+        Row_Header = semseg.Table.Row_Header
+        Body = semseg.Table.Body
 
     for page in range(semseg.Page):
-        Image = PagesImage[page]
         Layout = PagesLayout[page]
 
         LTPage = {}
@@ -110,8 +119,18 @@ def rst2json(conf, fileName, semseg, PagesImage, PagesLayout):
         if 'Table' in PageLayout.keys():
             if not Table[page] == []:
                 TableItem = Table[page]
+                CHeaderItem = Column_Header[page]
+                RHeaderItem = Row_Header[page]
+                BodyItem = Body[page]
+
                 TableJsonList = Fig2Json(Layout, TableItem)
-                for TableJson in TableJsonList:
+                CJsonList, RJsonList, BJsonList = CRB2Json(Layout, CHeaderItem, RHeaderItem, BodyItem)
+
+                for index in range(len(TableJsonList)):
+                    TableJson = TableJsonList[index]
+                    TableJson["row_header"] = RJsonList[index]
+                    TableJson["col_header"] = CJsonList[index]
+                    TableJson["data"] = BJsonList[index]
                     PageLayout['Table'].append(TableJson)
 
         LTPage['PageLayout'].append(PageLayout)
@@ -256,3 +275,54 @@ def Fig2Json(PageLayout, Figure):
         FigureJsonList.append(Text)
 
     return FigureJsonList
+
+def CRB2Json(Layout, CHeaderItem, RHeaderItem, BodyItem):
+    CHeaderJsonList = []
+    RHeaderJsonList = []
+    BodyJsonList = []
+
+    for CHeader in CHeaderItem:
+        CHeaderJson = []
+        for cell in CHeader:
+            CellJson = {}
+            CellJson["location"] = coordinateChange(Layout, cell[0])
+            CellJson["start_row"] = cell[1]
+            CellJson["end_row"] = cell[2]
+            CellJson["start_col"] = cell[3]
+            CellJson["end_col"] = cell[4]
+            CellJson["content"] = cell[5]
+            CellJson["Children"] = cell[6]
+            CHeaderJson.append(CellJson)
+
+        CHeaderJsonList.append(CHeaderJson)
+#pdf 2 "content":"SemEval",
+    for RHeader in RHeaderItem:
+        RHeaderJson = []
+        for cell in RHeader:
+            CellJson = {}
+            CellJson["location"] = coordinateChange(Layout, cell[0])
+            CellJson["start_row"] = cell[1]
+            CellJson["end_row"] = cell[2]
+            CellJson["start_col"] = cell[3]
+            CellJson["end_col"] = cell[4]
+            CellJson["content"] = cell[5]
+            CellJson["Children"] = cell[6]
+            RHeaderJson.append(CellJson)
+
+        RHeaderJsonList.append(RHeaderJson)
+
+    for Body in BodyItem:
+        BodyJson = []
+        for cell in Body:
+            CellJson = {}
+            CellJson["location"] = coordinateChange(Layout, cell[0])
+            CellJson["start_row"] = cell[1]
+            CellJson["end_row"] = cell[2]
+            CellJson["start_col"] = cell[3]
+            CellJson["end_col"] = cell[4]
+            CellJson["content"] = cell[5]
+            BodyJson.append(CellJson)
+
+        BodyJsonList.append(BodyJson)
+
+    return CHeaderJsonList, RHeaderJsonList, BodyJsonList

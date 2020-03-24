@@ -185,8 +185,4 @@ def extraction(page_layout, table_region):
         body.append([[cell.x0, cell.y1, cell.x1, cell.y0], cell.start_row, cell.end_row, cell.start_col, cell.end_col,
                      cell.get_text()])
 
-    print(column_header)
-    print(row_header)
-    print(body)
-
     return column_header, row_header, body

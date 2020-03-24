@@ -23,11 +23,17 @@ def rst2image(conf, semseg, PagesImage, PagesLayout):
         if TIT == 0:
             Image = semseg.Image.Image
             Table = semseg.Table.Table
+            Column_Header = semseg.Table.Column_Header
+            Row_Header = semseg.Table.Row_Header
+            Body = semseg.Table.Body
 
     elif TIT == 2:
         Image = semseg.Image.Image
     else:
         Table = semseg.Table.Table
+        Column_Header = semseg.Table.Column_Header
+        Row_Header = semseg.Table.Row_Header
+        Body = semseg.Table.Body
 
     for index in range(len(PagesImage)):
         PageImage = PagesImage[index]
@@ -48,17 +54,20 @@ def rst2image(conf, semseg, PagesImage, PagesLayout):
                 PageVisualize.annotate(PV, LTTableNote, TableNote[index])
             if TIT == 0:
                 PageVisualize.annotate(PV, LTFigure, Image[index])
-                if TableLevel == 1:
-                    PageVisualize.annotate(PV, LTTable, Table[index])
-                else:
-                    pass
+                PageVisualize.annotate(PV, LTTable, Table[index])
+                if TableLevel == 2:
+                    PageVisualize.annotate(PV, LTCell, Column_Header[index])
+                    PageVisualize.annotate(PV, LTCell, Row_Header[index])
+                    PageVisualize.annotate(PV, LTCell, Body[index])
+
         elif TIT == 2:
             PageVisualize.annotate(PV, LTFigure, Image[index])
         else:
-            if TableLevel == 1:
-                PageVisualize.annotate(PV, LTTable, Table[index])
-            else:
-                pass
+            PageVisualize.annotate(PV, LTTable, Table[index])
+            if TableLevel == 2:
+                PageVisualize.annotate(PV, LTCell, Column_Header[index])
+                PageVisualize.annotate(PV, LTCell, Row_Header[index])
+                PageVisualize.annotate(PV, LTCell, Body[index])
 
         #PageVisualize.show(PV)
         ImageList.append(PV.Image)
