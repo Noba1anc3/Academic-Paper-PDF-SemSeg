@@ -123,7 +123,7 @@ def further_split_row_header_cells(row_header_cells, column_intervals):
                 cell1 = separated_cells[index]
                 cell2 = below_column_intervals[index]
                 if abs(cell1.x0 - cell2[0]) > 1 and abs(cell1.x1 - cell2[1]) > 1 and \
-                        abs((cell1.x0 + cell1.x1) - (cell2[0] + cell2[1])) > 6:
+                        abs((cell1.x0 + cell1.x1) - (cell2[0] + cell2[1])) > 7:
                     check = False
                     break
 
@@ -235,15 +235,17 @@ def handle_span_row_cells(span_row_cells, row_intervals, column_intervals):
     merge_lists = []
     for interval in column_intervals:
         merge_lists.append([])
-        for cell in span_row_cells:
-            find = False
-            if interval[0] <= cell.x0 and interval[1] >= cell.x1:
-                merge_lists[-1].append(cell)
-                find = True
-            if not find:
-                merge_lists.insert(0, [cell])
+        for index in range(len(span_row_cells)):
+            cell = span_row_cells[index]
+            if cell is not None:
+                if interval[0] <= cell.x0 and interval[1] >= cell.x1:
+                    merge_lists[-1].append(cell)
+                    span_row_cells[index] = None
         if len(merge_lists[-1]) == 0:
             merge_lists = merge_lists[:-1]
+    for cell in span_row_cells:
+        if cell is not None:
+            merge_lists.append([cell])
 
     span_row_cells = []
     for m_list in merge_lists:
@@ -276,10 +278,10 @@ def column_partition(table_region, initial_cells, horizontal_curves):
     # ====================================================================================
     # 得到行表头，并粗略切分表头
     # 根据水平线条初步分割行表头区域和剩余区域
-    row_header_cells, body_cells = separate_row_header_from_body(table_region, initial_cells, horizontal_curves)
+    row_header_cells, initial_body_cells = separate_row_header_from_body(table_region, initial_cells, horizontal_curves)
 
     # 对body_cells进行初步列分割得到列区间
-    column_intervals = get_column_intervals([], [], body_cells)
+    column_intervals = get_column_intervals([], [], initial_body_cells)
 
     # 以column_intervals为基础，对row_header_cells进行进一步分割
     row_header_cells = further_split_row_header_cells(row_header_cells, column_intervals)
@@ -312,11 +314,11 @@ def column_partition(table_region, initial_cells, horizontal_curves):
 
     # 帮助列切割
     # 对跨越两个区间的body_cells进行切割
-    column_intervals = get_column_intervals([], cells_without_child, body_cells)
+    column_intervals = get_column_intervals([], cells_without_child, initial_body_cells)
     column_intervals = sorted(column_intervals, key=lambda inter: inter[0])
 
     split_body_cells = []
-    for b_cell in body_cells:
+    for b_cell in initial_body_cells:
         separators = []
         for interval_index in range(len(column_intervals) - 1):
             interval = column_intervals[interval_index]
@@ -330,7 +332,7 @@ def column_partition(table_region, initial_cells, horizontal_curves):
     # 由于body_cells被切割，所以要用切割后的split_body_cells进行列区域的重新划分
     column_intervals = get_column_intervals([], cells_without_child, split_body_cells)
     column_intervals = sorted(column_intervals, key=lambda inter: inter[0])
-    column_intervals_2 = get_column_intervals([], [], body_cells)
+    column_intervals_2 = get_column_intervals([], [], initial_body_cells)
     column_intervals_2 = sorted(column_intervals_2, key=lambda inter: inter[0])
     body_cells = []
     if column_intervals_2[0][1] < column_intervals[0][0]:

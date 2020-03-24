@@ -156,11 +156,24 @@ def extraction(page_layout, table_region):
     horizontal_curves = get_horizontal_curves(page_layout)
     rows, span_row_cells, remain_cells, column_intervals = column_partition(table_region, percent_split_cells,
                                                                             horizontal_curves)
+    column_header_end_row = -1
+    if len(column_intervals) <= 2:    # 只有两列的表格必定没有列表头
+        for row in rows:
+            for cell in row:
+                cell.children = []
+                cell.father = []
+                remain_cells.append(cell)
+                column_header_end_row = max(column_header_end_row, cell.end_row)
+        for cell in span_row_cells:
+            remain_cells.append(cell)
+            column_header_end_row = max(column_header_end_row, cell.end_row)
+        rows = []
+        span_row_cells = []
 
     # =============================================================
     # 进行行切割
-    row_header_cells, body_cells, row_intervals = row_partition(remain_cells, horizontal_curves, column_intervals)
-
+    row_header_cells, body_cells, row_intervals = row_partition(remain_cells, horizontal_curves, column_intervals,
+                                                                table_region, column_header_end_row)
 
     # 转换成需要的形式返回
     column_header = []
@@ -174,12 +187,12 @@ def extraction(page_layout, table_region):
     for cell in span_row_cells:
         column_header.append([[cell.x0, cell.y1, cell.x1, cell.y0], cell.start_row, cell.end_row, cell.start_col,
                            cell.end_col, cell.get_text(), cell.children])
-
+    
     row_header = []
     for cell in row_header_cells:
         row_header.append([[cell.x0, cell.y1, cell.x1, cell.y0], cell.start_row, cell.end_row, cell.start_col,
                            cell.end_col, cell.get_text(), cell.children])
-
+    
     body = []
     for cell in body_cells:
         body.append([[cell.x0, cell.y1, cell.x1, cell.y0], cell.start_row, cell.end_row, cell.start_col, cell.end_col,
