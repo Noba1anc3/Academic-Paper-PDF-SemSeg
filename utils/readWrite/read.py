@@ -100,7 +100,7 @@ class Configuration():
 
 class annotation():
     def __init__(self, fileName, PageNo):
-        self.annotateRoot = './example/annotation/'
+        self.annotateRoot = '../annotation/'
         self.fileName = fileName
         self.PageNo = PageNo
         self.Anno = []
