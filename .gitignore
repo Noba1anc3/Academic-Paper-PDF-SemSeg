@@ -1,5 +1,5 @@
+/utils/logging/out.log
 /example/
-/*.pyc
+*.pyc
 /.idea/workspace.xml
 /.idea/
-/utils/logging/out.log
