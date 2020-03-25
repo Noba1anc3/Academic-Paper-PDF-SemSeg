@@ -1,7 +1,7 @@
 
 from utils.formatChange.coordinateChange import *
 
-def rst2json(conf, fileName, semseg, PagesImage, PagesLayout):
+def rst2json(conf, fileName, semseg, PagesLayout):
     TIT = conf.tit_choice
     TextLevel = conf.text_level
 
