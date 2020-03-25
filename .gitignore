@@ -1,3 +1,4 @@
 /utils/logging/out.log
 /example/
+/.idea/
 *.pyc
