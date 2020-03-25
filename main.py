@@ -87,23 +87,24 @@ if __name__ == '__main__':
 
             Logger.get_log(logging).info("File - {} Processed\n".format(fileName))
 
-    for key in total_pre_num.keys():
-        if validnum[key] == 0:
-            total_pre_num[key] = 'NaN'
-            total_rec_num[key] = 'NaN'
-            total_f1_num[key] = 'NaN'
-            total_pre_area[key] = 'NaN'
-            total_rec_area[key] = 'NaN'
-            total_f1_area[key] = 'NaN'
-        else:
-            total_pre_num[key] /= validnum[key]
-            total_rec_num[key] /= validnum[key]
-            total_f1_num[key] /= validnum[key]
-            total_pre_area[key] /= validnum[key]
-            total_rec_area[key] /= validnum[key]
-            total_f1_area[key] /= validnum[key]
-
-    EstimationWrite(total_pre_num, total_rec_num, total_f1_num, total_pre_area,
-                    total_rec_area, total_f1_area, 'Average.pdf', conf.eva_folder)
+    if conf.evaluate == True:
+        for key in total_pre_num.keys():
+            if validnum[key] == 0:
+                total_pre_num[key] = 'NaN'
+                total_rec_num[key] = 'NaN'
+                total_f1_num[key] = 'NaN'
+                total_pre_area[key] = 'NaN'
+                total_rec_area[key] = 'NaN'
+                total_f1_area[key] = 'NaN'
+            else:
+                total_pre_num[key] /= validnum[key]
+                total_rec_num[key] /= validnum[key]
+                total_f1_num[key] /= validnum[key]
+                total_pre_area[key] /= validnum[key]
+                total_rec_area[key] /= validnum[key]
+                total_f1_area[key] /= validnum[key]
+    
+        EstimationWrite(total_pre_num, total_rec_num, total_f1_num, total_pre_area,
+                        total_rec_area, total_f1_area, 'Average.pdf', conf.eva_folder)
 
     Logger.get_log(logging).info("All file processed")

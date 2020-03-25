@@ -1,5 +1,5 @@
 import os
-
+import sys
 from configparser import ConfigParser
 from utils.logging.syslog import Logger
 
@@ -24,14 +24,12 @@ class Configuration():
 
         self.configCheck()
 
-        if not os.path.exists('output/'):
-            os.mkdir('output/')
-        seg_result_folder = 'output/seg_result/'
-        if not os.path.exists(seg_result_folder):
-            os.mkdir(seg_result_folder)
+        self.output_folder = 'output/'
+        if not os.path.exists(self.output_folder):
+            os.mkdir(self.output_folder)
 
         if self.evaluate == True:
-            self.eva_folder = seg_result_folder + 'evaluation/'
+            self.eva_folder = self.output_folder + 'evaluation/'
             self.eva_img_folder = self.eva_folder + 'image/'
             self.eva_doc_folder = self.eva_folder + 'doc/'
 
@@ -42,13 +40,18 @@ class Configuration():
             if not os.path.exists(self.eva_doc_folder):
                 os.mkdir(self.eva_doc_folder)
 
+        if self.save_text or self.save_image:
+            self.prediction_folder = self.output_folder + 'prediction/'
+            if not os.path.exists(self.prediction_folder):
+                os.mkdir(self.prediction_folder)
+
         if self.save_text == True:
-            self.json_folder = seg_result_folder + 'json/'
+            self.json_folder = self.prediction_folder + 'json/'
             if not os.path.exists(self.json_folder):
                 os.mkdir(self.json_folder)
 
         if self.save_image == True:
-            self.img_folder = seg_result_folder + 'image/'
+            self.img_folder = self.prediction_folder + 'image/'
             if not os.path.exists(self.img_folder):
                 os.mkdir(self.img_folder)
 
