@@ -42,7 +42,7 @@ if __name__ == '__main__':
             jsonFile = rst2json(Conf, fileName, semseg, PagesLayout)
 
             if Conf.evaluate:
-                #jsonFile = jsonRead(fileName)
+                jsonFile = jsonRead(fileName)
                 Anno = annotation(fileName, len(PagesImage))
                 if not Anno.Anno == []:
                     prfList = estimate(PagesImage, jsonFile, Anno, Conf.eva_img_folder)

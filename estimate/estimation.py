@@ -156,7 +156,8 @@ def estimate(PagesImage, segment, annotate, img_folder):
                             max_iou = iou
                             max_index = annoindex
                             max_anbox = anbox[:]
-                if max_iou > 0.7 or (max_iou > 0.5 and semtype == 'PageNo'):
+                if max_iou > 0.7 or (max_iou > 0.5 and semtype == 'PageNo')\
+                        or (max_iou > 0.5 and semtype == 'Title'):
                     pdftruenum[semtype] += 1
                     pdfprearea[semtype] += prearea
                     pdfrecarea[semtype] += get_boxarea(max_anbox)
