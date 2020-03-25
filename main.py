@@ -103,7 +103,7 @@ if __name__ == '__main__':
                 total_pre_area[key] /= validnum[key]
                 total_rec_area[key] /= validnum[key]
                 total_f1_area[key] /= validnum[key]
-    
+
         EstimationWrite(total_pre_num, total_rec_num, total_f1_num, total_pre_area,
                         total_rec_area, total_f1_area, 'Average.pdf', conf.eva_folder)
 
