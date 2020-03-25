@@ -59,7 +59,7 @@ if __name__ == '__main__':
             jsonFile = rst2json(conf, fileName, semseg, PagesLayout)
 
             if conf.evaluate == True:
-                jsonFile = jsonRead(fileName)
+                #jsonFile = jsonRead(fileName)
                 Anno = annotation(fileName, len(PagesImage))
                 if not Anno.Anno == []:
                     pre_num, rec_num, f1_num, pre_area, rec_area, f1_area = \
