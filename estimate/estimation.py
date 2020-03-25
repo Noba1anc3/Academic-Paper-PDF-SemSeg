@@ -211,9 +211,9 @@ def estimate(PagesImage, segment, annotate, img_folder):
                 semerror.append(table)
 
             # Cell
-            row_header = []  # table['row_header']
-            col_header = []  # table['col_header']
-            datalist = []  # table['data']
+            row_header = table['row_header']
+            col_header = table['col_header']
+            datalist = table['data']
             for headerindex in range(len(row_header)):     # row header
                 threshold = False
                 cell = row_header[headerindex]
@@ -238,33 +238,6 @@ def estimate(PagesImage, segment, annotate, img_folder):
                 if not threshold:
                     cell['SemanticType'] = semtype
                     semerror.append(cell)
-                # children
-                children = cell['children']
-                if children:
-                    for childindex in range(len(children)):
-                        threshold = False
-                        cell = children[childindex]
-                        semtype = 'Cell'
-                        prebox = cell['location']
-                        pdftotalnum[semtype] += 1
-                        prearea = get_boxarea(prebox)
-                        pdftotalarea[semtype] += prearea
-                        for annoindex in range(len(anno)):
-                            anbox = []
-                            if anno[annoindex].split(' ')[0] == semtype:
-                                for i in range(4):
-                                    anbox.append(int(anno[annoindex].split(' ')[i + 1]))
-                                Iou = IOU(prebox, anbox)
-                                if Iou > 0.8:
-                                    threshold = True
-                                    pdftruenum[semtype] += 1
-                                    pdfprearea[semtype] += prearea
-                                    pdfrecarea[semtype] += get_boxarea(anbox)
-                                    annofound.append(anno[annoindex])
-                                    break
-                        if not threshold:
-                            cell['SemanticType'] = semtype
-                            semerror.append(cell)
             for headerindex in range(len(col_header)):     # col header
                 threshold = False
                 cell = col_header[headerindex]
@@ -289,33 +262,6 @@ def estimate(PagesImage, segment, annotate, img_folder):
                 if not threshold:
                     cell['SemanticType'] = semtype
                     semerror.append(cell)
-                # children
-                children = cell['children']
-                if children:
-                    for childindex in range(len(children)):
-                        threshold = False
-                        cell = children[childindex]
-                        semtype = 'Cell'
-                        prebox = cell['location']
-                        pdftotalnum[semtype] += 1
-                        prearea = get_boxarea(prebox)
-                        pdftotalarea[semtype] += prearea
-                        for annoindex in range(len(anno)):
-                            anbox = []
-                            if anno[annoindex].split(' ')[0] == semtype:
-                                for i in range(4):
-                                    anbox.append(int(anno[annoindex].split(' ')[i + 1]))
-                                Iou = IOU(prebox, anbox)
-                                if Iou > 0.8:
-                                    threshold = True
-                                    pdftruenum[semtype] += 1
-                                    pdfprearea[semtype] += prearea
-                                    pdfrecarea[semtype] += get_boxarea(anbox)
-                                    annofound.append(anno[annoindex])
-                                    break
-                        if not threshold:
-                            cell['SemanticType'] = semtype
-                            semerror.append(cell)
             for dataindex in range(len(datalist)):     # data
                 threshold = False
                 cell = datalist[dataindex]
