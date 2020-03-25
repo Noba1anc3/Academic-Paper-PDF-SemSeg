@@ -1,7 +1,7 @@
 import json
 
 def jsonRead(fileName):
-    jsonFolder = './example/seg_result/json/'
+    jsonFolder = './output/prediction/json/'
     with open(jsonFolder+fileName[:-3]+'json', 'r') as f:
         load_dict = json.load(f)
 
