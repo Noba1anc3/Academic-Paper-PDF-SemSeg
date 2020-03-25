@@ -56,27 +56,27 @@ if __name__ == '__main__':
 
         if not PagesLayout == None:
             semseg = SemanticSegmentation(conf, PagesImage, PagesLayout)
-            jsonFile = rst2json(conf, fileName, semseg, PagesImage, PagesLayout)
+            jsonFile = rst2json(conf, fileName, semseg, PagesLayout)
 
             if conf.evaluate == True:
-                jsonFile = jsonRead(fileName)
+                #jsonFile = jsonRead(fileName)
                 Anno = annotation(fileName, len(PagesImage))
+                if not Anno.Anno == []:
+                    pre_num, rec_num, f1_num, pre_area, rec_area, f1_area = \
+                        estimate(PagesImage, jsonFile, Anno, conf.eva_img_folder)
+                    EstimationWrite(pre_num, rec_num, f1_num,
+                                    pre_area, rec_area, f1_area,
+                                    fileName, conf.eva_doc_folder)
 
-                pre_num, rec_num, f1_num, pre_area, rec_area, f1_area = \
-                    estimate(PagesImage, jsonFile, Anno, conf.eva_img_folder)
-                EstimationWrite(pre_num, rec_num, f1_num,
-                                pre_area, rec_area, f1_area,
-                                fileName, conf.eva_doc_folder)
-
-                for key in pre_num.keys():
-                    if pre_num[key] != 'NaN':
-                        validnum[key] += 1
-                        total_pre_num[key] += pre_num[key]
-                        total_rec_num[key] += rec_num[key]
-                        total_f1_num[key] += f1_num[key]
-                        total_pre_area[key] += pre_area[key]
-                        total_rec_area[key] += rec_area[key]
-                        total_f1_area[key] += f1_area[key]
+                    for key in pre_num.keys():
+                        if pre_num[key] != 'NaN':
+                            validnum[key] += 1
+                            total_pre_num[key] += pre_num[key]
+                            total_rec_num[key] += rec_num[key]
+                            total_f1_num[key] += f1_num[key]
+                            total_pre_area[key] += pre_area[key]
+                            total_rec_area[key] += rec_area[key]
+                            total_f1_area[key] += f1_area[key]
 
             if conf.save_image == True:
                 ImageList = rst2image(conf, semseg, PagesImage, PagesLayout)

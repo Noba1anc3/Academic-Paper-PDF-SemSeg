@@ -24,7 +24,9 @@ class Configuration():
 
         self.configCheck()
 
-        seg_result_folder = 'example/seg_result/'
+        if not os.path.exists('output/'):
+            os.mkdir('output/')
+        seg_result_folder = 'output/seg_result/'
         if not os.path.exists(seg_result_folder):
             os.mkdir(seg_result_folder)
 

@@ -1,4 +1,5 @@
 /utils/logging/out.log
 /example/
+/output/
 /.idea/
 *.pyc

@@ -32,6 +32,7 @@ def JsonWrite(JsonFile, fileName, fileFolder):
 
 
 def EstimationWrite(p_num, r_num, f_num, p_area, r_area, f_area, fileName, fileFolder):
+
     SemType = {'Title': '标题', 'Author': '作者', 'FigureNote': '图注',
                'TableNote': '表注', 'Note': '注释', 'PageNo': '页码',
                'Text': '正文', 'Figure': '图片', 'Table': '表格', 'Cell': '单元格'}
