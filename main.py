@@ -56,14 +56,14 @@ if __name__ == '__main__':
 
         filePath = conf.folder + fileName
         PagesImage  = pdf2image(filePath)
-        PagesLayout = pdf2layout(filePath)
+        #PagesLayout = pdf2layout(filePath)
 
-        if not PagesLayout == None:
-            semseg = SemanticSegmentation(conf, PagesImage, PagesLayout)
-            jsonFile = rst2json(conf, fileName, semseg, PagesImage, PagesLayout)
+        if not 1 == None:
+            #semseg = SemanticSegmentation(conf, PagesImage, PagesLayout)
+            #jsonFile = rst2json(conf, fileName, semseg, PagesImage, PagesLayout)
 
             if conf.evaluate == True:
-                #jsonFile = jsonRead(fileName)
+                jsonFile = jsonRead(fileName)
                 Anno = annotation(fileName, len(PagesImage))
 
                 pre_num, rec_num, f1_num, pre_area, rec_area, f1_area = \
@@ -82,12 +82,12 @@ if __name__ == '__main__':
                         total_rec_area[key] += rec_area[key]
                         total_f1_area[key] += f1_area[key]
 
-            if conf.save_image == True:
-                ImageList = rst2image(conf, semseg, PagesImage, PagesLayout)
-                ImageWrite(ImageList, fileName, conf.img_folder)
-
-            if conf.save_text == True:
-                JsonWrite(jsonFile, fileName, conf.json_folder)
+            # if conf.save_image == True:
+            #     ImageList = rst2image(conf, semseg, PagesImage, PagesLayout)
+            #     ImageWrite(ImageList, fileName, conf.img_folder)
+            #
+            # if conf.save_text == True:
+            #     JsonWrite(jsonFile, fileName, conf.json_folder)
 
             Logger.get_log(logging).info("File - {} Processed\n".format(fileName))
 
