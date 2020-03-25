@@ -1,7 +1,5 @@
-import sys
-import logging
 
-sys.dont_write_bytecode = True
+import logging
 
 class Logger:
     def __init__(self, loggername):

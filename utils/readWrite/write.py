@@ -1,12 +1,8 @@
 import os
 import cv2
-import sys
 import json
 import numpy as np
 from utils.logging.syslog import Logger
-
-sys.dont_write_bytecode = True
-
 
 def ImageWrite(ImageList, fileName, fileFolder):
     imgFolder = fileFolder + fileName[:-4] + '/'

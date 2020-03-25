@@ -2,8 +2,6 @@ from semseg.text.level_2.image_note import *
 from semseg.text.level_2.notetools import NotePostProcess
 from semseg.image.image import ImgExtraction
 from utils.logging.syslog import Logger
-import sys
-sys.dont_write_bytecode = True
 
 class ImageExtraction():
     def __init__(self, PagesImage, PagesLayout):

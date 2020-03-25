@@ -2,9 +2,6 @@ from semseg.image.cls import Region as RegionCls
 from semseg.image.tools import *
 from pdfminer.layout import *
 
-import sys
-sys.dont_write_bytecode = True
-
 def ImgExtraction(PageImage, PageLayout, PageFNote):
     SemFig = []
     ImgFig = []

@@ -1,6 +1,5 @@
 from utils.logging.syslog import Logger
 from semseg.text.level_2.tools import *
-sys.dont_write_bytecode = True
 
 def FNTypeCheck(FigNoteList):
     TypeList = []

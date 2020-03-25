@@ -1,6 +1,5 @@
 import re
 from semseg.text.level_2.notetools import *
-sys.dont_write_bytecode = True
 
 def TNTypeCheck(TabNoteList):
     TypeList = []

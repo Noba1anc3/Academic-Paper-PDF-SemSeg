@@ -3,11 +3,6 @@ from pdf2image import convert_from_path
 import numpy as np
 import tempfile
 import cv2
-import sys
-
-from wand.image import Image
-
-sys.dont_write_bytecode = True
 
 def pdf2image(fileName):
 

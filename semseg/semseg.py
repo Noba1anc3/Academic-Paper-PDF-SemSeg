@@ -5,9 +5,6 @@ from semseg.table.tableExtraction import TableExtraction
 
 from utils.logging.syslog import Logger
 
-import sys
-sys.dont_write_bytecode = True
-
 class SemanticSegmentation():
     def __init__(self, conf, PagesImage, PagesLayout):
         self.configList = conf

@@ -2,9 +2,6 @@ from semseg.table.table_detection import detect_table
 from semseg.table.table_structure_extraction import extraction
 from semseg.table.cls import Region
 from utils.logging.syslog import Logger
-import sys
-
-sys.dont_write_bytecode = True
 
 class TableExtraction():
     def __init__(self, TableLevel, PagesLayout):

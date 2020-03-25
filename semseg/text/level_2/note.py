@@ -1,7 +1,6 @@
 from pdfminer.layout import *
 from semseg.text.level_2.tools import BlockRange
 
-
 def NoteExtraction(PageLayout):
     Note = [[],[]]
     NoteLine = []

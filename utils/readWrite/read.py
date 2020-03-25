@@ -1,10 +1,7 @@
 import os
-import sys
 
 from configparser import ConfigParser
 from utils.logging.syslog import Logger
-
-sys.dont_write_bytecode = True
 
 class Configuration():
     def __init__(self):

@@ -1,7 +1,5 @@
-import sys
-from utils.formatChange.coordinateChange import *
 
-sys.dont_write_bytecode = True
+from utils.formatChange.coordinateChange import *
 
 def rst2json(conf, fileName, semseg, PagesImage, PagesLayout):
     TIT = conf.tit_choice

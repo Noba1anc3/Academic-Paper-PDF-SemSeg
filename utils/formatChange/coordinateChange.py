@@ -1,7 +1,5 @@
-import sys
-from pdfminer.layout import *
 
-sys.dont_write_bytecode = True
+from pdfminer.layout import *
 
 def coordinateChange(Layout, item):
 

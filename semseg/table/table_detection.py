@@ -1,4 +1,3 @@
-from pdfminer.layout import *
 
 from semseg.table.table_utils import *
 

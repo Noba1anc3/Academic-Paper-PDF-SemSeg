@@ -1,7 +1,5 @@
-import sys
-from utils.formatChange.visualize.annotate import *
 
-sys.dont_write_bytecode = True
+from utils.formatChange.visualize.annotate import *
 
 def rst2image(conf, semseg, PagesImage, PagesLayout):
     TIT = conf.tit_choice

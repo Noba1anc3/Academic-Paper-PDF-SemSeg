@@ -1,8 +1,6 @@
-import sys
+
 from pdfminer.layout import *
 from utils.logging.syslog import Logger
-
-sys.dont_write_bytecode = True
 
 def TitleExtraction(PageLayout):
     title = []

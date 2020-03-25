@@ -1,11 +1,8 @@
-import sys
+
 import cv2
 import numpy as np
 from semseg.image.tools import IOU
 from utils.readWrite.write import ImageWrite
-
-sys.dont_write_bytecode = True
-
 
 def get_annonum(annotate):
     annonum = {'Title': 0, 'Author': 0, 'Text': 0, 'FigureNote': 0,

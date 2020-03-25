@@ -7,9 +7,7 @@ from pdfminer.layout import *
 from utils.logging.syslog import Logger
 from binascii import b2a_hex
 import os
-import sys
 
-sys.dont_write_bytecode = True
 def with_pdf (pdf_doc, pdf_pwd, fn, *args):
     result = None
 

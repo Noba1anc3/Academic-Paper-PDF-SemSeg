@@ -1,4 +1,3 @@
-from semseg.text.level_2.tools import *
 from pdfminer.layout import *
 
 import sys
