@@ -334,4 +334,4 @@ def estimate(PagesImage, segment, annotate, img_folder):
     p_num, r_num, f_num = numcalculate(pdftotalnum, pdftruenum, annonum)
     p_area, r_area, f_area = areacalculate(pdftotalarea, pdfprearea, pdfrecarea, annoarea)
 
-    return p_num, r_num, f_num, p_area, r_area, f_area
+    return [p_num, r_num, f_num, p_area, r_area, f_area]

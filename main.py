@@ -2,8 +2,10 @@ from utils.readWrite.read import *
 from utils.readWrite.write import *
 
 from semseg.semseg import *
-from estimate.estimation import estimate
+
+from estimate.estClass import *
 from estimate.jsonRead import jsonRead
+from estimate.estimation import estimate
 
 from utils.formatChange.pdf2xml import pdf2layout
 from utils.formatChange.pdf2image import pdf2image
@@ -14,97 +16,50 @@ if __name__ == '__main__':
     logging = Logger(__name__)
     Logger.get_log(logging).info('System Start\n')
 
-    conf = Configuration()
+    Conf = Configuration()
 
-    total_pre_num = {'Title': 0.0, 'Author': 0.0, 'Text': 0.0, 'FigureNote': 0.0,
-                     'TableNote': 0.0, 'Note': 0.0, 'PageNo': 0.0, 'Figure': 0.0,
-                     'Table': 0.0, 'Cell': 0.0}
-    total_rec_num = {'Title': 0.0, 'Author': 0.0, 'Text': 0.0, 'FigureNote': 0.0,
-                     'TableNote': 0.0, 'Note': 0.0, 'PageNo': 0.0, 'Figure': 0.0,
-                     'Table': 0.0, 'Cell': 0.0}
-    total_f1_num = {'Title': 0.0, 'Author': 0.0, 'Text': 0.0, 'FigureNote': 0.0,
-                    'TableNote': 0.0, 'Note': 0.0, 'PageNo': 0.0, 'Figure': 0.0,
-                    'Table': 0.0, 'Cell': 0.0}
-    total_pre_area = {'Title': 0.0, 'Author': 0.0, 'Text': 0.0, 'FigureNote': 0.0,
-                      'TableNote': 0.0, 'Note': 0.0, 'PageNo': 0.0, 'Figure': 0.0,
-                      'Table': 0.0, 'Cell': 0.0}
-    total_rec_area = {'Title': 0.0, 'Author': 0.0, 'Text': 0.0, 'FigureNote': 0.0,
-                      'TableNote': 0.0, 'Note': 0.0, 'PageNo': 0.0, 'Figure': 0.0,
-                      'Table': 0.0, 'Cell': 0.0}
-    total_f1_area = {'Title': 0.0, 'Author': 0.0, 'Text': 0.0, 'FigureNote': 0.0,
-                     'TableNote': 0.0, 'Note': 0.0, 'PageNo': 0.0, 'Figure': 0.0,
-                     'Table': 0.0, 'Cell': 0.0}
-    validnum = {'Title': 0, 'Author': 0, 'Text': 0, 'FigureNote': 0,
-                'TableNote': 0, 'Note': 0, 'PageNo': 0, 'Figure': 0,
-                'Table': 0, 'Cell': 0}
+    if Conf.evaluate:
+        Est = Estimation()
 
-    for index in range(len(conf.fileList)):
-        fileName = conf.fileList[index]
+    for index in range(len(Conf.fileList)):
+        fileName = Conf.fileList[index]
         if not fileName.endswith('.pdf'):
             Logger.get_log(logging).info\
                 ('{} is skipped  ({}/{})'.format
-                 (fileName, index + 1, len(conf.fileList)))
+                 (fileName, index + 1, len(Conf.fileList)))
             continue
         else:
             Logger.get_log(logging).info(
                 'Processing File - {}  ({}/{})'.format
-                (fileName, index + 1, len(conf.fileList)))
+                (fileName, index + 1, len(Conf.fileList)))
 
-        filePath = conf.folder + fileName
+        filePath = Conf.folder + fileName
         PagesImage  = pdf2image(filePath)
         PagesLayout = pdf2layout(filePath)
 
         if not PagesLayout == None:
-            semseg = SemanticSegmentation(conf, PagesImage, PagesLayout)
-            jsonFile = rst2json(conf, fileName, semseg, PagesLayout)
+            semseg = SemanticSegmentation(Conf, PagesImage, PagesLayout)
+            jsonFile = rst2json(Conf, fileName, semseg, PagesLayout)
 
-            if conf.evaluate == True:
+            if Conf.evaluate:
                 #jsonFile = jsonRead(fileName)
                 Anno = annotation(fileName, len(PagesImage))
                 if not Anno.Anno == []:
-                    pre_num, rec_num, f1_num, pre_area, rec_area, f1_area = \
-                        estimate(PagesImage, jsonFile, Anno, conf.eva_img_folder)
-                    EstimationWrite(pre_num, rec_num, f1_num,
-                                    pre_area, rec_area, f1_area,
-                                    fileName, conf.eva_doc_folder)
+                    prfList = estimate(PagesImage, jsonFile, Anno, Conf.eva_img_folder)
+                    Est.num_add(prfList)
+                    EstimationWrite(prfList, fileName, Conf.eva_doc_folder)
 
-                    for key in pre_num.keys():
-                        if pre_num[key] != 'NaN':
-                            validnum[key] += 1
-                            total_pre_num[key] += pre_num[key]
-                            total_rec_num[key] += rec_num[key]
-                            total_f1_num[key] += f1_num[key]
-                            total_pre_area[key] += pre_area[key]
-                            total_rec_area[key] += rec_area[key]
-                            total_f1_area[key] += f1_area[key]
+            if Conf.save_image:
+                ImageList = rst2image(Conf, semseg, PagesImage, PagesLayout)
+                ImageWrite(ImageList, fileName, Conf.img_folder)
 
-            if conf.save_image == True:
-                ImageList = rst2image(conf, semseg, PagesImage, PagesLayout)
-                ImageWrite(ImageList, fileName, conf.img_folder)
-
-            if conf.save_text == True:
-                JsonWrite(jsonFile, fileName, conf.json_folder)
+            if Conf.save_text:
+                JsonWrite(jsonFile, fileName, Conf.json_folder)
 
             Logger.get_log(logging).info("File - {} Processed\n".format(fileName))
 
-    if conf.evaluate == True:
-        for key in total_pre_num.keys():
-            if validnum[key] == 0:
-                total_pre_num[key] = 'NaN'
-                total_rec_num[key] = 'NaN'
-                total_f1_num[key] = 'NaN'
-                total_pre_area[key] = 'NaN'
-                total_rec_area[key] = 'NaN'
-                total_f1_area[key] = 'NaN'
-            else:
-                total_pre_num[key] /= validnum[key]
-                total_rec_num[key] /= validnum[key]
-                total_f1_num[key] /= validnum[key]
-                total_pre_area[key] /= validnum[key]
-                total_rec_area[key] /= validnum[key]
-                total_f1_area[key] /= validnum[key]
-
-        EstimationWrite(total_pre_num, total_rec_num, total_f1_num, total_pre_area,
-                        total_rec_area, total_f1_area, 'Average.pdf', conf.eva_folder)
+    if Conf.evaluate:
+        prfList = Est.cal_total_score()
+        EstimationWrite(prfList, 'Average.pdf', Conf.eva_folder)
 
     Logger.get_log(logging).info("All file processed")

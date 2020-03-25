@@ -31,7 +31,14 @@ def JsonWrite(JsonFile, fileName, fileFolder):
     logging.logger.handlers.clear()
 
 
-def EstimationWrite(p_num, r_num, f_num, p_area, r_area, f_area, fileName, fileFolder):
+def EstimationWrite(prfList, fileName, fileFolder):
+
+    p_num = prfList[0]
+    r_num = prfList[1]
+    f_num = prfList[2]
+    p_area = prfList[3]
+    r_area = prfList[4]
+    f_area = prfList[5]
 
     SemType = {'Title': '标题', 'Author': '作者', 'FigureNote': '图注',
                'TableNote': '表注', 'Note': '注释', 'PageNo': '页码',
@@ -47,8 +54,10 @@ def EstimationWrite(p_num, r_num, f_num, p_area, r_area, f_area, fileName, fileF
     num = 0
 
     with open(estFile, 'w') as f:
-        f.write('|| 基于个数的准确率 | 基于个数的召回率 | 基于个数的F1 | 基于面积的准确率 | 基于面积的召回率 | 基于面积的F1 |\n')
-        f.write('| -------- | -------- | -------- | -------- | -------- | -------- | -------- |\n')
+        f.write('|| 基于个数的准确率 | 基于个数的召回率 | 基于个数的F1 |'
+                ' 基于面积的准确率 | 基于面积的召回率 | 基于面积的F1 |\n')
+        f.write('| -------- | -------- | -------- | -------- | '
+                '-------- | -------- | -------- |\n')
 
         for key in p_num.keys():
 
