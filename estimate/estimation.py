@@ -342,7 +342,8 @@ def estimate(PagesImage, segment, annotate, img_folder):
                 cv2.rectangle(image, (x1, y1), (x2, y2), (122, 103, 238), 3)
                 cv2.putText(image, semtype, (x1, y1), 0, 1.5, (122, 103, 238), 2)
 
-                Images.append(image)
+            Images.append(image)
+
         else:
             Images.append(None)
 
@@ -351,4 +352,4 @@ def estimate(PagesImage, segment, annotate, img_folder):
     p_num, r_num, f_num = numcalculate(pdftotalnum, pdftruenum, annonum)
     p_area, r_area, f_area = areacalculate(pdftotalarea, pdfprearea, pdfrecarea, annoarea)
 
-    return p_num, r_num, f_num, p_area, r_area, f_area
+    return [p_num, r_num, f_num, p_area, r_area, f_area]
