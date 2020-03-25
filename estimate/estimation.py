@@ -152,7 +152,7 @@ def estimate(PagesImage, segment, annotate, img_folder):
                         for i in range(4):
                             anbox.append(int(anno[annoindex].split(' ')[i+1]))
                         Iou = IOU(prebox, anbox)
-                        if Iou > 0.7 :
+                        if Iou > 0.7 or (Iou > 0.5 and semtype == 'PageNo'):
                             threshold = True
                             pdftruenum[semtype] += 1
                             pdfprearea[semtype] += prearea
