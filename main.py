@@ -19,40 +19,51 @@ if __name__ == '__main__':
     Logger.get_log(logging).info('System Start\n')
 
     conf = Configuration()
-    total_pre_num = {'Title': 0.0, 'Author': 0.0, 'Text': 0.0, 'FigureNote': 0.0, 'TableNote': 0.0, 'Note': 0.0,
-                     'PageNo': 0.0, 'Figure': 0.0, 'Table': 0.0, 'Cell': 0.0}
-    total_rec_num = {'Title': 0.0, 'Author': 0.0, 'Text': 0.0, 'FigureNote': 0.0, 'TableNote': 0.0, 'Note': 0.0,
-                     'PageNo': 0.0, 'Figure': 0.0, 'Table': 0.0, 'Cell': 0.0}
-    total_f1_num = {'Title': 0.0, 'Author': 0.0, 'Text': 0.0, 'FigureNote': 0.0, 'TableNote': 0.0, 'Note': 0.0,
-                    'PageNo': 0.0, 'Figure': 0.0, 'Table': 0.0, 'Cell': 0.0}
-    total_pre_area = {'Title': 0.0, 'Author': 0.0, 'Text': 0.0, 'FigureNote': 0.0, 'TableNote': 0.0, 'Note': 0.0,
-                      'PageNo': 0.0, 'Figure': 0.0, 'Table': 0.0, 'Cell': 0.0}
-    total_rec_area = {'Title': 0.0, 'Author': 0.0, 'Text': 0.0, 'FigureNote': 0.0, 'TableNote': 0.0, 'Note': 0.0,
-                      'PageNo': 0.0, 'Figure': 0.0, 'Table': 0.0, 'Cell': 0.0}
-    total_f1_area = {'Title': 0.0, 'Author': 0.0, 'Text': 0.0, 'FigureNote': 0.0, 'TableNote': 0.0, 'Note': 0.0,
-                     'PageNo': 0.0, 'Figure': 0.0, 'Table': 0.0, 'Cell': 0.0}
-    validnum = {'Title': 0, 'Author': 0, 'Text': 0, 'FigureNote': 0, 'TableNote': 0, 'Note': 0, 'PageNo': 0,
-                'Figure': 0, 'Table': 0, 'Cell': 0}
+
+    total_pre_num = {'Title': 0.0, 'Author': 0.0, 'Text': 0.0, 'FigureNote': 0.0,
+                     'TableNote': 0.0, 'Note': 0.0, 'PageNo': 0.0, 'Figure': 0.0,
+                     'Table': 0.0, 'Cell': 0.0}
+    total_rec_num = {'Title': 0.0, 'Author': 0.0, 'Text': 0.0, 'FigureNote': 0.0,
+                     'TableNote': 0.0, 'Note': 0.0, 'PageNo': 0.0, 'Figure': 0.0,
+                     'Table': 0.0, 'Cell': 0.0}
+    total_f1_num = {'Title': 0.0, 'Author': 0.0, 'Text': 0.0, 'FigureNote': 0.0,
+                    'TableNote': 0.0, 'Note': 0.0, 'PageNo': 0.0, 'Figure': 0.0,
+                    'Table': 0.0, 'Cell': 0.0}
+    total_pre_area = {'Title': 0.0, 'Author': 0.0, 'Text': 0.0, 'FigureNote': 0.0,
+                      'TableNote': 0.0, 'Note': 0.0, 'PageNo': 0.0, 'Figure': 0.0,
+                      'Table': 0.0, 'Cell': 0.0}
+    total_rec_area = {'Title': 0.0, 'Author': 0.0, 'Text': 0.0, 'FigureNote': 0.0,
+                      'TableNote': 0.0, 'Note': 0.0, 'PageNo': 0.0, 'Figure': 0.0,
+                      'Table': 0.0, 'Cell': 0.0}
+    total_f1_area = {'Title': 0.0, 'Author': 0.0, 'Text': 0.0, 'FigureNote': 0.0,
+                     'TableNote': 0.0, 'Note': 0.0, 'PageNo': 0.0, 'Figure': 0.0,
+                     'Table': 0.0, 'Cell': 0.0}
+    validnum = {'Title': 0, 'Author': 0, 'Text': 0, 'FigureNote': 0,
+                'TableNote': 0, 'Note': 0, 'PageNo': 0, 'Figure': 0,
+                'Table': 0, 'Cell': 0}
 
     for index in range(len(conf.fileList)):
         fileName = conf.fileList[index]
         if not fileName.endswith('.pdf'):
-            Logger.get_log(logging).info('{} is skipped  ({}/{})'.format(fileName, index + 1, len(conf.fileList)))
+            Logger.get_log(logging).info\
+                ('{} is skipped  ({}/{})'.format
+                 (fileName, index + 1, len(conf.fileList)))
             continue
         else:
             Logger.get_log(logging).info(
-                'Processing File - {}  ({}/{})'.format(fileName, index + 1, len(conf.fileList)))
+                'Processing File - {}  ({}/{})'.format
+                (fileName, index + 1, len(conf.fileList)))
 
         filePath = conf.folder + fileName
         PagesImage  = pdf2image(filePath)
-        PagesLayout = pdf2layout(filePath)
+        #PagesLayout = pdf2layout(filePath)
 
-        if not PagesLayout == None:
-            semseg = SemanticSegmentation(conf, PagesImage, PagesLayout)
-            jsonFile = rst2json(conf, fileName, semseg, PagesImage, PagesLayout)
+        if not 1 == None:
+            #semseg = SemanticSegmentation(conf, PagesImage, PagesLayout)
+            #jsonFile = rst2json(conf, fileName, semseg, PagesImage, PagesLayout)
 
             if conf.evaluate == True:
-                #jsonFile = jsonRead(fileName)
+                jsonFile = jsonRead(fileName)
                 Anno = annotation(fileName, len(PagesImage))
 
                 pre_num, rec_num, f1_num, pre_area, rec_area, f1_area = \
@@ -71,12 +82,12 @@ if __name__ == '__main__':
                         total_rec_area[key] += rec_area[key]
                         total_f1_area[key] += f1_area[key]
 
-            if conf.save_image == True:
-                ImageList = rst2image(conf, semseg, PagesImage, PagesLayout)
-                ImageWrite(ImageList, fileName, conf.img_folder)
-
-            if conf.save_text == True:
-                JsonWrite(jsonFile, fileName, conf.json_folder)
+            # if conf.save_image == True:
+            #     ImageList = rst2image(conf, semseg, PagesImage, PagesLayout)
+            #     ImageWrite(ImageList, fileName, conf.img_folder)
+            #
+            # if conf.save_text == True:
+            #     JsonWrite(jsonFile, fileName, conf.json_folder)
 
             Logger.get_log(logging).info("File - {} Processed\n".format(fileName))
 
@@ -95,12 +106,6 @@ if __name__ == '__main__':
             total_pre_area[key] /= validnum[key]
             total_rec_area[key] /= validnum[key]
             total_f1_area[key] /= validnum[key]
-            total_pre_num[key] = float(format(total_pre_num[key], '.2f'))
-            total_rec_num[key] = float(format(total_rec_num[key], '.2f'))
-            total_f1_num[key] = float(format(total_f1_num[key], '.2f'))
-            total_pre_area[key] = float(format(total_pre_area[key], '.2f'))
-            total_rec_area[key] = float(format(total_rec_area[key], '.2f'))
-            total_f1_area[key] = float(format(total_f1_area[key], '.2f'))
 
     EstimationWrite(total_pre_num, total_rec_num, total_f1_num, total_pre_area,
                     total_rec_area, total_f1_area, 'Average.pdf', conf.eva_folder)

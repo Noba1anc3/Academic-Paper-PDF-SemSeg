@@ -48,13 +48,18 @@ def EstimationWrite(p_num, r_num, f_num, p_area, r_area, f_area, fileName, fileF
     Recall_Area = 0.0
     F1_Area = 0.0
     num = 0
+
     with open(estFile, 'w') as f:
         f.write('|| 基于个数的准确率 | 基于个数的召回率 | 基于个数的F1 | 基于面积的准确率 | 基于面积的召回率 | 基于面积的F1 |\n')
         f.write('| -------- | -------- | -------- | -------- | -------- | -------- | -------- |\n')
+
         for key in p_num.keys():
-            f.write('|' + SemType[key] + '|' + str(p_num[key]) + '|' + str(r_num[key]) + '|' +
-                    str(f_num[key]) + '|' + str(p_area[key]) + '|' + str(r_area[key]) + '|' + str(f_area[key])
-                    + '|' + '\n')
+
+            f.write('|' + SemType[key] + '|' + f2p(p_num[key]) + '|' +
+                    f2p(r_num[key]) + '|' + f1(f_num[key]) + '|' +
+                    f2p(p_area[key]) + '|' + f2p(r_area[key]) + '|' +
+                    f1(f_area[key]) + '|' + '\n')
+
             if p_num[key] != 'NaN':
                 num += 1
                 Precision_Num += p_num[key]
@@ -64,9 +69,22 @@ def EstimationWrite(p_num, r_num, f_num, p_area, r_area, f_area, fileName, fileF
                 Recall_Area += r_area[key]
                 F1_Area += f_area[key]
 
-        if fileName == 'AAAAA':
-            f.write('|' + '所有' + '|' + format(Precision_Num / num, '.2f') + '|' + format(Recall_Num / num, '.2f')
-                    + '|' + format(F1_Num / num, '.2f') + '|' + format(Precision_Area / num, '.2f') + '|'
-                    + format(Recall_Area / num, '.2f') + '|' + format(F1_Area / num, '.2f') + '|' + '\n')
+        if fileName == 'Average.pdf':
+            f.write('|' + '所有' + '|' + f2p(Precision_Num / num) +
+                    '|' + f2p(Recall_Num / num) + '|' + f1(F1_Num / num) +
+                    '|' + f2p(Precision_Area / num) +
+                    '|' + f2p(Recall_Area / num) + '|' + f1(F1_Area / num) +
+                    '|' + '\n')
 
         f.close()
+
+def f2p(num):
+    if not isinstance(num, str):
+        num *= 100
+        num = format(num, '.2f') + '%'
+    return num
+
+def f1(num):
+    if not isinstance(num, str):
+        num = format(num, '.2f')
+    return num

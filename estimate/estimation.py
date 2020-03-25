@@ -8,10 +8,13 @@ sys.dont_write_bytecode = True
 
 
 def get_annonum(annotate):
-    annonum = {'Title': 0, 'Author': 0, 'Text': 0, 'FigureNote': 0, 'TableNote': 0, 'Note': 0, 'PageNo': 0, 'Figure': 0,
+    annonum = {'Title': 0, 'Author': 0, 'Text': 0, 'FigureNote': 0,
+               'TableNote': 0, 'Note': 0, 'PageNo': 0, 'Figure': 0,
                'Table': 0, 'Cell': 0}
-    annoarea = {'Title': 0, 'Author': 0, 'Text': 0, 'FigureNote': 0, 'TableNote': 0, 'Note': 0, 'PageNo': 0,
-                'Figure': 0, 'Table': 0, 'Cell': 0}
+    annoarea = {'Title': 0, 'Author': 0, 'Text': 0, 'FigureNote': 0,
+                'TableNote': 0, 'Note': 0, 'PageNo': 0, 'Figure': 0,
+                'Table': 0, 'Cell': 0}
+
     for i in range(len(annotate.Anno)):
         anno = annotate.Anno[i]
         for j in range(len(anno)):
@@ -28,7 +31,7 @@ def get_annonum(annotate):
 
 def get_annoarea(annoline):
 
-    return (int(annoline.split(' ')[3]) - int(annoline.split(' ')[1]))\
+    return (int(annoline.split(' ')[3]) - int(annoline.split(' ')[1])) \
            * (int(annoline.split(' ')[4]) - int(annoline.split(' ')[2]))
 
 
@@ -54,10 +57,10 @@ def numcalculate(total, true, anno):
             if total[key] == 0:
                 p[key] = 0
             else:
-                p[key] = float(format(true[key] / total[key], '.2f'))
-            r[key] = float(format(true[key] / float(value), '.2f'))
-            if (p[key] + r[key]) > 0:
-                f[key] = float(format(2 * (p[key] * r[key]) / (p[key] + r[key]), '.2f'))
+                p[key] = true[key] / total[key]
+            r[key] = true[key] / float(value)
+            if p[key] + r[key] > 0:
+                f[key] = 2 * p[key] * r[key] / (p[key] + r[key])
             else:
                 f[key] = 0
 
@@ -65,18 +68,16 @@ def numcalculate(total, true, anno):
 
 
 def areacalculate(total, prearea, recarea, anno):
-    p = {'Title': 0.0, 'Author': 0.0, 'Text': 0.0, 'FigureNote': 0.0, 'TableNote': 0.0, 'Note': 0.0, 'PageNo': 0.0,
-         'Figure': 0.0, 'Table': 0.0, 'Cell': 0.0}
-    r = {'Title': 0.0, 'Author': 0.0, 'Text': 0.0, 'FigureNote': 0.0, 'TableNote': 0.0, 'Note': 0.0, 'PageNo': 0.0,
-         'Figure': 0.0, 'Table': 0.0, 'Cell': 0.0}
-    f = {'Title': 0.0, 'Author': 0.0, 'Text': 0.0, 'FigureNote': 0.0, 'TableNote': 0.0, 'Note': 0.0, 'PageNo': 0.0,
-         'Figure': 0.0, 'Table': 0.0, 'Cell': 0.0}
-    '''p = {'Title': 0, 'Author': 0, 'Text': 0, 'FigureNote': 0, 'TableNote': 0, 'Note': 0, 'PageNo': 0, 'Figure': 0,
-         'Table': 0, 'Cell': 0}
-    r = {'Title': 0, 'Author': 0, 'Text': 0, 'FigureNote': 0, 'TableNote': 0, 'Note': 0, 'PageNo': 0, 'Figure': 0,
-         'Table': 0, 'Cell': 0}
-    f = {'Title': 0, 'Author': 0, 'Text': 0, 'FigureNote': 0, 'TableNote': 0, 'Note': 0, 'PageNo': 0, 'Figure': 0,
-         'Table': 0, 'Cell': 0}'''
+    p = {'Title': 0.0, 'Author': 0.0, 'Text': 0.0, 'FigureNote': 0.0,
+         'TableNote': 0.0, 'Note': 0.0, 'PageNo': 0.0, 'Figure': 0.0,
+         'Table': 0.0, 'Cell': 0.0}
+    r = {'Title': 0.0, 'Author': 0.0, 'Text': 0.0, 'FigureNote': 0.0,
+         'TableNote': 0.0, 'Note': 0.0, 'PageNo': 0.0, 'Figure': 0.0,
+         'Table': 0.0, 'Cell': 0.0}
+    f = {'Title': 0.0, 'Author': 0.0, 'Text': 0.0, 'FigureNote': 0.0,
+         'TableNote': 0.0, 'Note': 0.0, 'PageNo': 0.0, 'Figure': 0.0,
+         'Table': 0.0, 'Cell': 0.0}
+
     for key, value in anno.items():
         if value == 'NaN':
             p[key] = 'NaN'
@@ -86,10 +87,10 @@ def areacalculate(total, prearea, recarea, anno):
             if total[key] == 0:
                 p[key] = 0.00
             else:
-                p[key] = float(format(prearea[key] / total[key], '.2f'))
-            r[key] = float(format(recarea[key] / float(value), '.2f'))
-            if (p[key] + r[key]) > 0.0:
-                f[key] = float(format(2 * (p[key] * r[key]) / (p[key] + r[key]), '.2f'))
+                p[key] = prearea[key] / total[key]
+            r[key] = recarea[key] / float(value)
+            if p[key] + r[key] > 0.0:
+                f[key] = 2 * p[key] * r[key] / (p[key] + r[key])
             else:
                 f[key] = 0.00
 
@@ -100,18 +101,24 @@ def estimate(PagesImage, segment, annotate, img_folder):
     Images = []
     annonum, annoarea = get_annonum(annotate)
 
-    pdftotalnum = {'Title': 0, 'Author': 0, 'Text': 0, 'FigureNote': 0, 'TableNote': 0, 'Note': 0, 'PageNo': 0,
-                   'Figure': 0, 'Table': 0, 'Cell': 0}
-    pdftruenum = {'Title': 0, 'Author': 0, 'Text': 0, 'FigureNote': 0, 'TableNote': 0, 'Note': 0, 'PageNo': 0,
-                  'Figure': 0, 'Table': 0, 'Cell': 0}
-    pdftotalarea = {'Title': 0, 'Author': 0, 'Text': 0, 'FigureNote': 0, 'TableNote': 0, 'Note': 0, 'PageNo': 0,
-                    'Figure': 0, 'Table': 0, 'Cell': 0}
-    pdfprearea = {'Title': 0, 'Author': 0, 'Text': 0, 'FigureNote': 0, 'TableNote': 0, 'Note': 0, 'PageNo': 0,
-                  'Figure': 0, 'Table': 0, 'Cell': 0}
-    pdfrecarea = {'Title': 0, 'Author': 0, 'Text': 0, 'FigureNote': 0, 'TableNote': 0, 'Note': 0, 'PageNo': 0,
-                  'Figure': 0, 'Table': 0, 'Cell': 0}
+    pdftotalnum = {'Title': 0, 'Author': 0, 'Text': 0, 'FigureNote': 0,
+                   'TableNote': 0, 'Note': 0, 'PageNo': 0, 'Figure': 0,
+                   'Table': 0, 'Cell': 0}
+    pdftruenum = {'Title': 0, 'Author': 0, 'Text': 0, 'FigureNote': 0,
+                  'TableNote': 0, 'Note': 0, 'PageNo': 0, 'Figure': 0,
+                  'Table': 0, 'Cell': 0}
+    pdftotalarea = {'Title': 0, 'Author': 0, 'Text': 0, 'FigureNote': 0,
+                    'TableNote': 0, 'Note': 0, 'PageNo': 0, 'Figure': 0,
+                    'Table': 0, 'Cell': 0}
+    pdfprearea = {'Title': 0, 'Author': 0, 'Text': 0, 'FigureNote': 0,
+                  'TableNote': 0, 'Note': 0, 'PageNo': 0, 'Figure': 0,
+                  'Table': 0, 'Cell': 0}
+    pdfrecarea = {'Title': 0, 'Author': 0, 'Text': 0, 'FigureNote': 0,
+                  'TableNote': 0, 'Note': 0, 'PageNo': 0, 'Figure': 0,
+                  'Table': 0, 'Cell': 0}
 
     pages = segment['Pages']
+
     for pageindex in range(len(pages)):
         page = pages[pageindex]
         anno = annotate.Anno[pageindex]
@@ -148,7 +155,7 @@ def estimate(PagesImage, segment, annotate, img_folder):
                         for i in range(4):
                             anbox.append(int(anno[annoindex].split(' ')[i+1]))
                         Iou = IOU(prebox, anbox)
-                        if Iou > 0.7 or (Iou > 0.5 and semtype == 'PageNo'):
+                        if Iou > 0.7 :
                             threshold = True
                             pdftruenum[semtype] += 1
                             pdfprearea[semtype] += prearea
@@ -211,9 +218,9 @@ def estimate(PagesImage, segment, annotate, img_folder):
                 semerror.append(table)
 
             # Cell
-            row_header = []  # table['row_header']
-            col_header = []  # table['col_header']
-            datalist = []  # table['data']
+            row_header = table['row_header']
+            col_header = table['col_header']
+            datalist = table['data']
             for headerindex in range(len(row_header)):     # row header
                 threshold = False
                 cell = row_header[headerindex]
@@ -238,33 +245,7 @@ def estimate(PagesImage, segment, annotate, img_folder):
                 if not threshold:
                     cell['SemanticType'] = semtype
                     semerror.append(cell)
-                # children
-                children = cell['children']
-                if children:
-                    for childindex in range(len(children)):
-                        threshold = False
-                        cell = children[childindex]
-                        semtype = 'Cell'
-                        prebox = cell['location']
-                        pdftotalnum[semtype] += 1
-                        prearea = get_boxarea(prebox)
-                        pdftotalarea[semtype] += prearea
-                        for annoindex in range(len(anno)):
-                            anbox = []
-                            if anno[annoindex].split(' ')[0] == semtype:
-                                for i in range(4):
-                                    anbox.append(int(anno[annoindex].split(' ')[i + 1]))
-                                Iou = IOU(prebox, anbox)
-                                if Iou > 0.8:
-                                    threshold = True
-                                    pdftruenum[semtype] += 1
-                                    pdfprearea[semtype] += prearea
-                                    pdfrecarea[semtype] += get_boxarea(anbox)
-                                    annofound.append(anno[annoindex])
-                                    break
-                        if not threshold:
-                            cell['SemanticType'] = semtype
-                            semerror.append(cell)
+
             for headerindex in range(len(col_header)):     # col header
                 threshold = False
                 cell = col_header[headerindex]
@@ -289,33 +270,7 @@ def estimate(PagesImage, segment, annotate, img_folder):
                 if not threshold:
                     cell['SemanticType'] = semtype
                     semerror.append(cell)
-                # children
-                children = cell['children']
-                if children:
-                    for childindex in range(len(children)):
-                        threshold = False
-                        cell = children[childindex]
-                        semtype = 'Cell'
-                        prebox = cell['location']
-                        pdftotalnum[semtype] += 1
-                        prearea = get_boxarea(prebox)
-                        pdftotalarea[semtype] += prearea
-                        for annoindex in range(len(anno)):
-                            anbox = []
-                            if anno[annoindex].split(' ')[0] == semtype:
-                                for i in range(4):
-                                    anbox.append(int(anno[annoindex].split(' ')[i + 1]))
-                                Iou = IOU(prebox, anbox)
-                                if Iou > 0.8:
-                                    threshold = True
-                                    pdftruenum[semtype] += 1
-                                    pdfprearea[semtype] += prearea
-                                    pdfrecarea[semtype] += get_boxarea(anbox)
-                                    annofound.append(anno[annoindex])
-                                    break
-                        if not threshold:
-                            cell['SemanticType'] = semtype
-                            semerror.append(cell)
+
             for dataindex in range(len(datalist)):     # data
                 threshold = False
                 cell = datalist[dataindex]
