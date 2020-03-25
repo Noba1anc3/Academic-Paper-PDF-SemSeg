@@ -130,12 +130,9 @@ def estimate(PagesImage, segment, annotate, img_folder):
                 tablelist = value
 
         semerror = []
-        annofound = []
-        anno_notfound = []
 
         # text
         for textindex in range(len(textlist)):
-            threshold = False
             text = textlist[textindex]
             semtype = text['SemanticType']
             prebox = text['location']
@@ -146,163 +143,183 @@ def estimate(PagesImage, segment, annotate, img_folder):
                 #semerror.append(text)
                 pass
             else:
+                max_iou = 0
+                max_index = 0
+                max_anbox = []
                 for annoindex in range(len(anno)):
                     if anno[annoindex].split(' ')[0] == semtype:
                         anbox = []
                         for i in range(4):
                             anbox.append(int(anno[annoindex].split(' ')[i+1]))
-                        Iou = IOU(prebox, anbox)
-                        if Iou > 0.7 :
-                            threshold = True
-                            pdftruenum[semtype] += 1
-                            pdfprearea[semtype] += prearea
-                            pdfrecarea[semtype] += get_boxarea(anbox)
-                            annofound.append(anno[annoindex])
-                            break
-                if not threshold:
+                        iou = IOU(prebox, anbox)
+                        if iou > max_iou:
+                            max_iou = iou
+                            max_index = annoindex
+                            max_anbox = anbox[:]
+                if max_iou > 0.7:
+                    pdftruenum[semtype] += 1
+                    pdfprearea[semtype] += prearea
+                    pdfrecarea[semtype] += get_boxarea(max_anbox)
+                    anno.pop(max_index)
+                else:
                     semerror.append(text)
 
         # figure
         for figureindex in range(len(figurelist)):
-            threshold = False
             figure = figurelist[figureindex]
             semtype = 'Figure'
             prebox = figure['location']
             pdftotalnum[semtype] += 1
             prearea = get_boxarea(prebox)
             pdftotalarea[semtype] += prearea
+            max_iou = 0
+            max_index = 0
+            max_anbox = []
             for annoindex in range(len(anno)):
                 if anno[annoindex].split(' ')[0] == semtype:
                     anbox = []
                     for i in range(4):
                         anbox.append(int(anno[annoindex].split(' ')[i + 1]))
-                    Iou = IOU(prebox, anbox)
-                    if Iou > 0.8:
-                        threshold = True
-                        pdftruenum[semtype] += 1
-                        pdfprearea[semtype] += prearea
-                        pdfrecarea[semtype] += get_boxarea(anbox)
-                        annofound.append(anno[annoindex])
-                        break
-            if not threshold:
+                    ou = IOU(prebox, anbox)
+                    if iou > max_iou:
+                        max_iou = iou
+                        max_index = annoindex
+                        max_anbox = anbox[:]
+            if max_iou > 0.8:
+                pdftruenum[semtype] += 1
+                pdfprearea[semtype] += prearea
+                pdfrecarea[semtype] += get_boxarea(max_anbox)
+                anno.pop(max_index)
+            else:
                 figure['SemanticType'] = semtype
                 semerror.append(figure)
 
         # table
         for tableindex in range(len(tablelist)):
-            threshold = False
             table = tablelist[tableindex]
             semtype = 'Table'
             prebox = table['location']
             pdftotalnum[semtype] += 1
             prearea = get_boxarea(prebox)
             pdftotalarea[semtype] += prearea
+            max_iou = 0
+            max_index = 0
+            max_anbox = []
             for annoindex in range(len(anno)):
                 if anno[annoindex].split(' ')[0] == semtype:
                     anbox = []
                     for i in range(4):
                         anbox.append(int(anno[annoindex].split(' ')[i + 1]))
-                    Iou = IOU(prebox, anbox)
-                    if Iou > 0.8:
-                        threshold = True
-                        pdftruenum[semtype] += 1
-                        pdfprearea[semtype] += prearea
-                        pdfrecarea[semtype] += get_boxarea(anbox)
-                        annofound.append(anno[annoindex])
-                        break
-            if not threshold:
+                    iou = IOU(prebox, anbox)
+                    if iou > max_iou:
+                        max_iou = iou
+                        max_index = annoindex
+                        max_anbox = anbox[:]
+            if max_iou > 0.8:
+                pdftruenum[semtype] += 1
+                pdfprearea[semtype] += prearea
+                pdfrecarea[semtype] += get_boxarea(max_anbox)
+                anno.pop(max_index)
+            else:
                 table['SemanticType'] = semtype
                 semerror.append(table)
-
             # Cell
             row_header = table['row_header']
             col_header = table['col_header']
             datalist = table['data']
             for headerindex in range(len(row_header)):     # row header
-                threshold = False
                 cell = row_header[headerindex]
                 semtype = 'Cell'
                 prebox = cell['location']
                 pdftotalnum[semtype] += 1
                 prearea = get_boxarea(prebox)
                 pdftotalarea[semtype] += prearea
+                max_iou = 0
+                max_index = 0
+                max_anbox = []
                 for annoindex in range(len(anno)):
                     anbox = []
                     if anno[annoindex].split(' ')[0] == semtype:
                         for i in range(4):
                             anbox.append(int(anno[annoindex].split(' ')[i + 1]))
-                        Iou = IOU(prebox, anbox)
-                        if Iou > 0.5:
-                            threshold = True
-                            pdftruenum[semtype] += 1
-                            pdfprearea[semtype] += prearea
-                            pdfrecarea[semtype] += get_boxarea(anbox)
-                            annofound.append(anno[annoindex])
-                            break
-                if not threshold:
+                        iou = IOU(prebox, anbox)
+                        if iou > max_iou:
+                            max_iou = iou
+                            max_index = annoindex
+                            max_anbox = anbox[:]
+                if max_iou > 0.5:
+                    pdftruenum[semtype] += 1
+                    pdfprearea[semtype] += prearea
+                    pdfrecarea[semtype] += get_boxarea(max_anbox)
+                    anno.pop(max_index)
+                else:
                     cell['SemanticType'] = semtype
                     semerror.append(cell)
 
             for headerindex in range(len(col_header)):     # col header
-                threshold = False
                 cell = col_header[headerindex]
                 semtype = 'Cell'
                 prebox = cell['location']
                 pdftotalnum[semtype] += 1
                 prearea = get_boxarea(prebox)
                 pdftotalarea[semtype] += prearea
+                max_iou = 0
+                max_index = 0
+                max_anbox = []
                 for annoindex in range(len(anno)):
                     anbox = []
                     if anno[annoindex].split(' ')[0] == semtype:
                         for i in range(4):
                             anbox.append(int(anno[annoindex].split(' ')[i + 1]))
-                        Iou = IOU(prebox, anbox)
-                        if Iou > 0.5:
-                            threshold = True
-                            pdftruenum[semtype] += 1
-                            pdfprearea[semtype] += prearea
-                            pdfrecarea[semtype] += get_boxarea(anbox)
-                            annofound.append(anno[annoindex])
-                            break
-                if not threshold:
+                        iou = IOU(prebox, anbox)
+                        if iou > max_iou:
+                            max_iou = iou
+                            max_index = annoindex
+                            max_anbox = anbox[:]
+                if max_iou > 0.5:
+                    pdftruenum[semtype] += 1
+                    pdfprearea[semtype] += prearea
+                    pdfrecarea[semtype] += get_boxarea(max_anbox)
+                    anno.pop(max_index)
+                else:
                     cell['SemanticType'] = semtype
                     semerror.append(cell)
 
             for dataindex in range(len(datalist)):     # data
-                threshold = False
                 cell = datalist[dataindex]
                 semtype = 'Cell'
                 prebox = cell['location']
                 pdftotalnum[semtype] += 1
                 prearea = get_boxarea(prebox)
                 pdftotalarea[semtype] += prearea
+                max_iou = 0
+                max_index = 0
+                max_anbox = []
                 for annoindex in range(len(anno)):
                     anbox = []
                     if anno[annoindex].split(' ')[0] == semtype:
                         for i in range(4):
                             anbox.append(int(anno[annoindex].split(' ')[i + 1]))
-                        Iou = IOU(prebox, anbox)
-                        if Iou > 0.5:
-                            threshold = True
-                            pdftruenum[semtype] += 1
-                            pdfprearea[semtype] += prearea
-                            pdfrecarea[semtype] += get_boxarea(anbox)
-                            annofound.append(anno[annoindex])
-                            break
-                if not threshold:
+                        iou = IOU(prebox, anbox)
+                        if iou > max_iou:
+                            max_iou = iou
+                            max_index = annoindex
+                            max_anbox = anbox[:]
+                if max_iou > 0.5:
+                    pdftruenum[semtype] += 1
+                    pdfprearea[semtype] += prearea
+                    pdfrecarea[semtype] += get_boxarea(max_anbox)
+                    anno.pop(max_index)
+                else:
                     cell['SemanticType'] = semtype
                     semerror.append(cell)
 
         # annotation not found  and  segmentation error
-        for i in range(len(anno)):
-            if anno[i] not in annofound:
-                anno_notfound.append(anno[i])
-
-        if len(anno_notfound) + len(semerror) > 0:
+        if len(anno) + len(semerror) > 0:
             image = np.array(image)
 
-            for i in range(len(anno_notfound)):
-                error = anno_notfound[i]
+            for i in range(len(anno)):
+                error = anno[i]
                 semtype = error.split(' ')[0]
 
                 x1 = int(error.split(' ')[1])
