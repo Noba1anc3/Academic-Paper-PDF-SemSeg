@@ -5,7 +5,7 @@ from semseg.semseg import *
 
 from estimate.estClass import *
 from estimate.jsonRead import jsonRead
-from estimate.estimation import estimate
+from estimate.estimation import estimate, annoContract
 
 from utils.formatChange.pdf2xml import pdf2layout
 from utils.formatChange.pdf2image import pdf2image
@@ -44,6 +44,7 @@ if __name__ == '__main__':
             if Conf.evaluate:
                 #jsonFile = jsonRead(fileName)
                 Anno = annotation(fileName, len(PagesImage))
+                Anno = annoContract(PagesImage, Anno, PagesLayout)
                 if not Anno.Anno == []:
                     prfList = estimate(PagesImage, jsonFile, Anno, Conf.eva_img_folder)
                     Est.num_add(prfList)
