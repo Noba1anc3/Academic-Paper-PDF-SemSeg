@@ -139,95 +139,33 @@ def estimate(PagesImage, segment, annotate, img_folder):
         for textindex in range(len(textlist)):
             text = textlist[textindex]
             semtype = text['SemanticType']
-            prebox = text['location']
-            pdftotalnum[semtype] += 1
-            prearea = get_boxarea(prebox)
-            pdftotalarea[semtype] += prearea
+            pdftotalnum, pdftotalarea = add_pdftotal(pdftotalnum, pdftotalarea, semtype, text)
             if semtype == 'Text':
                 #semerror.append(text)
                 pass
             else:
-                max_iou = 0
-                max_index = 0
-                max_anbox = []
-                for annoindex in range(len(anno)):
-                    if anno[annoindex].split(' ')[0] == semtype:
-                        anbox = []
-                        for i in range(4):
-                            anbox.append(int(anno[annoindex].split(' ')[i+1]))
-                        iou = IOU(prebox, anbox)
-                        if iou > max_iou:
-                            max_iou = iou
-                            max_index = annoindex
-                            max_anbox = anbox[:]
-                if max_iou > 0.7 or (max_iou > 0.5 and semtype == 'PageNo')\
-                        or (max_iou > 0.5 and semtype == 'Title'):
-                    pdftruenum[semtype] += 1
-                    pdfprearea[semtype] += prearea
-                    pdfrecarea[semtype] += get_boxarea(max_anbox)
-                    anno.pop(max_index)
+                if semtype == 'PageNo':
+                    pdftruenum, pdfprearea, pdfrecarea, semerror,anno = ft_estimate(text, semtype, anno, 0.5, pdftruenum,
+                                                                               pdfprearea, pdfrecarea, semerror)
                 else:
-                    semerror.append(text)
+                    pdftruenum, pdfprearea, pdfrecarea, semerror, anno = ft_estimate(text, semtype, anno, 0.7,
+                                                                                     pdftruenum, pdfprearea, pdfrecarea, semerror)
 
         # figure
         for figureindex in range(len(figurelist)):
             figure = figurelist[figureindex]
             semtype = 'Figure'
-            prebox = figure['location']
-            pdftotalnum[semtype] += 1
-            prearea = get_boxarea(prebox)
-            pdftotalarea[semtype] += prearea
-            max_iou = 0
-            max_index = 0
-            max_anbox = []
-            for annoindex in range(len(anno)):
-                if anno[annoindex].split(' ')[0] == semtype:
-                    anbox = []
-                    for i in range(4):
-                        anbox.append(int(anno[annoindex].split(' ')[i + 1]))
-                    iou = IOU(prebox, anbox)
-                    if iou > max_iou:
-                        max_iou = iou
-                        max_index = annoindex
-                        max_anbox = anbox[:]
-            if max_iou > 0.8:
-                pdftruenum[semtype] += 1
-                pdfprearea[semtype] += prearea
-                pdfrecarea[semtype] += get_boxarea(max_anbox)
-                anno.pop(max_index)
-            else:
-                figure['SemanticType'] = semtype
-                semerror.append(figure)
+            pdftotalnum, pdftotalarea = add_pdftotal(pdftotalnum, pdftotalarea, semtype, figure)
+            pdftruenum, pdfprearea, pdfrecarea, semerror, anno = ft_estimate(figure, semtype, anno, 0.8, pdftruenum,
+                                                                             pdfprearea, pdfrecarea, semerror)
 
         # table
         for tableindex in range(len(tablelist)):
             table = tablelist[tableindex]
             semtype = 'Table'
-            prebox = table['location']
-            pdftotalnum[semtype] += 1
-            prearea = get_boxarea(prebox)
-            pdftotalarea[semtype] += prearea
-            max_iou = 0
-            max_index = 0
-            max_anbox = []
-            for annoindex in range(len(anno)):
-                if anno[annoindex].split(' ')[0] == semtype:
-                    anbox = []
-                    for i in range(4):
-                        anbox.append(int(anno[annoindex].split(' ')[i + 1]))
-                    iou = IOU(prebox, anbox)
-                    if iou > max_iou:
-                        max_iou = iou
-                        max_index = annoindex
-                        max_anbox = anbox[:]
-            if max_iou > 0.8:
-                pdftruenum[semtype] += 1
-                pdfprearea[semtype] += prearea
-                pdfrecarea[semtype] += get_boxarea(max_anbox)
-                anno.pop(max_index)
-            else:
-                table['SemanticType'] = semtype
-                semerror.append(table)
+            dftotalnum, pdftotalarea = add_pdftotal(pdftotalnum, pdftotalarea, semtype, table)
+            pdftruenum, pdfprearea, pdfrecarea, semerror, anno = ft_estimate(table, semtype, anno, 0.8, pdftruenum,
+                                                                             pdfprearea, pdfrecarea, semerror)
             # Cell
             row_header = table['row_header']
             col_header = table['col_header']
@@ -236,149 +174,41 @@ def estimate(PagesImage, segment, annotate, img_folder):
             for headerindex in range(len(row_header)):     # row header
                 cell = row_header[headerindex]
                 semtype = 'Cell'
-                prebox = cell['location']
-                pdftotalnum[semtype] += 1
-                prearea = get_boxarea(prebox)
-                pdftotalarea[semtype] += prearea
-                max_iou = 0
-                max_index = 0
-                max_anbox = []
-                for annoindex in range(len(anno)):
-                    anbox = []
-                    if anno[annoindex].split(' ')[0] == semtype:
-                        for i in range(4):
-                            anbox.append(int(anno[annoindex].split(' ')[i + 1]))
-                        iou = IOU(prebox, anbox)
-                        if iou > max_iou:
-                            max_iou = iou
-                            max_index = annoindex
-                            max_anbox = anbox[:]
-                if max_iou > 0.5:
-                    pdftruenum[semtype] += 1
-                    pdfprearea[semtype] += prearea
-                    pdfrecarea[semtype] += get_boxarea(max_anbox)
-                    anno.pop(max_index)
-                else:
-                    cell['SemanticType'] = semtype
-                    semerror.append(cell)
+                pdftotalnum, pdftotalarea = add_pdftotal(pdftotalnum, pdftotalarea, semtype, cell)
+                pdftruenum, pdfprearea, pdfrecarea, semerror, anno = ft_estimate(cell, semtype, anno, 0.5, pdftruenum,
+                                                                                 pdfprearea, pdfrecarea, semerror)
 
                 children = cell['children']
                 if not children == []:
                     for child in children:
                         semtype = 'Cell'
-                        prebox = child['location']
-                        pdftotalnum[semtype] += 1
-                        prearea = get_boxarea(prebox)
-                        pdftotalarea[semtype] += prearea
-                        max_iou = 0
-                        max_index = 0
-                        max_anbox = []
-                        for annoindex in range(len(anno)):
-                            anbox = []
-                            if anno[annoindex].split(' ')[0] == semtype:
-                                for i in range(4):
-                                    anbox.append(int(anno[annoindex].split(' ')[i + 1]))
-                                iou = IOU(prebox, anbox)
-                                if iou > max_iou:
-                                    max_iou = iou
-                                    max_index = annoindex
-                                    max_anbox = anbox[:]
-                        if max_iou > 0.5:
-                            pdftruenum[semtype] += 1
-                            pdfprearea[semtype] += prearea
-                            pdfrecarea[semtype] += get_boxarea(max_anbox)
-                            anno.pop(max_index)
-                        else:
-                            child['SemanticType'] = semtype
-                            semerror.append(child)
+                        pdftotalnum, pdftotalarea = add_pdftotal(pdftotalnum, pdftotalarea, semtype, child)
+                        pdftruenum, pdfprearea, pdfrecarea, semerror, anno = ft_estimate(child, semtype, anno, 0.5,
+                                                                                         pdftruenum, pdfprearea,
+                                                                                         pdfrecarea, semerror)
 
             for headerindex in range(len(col_header)):     # col header
                 cell = col_header[headerindex]
                 semtype = 'Cell'
-                prebox = cell['location']
-                pdftotalnum[semtype] += 1
-                prearea = get_boxarea(prebox)
-                pdftotalarea[semtype] += prearea
-                max_iou = 0
-                max_index = 0
-                max_anbox = []
-                for annoindex in range(len(anno)):
-                    anbox = []
-                    if anno[annoindex].split(' ')[0] == semtype:
-                        for i in range(4):
-                            anbox.append(int(anno[annoindex].split(' ')[i + 1]))
-                        iou = IOU(prebox, anbox)
-                        if iou > max_iou:
-                            max_iou = iou
-                            max_index = annoindex
-                            max_anbox = anbox[:]
-                if max_iou > 0.5:
-                    pdftruenum[semtype] += 1
-                    pdfprearea[semtype] += prearea
-                    pdfrecarea[semtype] += get_boxarea(max_anbox)
-                    anno.pop(max_index)
-                else:
-                    cell['SemanticType'] = semtype
-                    semerror.append(cell)
+                pdftotalnum, pdftotalarea = add_pdftotal(pdftotalnum, pdftotalarea, semtype, cell)
+                pdftruenum, pdfprearea, pdfrecarea, semerror, anno = ft_estimate(cell, semtype, anno, 0.5, pdftruenum,
+                                                                                 pdfprearea, pdfrecarea, semerror)
 
                 children = cell['children']
                 if not children == []:
                     for child in children:
                         semtype = 'Cell'
-                        prebox = child['location']
-                        pdftotalnum[semtype] += 1
-                        prearea = get_boxarea(prebox)
-                        pdftotalarea[semtype] += prearea
-                        max_iou = 0
-                        max_index = 0
-                        max_anbox = []
-                        for annoindex in range(len(anno)):
-                            anbox = []
-                            if anno[annoindex].split(' ')[0] == semtype:
-                                for i in range(4):
-                                    anbox.append(int(anno[annoindex].split(' ')[i + 1]))
-                                iou = IOU(prebox, anbox)
-                                if iou > max_iou:
-                                    max_iou = iou
-                                    max_index = annoindex
-                                    max_anbox = anbox[:]
-                        if max_iou > 0.5:
-                            pdftruenum[semtype] += 1
-                            pdfprearea[semtype] += prearea
-                            pdfrecarea[semtype] += get_boxarea(max_anbox)
-                            anno.pop(max_index)
-                        else:
-                            child['SemanticType'] = semtype
-                            semerror.append(child)
+                        pdftotalnum, pdftotalarea = add_pdftotal(pdftotalnum, pdftotalarea, semtype, child)
+                        pdftruenum, pdfprearea, pdfrecarea, semerror, anno = ft_estimate(child, semtype, anno, 0.5,
+                                                                                         pdftruenum, pdfprearea,
+                                                                                         pdfrecarea, semerror)
 
             for dataindex in range(len(datalist)):     # data
                 cell = datalist[dataindex]
                 semtype = 'Cell'
-                prebox = cell['location']
-                pdftotalnum[semtype] += 1
-                prearea = get_boxarea(prebox)
-                pdftotalarea[semtype] += prearea
-                max_iou = 0
-                max_index = 0
-                max_anbox = []
-                for annoindex in range(len(anno)):
-                    anbox = []
-                    if anno[annoindex].split(' ')[0] == semtype:
-                        for i in range(4):
-                            anbox.append(int(anno[annoindex].split(' ')[i + 1]))
-                        iou = IOU(prebox, anbox)
-                        if iou > max_iou:
-                            max_iou = iou
-                            max_index = annoindex
-                            max_anbox = anbox[:]
-                if max_iou > 0.5:
-                    pdftruenum[semtype] += 1
-                    pdfprearea[semtype] += prearea
-                    pdfrecarea[semtype] += get_boxarea(max_anbox)
-                    anno.pop(max_index)
-                else:
-                    cell['SemanticType'] = semtype
-                    semerror.append(cell)
+                pdftotalnum, pdftotalarea = add_pdftotal(pdftotalnum, pdftotalarea, semtype, cell)
+                pdftruenum, pdfprearea, pdfrecarea, semerror, anno = ft_estimate(cell, semtype, anno, 0.5, pdftruenum,
+                                                                                 pdfprearea, pdfrecarea, semerror)
 
         # annotation not found  and  segmentation error
         if len(anno) + len(semerror) > 0:
@@ -434,3 +264,37 @@ def annoContract(pagesimg, annotation, pageslayout):
                       ' ' + (str(int(region.x1)) + ' ' + str(int(pageslayout[i].height - region.y0)))
             annotation.Anno[i][j] = newanno
     return annotation
+
+
+def add_pdftotal(totalnum, totalarea, semtype, sem):
+    prebox = sem['location']
+    totalnum[semtype] += 1
+    prearea = get_boxarea(prebox)
+    totalarea[semtype] += prearea
+    return totalnum, totalarea
+
+
+def ft_estimate(sem, semtype, annotation, Iou, truenum, prearea, recarea, errorlist):
+    prebox = sem['location']
+    max_iou = 0
+    max_index = 0
+    max_anbox = []
+    for annoindex in range(len(annotation)):
+        anbox = []
+        if annotation[annoindex].split(' ')[0] == semtype:
+            for i in range(4):
+                anbox.append(int(annotation[annoindex].split(' ')[i + 1]))
+            iou = IOU(prebox, anbox)
+            if iou > max_iou:
+                max_iou = iou
+                max_index = annoindex
+                max_anbox = anbox[:]
+    if max_iou > Iou:
+        truenum[semtype] += 1
+        prearea[semtype] += get_boxarea(prebox)
+        recarea[semtype] += get_boxarea(max_anbox)
+        annotation.pop(max_index)
+    else:
+        sem['SemanticType'] = semtype
+        errorlist.append(sem)
+    return truenum, prearea, recarea, errorlist, annotation
