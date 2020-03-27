@@ -44,7 +44,7 @@ if __name__ == '__main__':
             if Conf.evaluate:
                 #jsonFile = jsonRead(fileName)
                 Anno = annotation(fileName, len(PagesImage))
-                Anno = annoContract(PagesImage, Anno, PagesLayout)
+                #Anno = annoContract(PagesImage, Anno, PagesLayout)
                 if not Anno.Anno == []:
                     prfList = estimate(PagesImage, jsonFile, Anno, Conf.eva_img_folder)
                     Est.num_add(prfList)
