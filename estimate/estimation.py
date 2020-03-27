@@ -1,8 +1,12 @@
 
 import cv2
 import numpy as np
+
+from semseg.image.cls import Region
+from semseg.image.image import ColorContract
 from semseg.image.tools import IOU
 from utils.readWrite.write import ImageWrite
+
 
 def get_annonum(annotate):
     annonum = {'Title': 0, 'Author': 0, 'Text': 0, 'FigureNote': 0,
@@ -354,3 +358,18 @@ def estimate(PagesImage, segment, annotate, img_folder):
     p_area, r_area, f_area = areacalculate(pdftotalarea, pdfprearea, pdfrecarea, annoarea)
 
     return [p_num, r_num, f_num, p_area, r_area, f_area]
+
+
+def annoContract(pagesimg, annotation, pageslayout):
+    for i in range(len(annotation.Anno)):
+        pageanno = annotation.Anno[i]
+        for j in range(len(pageanno)):
+            box = []
+            annotype = pageanno[j].split(' ')[0]
+            for index in range(4):
+                box.append(int(pageanno[j].split(' ')[index + 1]))
+            region = ColorContract(pagesimg[i], Region(pageslayout[i].height, box), pageslayout[i].height)
+            newanno = annotype + ' ' + str(int(region.x0)) + ' ' + str(int(pageslayout[i].height - region.y1)) + \
+                      ' ' + (str(int(region.x1)) + ' ' + str(int(pageslayout[i].height - region.y0)))
+            annotation.Anno[i][j] = newanno
+    return annotation
