@@ -289,7 +289,24 @@ def CRB2Json(Layout, CHeaderItem, RHeaderItem, BodyItem):
             CellJson["start_col"] = cell[3]
             CellJson["end_col"] = cell[4]
             CellJson["content"] = cell[5]
-            CellJson["Children"] = cell[6]
+
+            children = cell[6]
+            if children == []:
+                CellJson["children"] = children
+            else:
+                ChildrenJson = []
+                for child in children:
+                    childJson = {}
+                    childJson["location"] = coordinateChange(Layout, child[0])
+                    childJson["start_row"] = child[1]
+                    childJson["end_row"] = child[2]
+                    childJson["start_col"] = child[3]
+                    childJson["end_col"] = child[4]
+                    childJson["content"] = child[5]
+                    childJson["children"] = child[6]
+                    ChildrenJson.append(childJson)
+                CellJson["children"] = ChildrenJson
+
             CHeaderJson.append(CellJson)
 
         CHeaderJsonList.append(CHeaderJson)
@@ -304,7 +321,24 @@ def CRB2Json(Layout, CHeaderItem, RHeaderItem, BodyItem):
             CellJson["start_col"] = cell[3]
             CellJson["end_col"] = cell[4]
             CellJson["content"] = cell[5]
-            CellJson["Children"] = cell[6]
+
+            children = cell[6]
+            if children == []:
+                CellJson["children"] = children
+            else:
+                ChildrenJson = []
+                for child in children:
+                    childJson = {}
+                    childJson["location"] = coordinateChange(Layout, child[0])
+                    childJson["start_row"] = child[1]
+                    childJson["end_row"] = child[2]
+                    childJson["start_col"] = child[3]
+                    childJson["end_col"] = child[4]
+                    childJson["content"] = child[5]
+                    childJson["children"] = child[6]
+                    ChildrenJson.append(childJson)
+                CellJson["children"] = ChildrenJson
+
             RHeaderJson.append(CellJson)
 
         RHeaderJsonList.append(RHeaderJson)

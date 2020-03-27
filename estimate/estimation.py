@@ -232,6 +232,7 @@ def estimate(PagesImage, segment, annotate, img_folder):
             row_header = table['row_header']
             col_header = table['col_header']
             datalist = table['data']
+
             for headerindex in range(len(row_header)):     # row header
                 cell = row_header[headerindex]
                 semtype = 'Cell'
@@ -261,6 +262,36 @@ def estimate(PagesImage, segment, annotate, img_folder):
                     cell['SemanticType'] = semtype
                     semerror.append(cell)
 
+                children = cell['children']
+                if not children == []:
+                    for child in children:
+                        semtype = 'Cell'
+                        prebox = child['location']
+                        pdftotalnum[semtype] += 1
+                        prearea = get_boxarea(prebox)
+                        pdftotalarea[semtype] += prearea
+                        max_iou = 0
+                        max_index = 0
+                        max_anbox = []
+                        for annoindex in range(len(anno)):
+                            anbox = []
+                            if anno[annoindex].split(' ')[0] == semtype:
+                                for i in range(4):
+                                    anbox.append(int(anno[annoindex].split(' ')[i + 1]))
+                                iou = IOU(prebox, anbox)
+                                if iou > max_iou:
+                                    max_iou = iou
+                                    max_index = annoindex
+                                    max_anbox = anbox[:]
+                        if max_iou > 0.5:
+                            pdftruenum[semtype] += 1
+                            pdfprearea[semtype] += prearea
+                            pdfrecarea[semtype] += get_boxarea(max_anbox)
+                            anno.pop(max_index)
+                        else:
+                            child['SemanticType'] = semtype
+                            semerror.append(child)
+
             for headerindex in range(len(col_header)):     # col header
                 cell = col_header[headerindex]
                 semtype = 'Cell'
@@ -289,6 +320,36 @@ def estimate(PagesImage, segment, annotate, img_folder):
                 else:
                     cell['SemanticType'] = semtype
                     semerror.append(cell)
+
+                children = cell['children']
+                if not children == []:
+                    for child in children:
+                        semtype = 'Cell'
+                        prebox = child['location']
+                        pdftotalnum[semtype] += 1
+                        prearea = get_boxarea(prebox)
+                        pdftotalarea[semtype] += prearea
+                        max_iou = 0
+                        max_index = 0
+                        max_anbox = []
+                        for annoindex in range(len(anno)):
+                            anbox = []
+                            if anno[annoindex].split(' ')[0] == semtype:
+                                for i in range(4):
+                                    anbox.append(int(anno[annoindex].split(' ')[i + 1]))
+                                iou = IOU(prebox, anbox)
+                                if iou > max_iou:
+                                    max_iou = iou
+                                    max_index = annoindex
+                                    max_anbox = anbox[:]
+                        if max_iou > 0.5:
+                            pdftruenum[semtype] += 1
+                            pdfprearea[semtype] += prearea
+                            pdfrecarea[semtype] += get_boxarea(max_anbox)
+                            anno.pop(max_index)
+                        else:
+                            child['SemanticType'] = semtype
+                            semerror.append(child)
 
             for dataindex in range(len(datalist)):     # data
                 cell = datalist[dataindex]

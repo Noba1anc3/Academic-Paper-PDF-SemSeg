@@ -31,9 +31,17 @@ class TableExtraction():
                     for cell in c_header:
                         cell.insert(0, Region(cell[0]))
                         cell.remove(cell[1])
+                        if not cell[6] == []:
+                            for child in cell[6]:
+                                child.insert(0, Region(child[0]))
+                                child.remove(child[1])
                     for cell in r_header:
                         cell.insert(0, Region(cell[0]))
                         cell.remove(cell[1])
+                        if not cell[6] == []:
+                            for child in cell[6]:
+                                child.insert(0, Region(child[0]))
+                                child.remove(child[1])
                     for cell in body:
                         cell.insert(0, Region(cell[0]))
                         cell.remove(cell[1])
