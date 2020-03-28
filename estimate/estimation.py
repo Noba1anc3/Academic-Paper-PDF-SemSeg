@@ -145,11 +145,17 @@ def estimate(PagesImage, segment, annotate, img_folder):
                 pass
             else:
                 if semtype == 'PageNo':
-                    pdftruenum, pdfprearea, pdfrecarea, semerror,anno = ft_estimate(text, semtype, anno, 0.5, pdftruenum,
-                                                                               pdfprearea, pdfrecarea, semerror)
+                    pdftruenum, pdfprearea, pdfrecarea, semerror, anno\
+                        = ft_estimate(text, semtype, anno, 0.5,
+                                      pdftruenum, pdfprearea, pdfrecarea, semerror)
+                elif semtype == 'Title':
+                    pdftruenum, pdfprearea, pdfrecarea, semerror, anno\
+                        = ft_estimate(text, semtype, anno, 0.5,
+                                      pdftruenum, pdfprearea, pdfrecarea, semerror)
                 else:
-                    pdftruenum, pdfprearea, pdfrecarea, semerror, anno = ft_estimate(text, semtype, anno, 0.7,
-                                                                                     pdftruenum, pdfprearea, pdfrecarea, semerror)
+                    pdftruenum, pdfprearea, pdfrecarea, semerror, anno\
+                        = ft_estimate(text, semtype, anno, 0.7,
+                                      pdftruenum, pdfprearea, pdfrecarea, semerror)
 
         # figure
         for figureindex in range(len(figurelist)):
