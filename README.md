@@ -28,6 +28,7 @@ pip install -r requirements.txt
  - `tit_choice`: 默认设置为0, 表示对文字、图片和表格均做语义分割. 若只对文字区域做语义分割则请设置为1, 只对图片区域做语义分割则请设置为2, 只对表格区域做语义分割请设置为3. 
  - `save_image`: 默认设置为True, 表示保存语义分割结果的图片. 若不希望保存语义分割结果的图片, 请设置为False.
  - `save_text`: 默认设置为False, 表示不保存语义分析结果的JSON文件. 若希望保存语义分割结果的JSON文件, 请设置为True.
+
 ## 运行
 ```python
 python3 main.py
