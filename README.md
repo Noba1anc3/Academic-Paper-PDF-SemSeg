@@ -38,6 +38,6 @@ python3 main.py
 ```
 ## 测试
 测试时，请在根目录下创建example/文件夹, 并把pdf所在文件夹`pdf_file`和标注文件所在文件夹`annotation`分别放到`example`文件夹下, 在配置文件内启动测试功能后即可进行测试.
- - pdf文件链接: https://bhpan.buaa.edu.cn:443/link/92598A40D3D902B217C407A3CF8C636C
- - 标注文件链接: https://bhpan.buaa.edu.cn:443/link/1D7D70A6EBA2284AD633C7F0BA1A6B37 (2020.03.27)
++ [原始PDF数据下载] (https://bhpan.buaa.edu.cn:443/link/92598A40D3D902B217C407A3CF8C636C)
+ - 标注文件链接: https://bhpan.buaa.edu.cn:443/link/1D7D70A6EBA2284AD633C7F0BA1A6B37
 
