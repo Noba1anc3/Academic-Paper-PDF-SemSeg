@@ -1,13 +1,13 @@
 # 基于PDFMiner的英文学术文档语义分割
-
+![Image text](https://img.shields.io/badge/Version-v1.0.0-lightgrey)
 ## 项目下载
 #####   为下载该项目, 请在希望保存该项目的路径启动控制台并执行如下命令:
 ```
 git clone http://47.98.230.217:3000/Semantic_Segmentation/pdf_analysis.git
 ```
 ## 环境要求
+![Image text](https://img.shields.io/badge/Python-3.6-green?style=flat)
 #####   项目运行所需要的依赖包如下所示：
- - python>=3.6.8
  - pdfminer
  - numpy
  - logzero
@@ -18,7 +18,7 @@ git clone http://47.98.230.217:3000/Semantic_Segmentation/pdf_analysis.git
 ```
 pip install -r requirements.txt
 ```
-## 开始使用
+## 配置文件
 本项目支持通过配置的方式启动，配置文件为`conf.cfg`, 可配置的功能如下：
  - `folder`: 默认设置为./example/pdf_file/, 其值为待处理的pdf文件所在目录.
  - `filename`: 默认设置为all, 表示对folder目录下的所有文件做语义分割. 若指定文件则请设置为文件名称.
@@ -28,7 +28,10 @@ pip install -r requirements.txt
  - `tit_choice`: 默认设置为0, 表示对文字、图片和表格均做语义分割. 若只对文字区域做语义分割则请设置为1, 只对图片区域做语义分割则请设置为2, 只对表格区域做语义分割请设置为3. 
  - `save_image`: 默认设置为True, 表示保存语义分割结果的图片. 若不希望保存语义分割结果的图片, 请设置为False.
  - `save_text`: 默认设置为False, 表示不保存语义分析结果的JSON文件. 若希望保存语义分割结果的JSON文件, 请设置为True.
-
+## 运行
+```python
+python3 main.py
+```
 ## 测试
 测试时，请在根目录下创建example/文件夹, 并把pdf所在文件夹`pdf_file`和标注文件所在文件夹`annotation`分别放到`example`文件夹下, 在配置文件内启动测试功能后即可进行测试.
  - pdf文件链接: https://bhpan.buaa.edu.cn:443/link/92598A40D3D902B217C407A3CF8C636C
