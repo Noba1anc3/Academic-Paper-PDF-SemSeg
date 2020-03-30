@@ -1,5 +1,8 @@
 # 基于PDFMiner的英文学术文档语义分割
 ![Image text](https://img.shields.io/badge/Version-v1.0.0-lightgrey)
+需求文档：http://47.98.230.217:3000/Semantic_Segmentation/pdf_analysis/wiki/v1.0.0+%E9%9C%80%E6%B1%82%E6%96%87%E6%A1%A3
+设计文档：http://47.98.230.217:3000/Semantic_Segmentation/pdf_analysis/wiki/v1.0.0+%E8%AE%BE%E8%AE%A1%E6%96%87%E6%A1%A3
+
 ## 项目下载
 #####   为下载该项目, 请在希望保存该项目的路径启动控制台并执行如下命令:
 ```
