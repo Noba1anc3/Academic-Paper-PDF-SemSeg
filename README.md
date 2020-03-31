@@ -1,12 +1,12 @@
 # 基于PDFMiner的英文学术论文语义分割
 ![Image text](https://img.shields.io/badge/Version-v1.0.0-lightgrey)
-+ [需求文档](http://47.98.230.217:3000/Semantic_Segmentation/pdf_analysis/wiki/v1.0.0+%E9%9C%80%E6%B1%82%E6%96%87%E6%A1%A3)
-+ [设计文档](http://47.98.230.217:3000/Semantic_Segmentation/pdf_analysis/wiki/v1.0.0+%E8%AE%BE%E8%AE%A1%E6%96%87%E6%A1%A3)
++ [需求文档](https://github.com/Noba1anc3/Academic-Paper-PDF-SemSeg/wiki/%E5%AD%A6%E6%9C%AF%E8%AE%BA%E6%96%87%E8%AF%AD%E4%B9%89%E5%88%86%E5%89%B2---%E9%9C%80%E6%B1%82%E6%96%87%E6%A1%A3---v1.0)
++ [设计文档](https://github.com/Noba1anc3/Academic-Paper-PDF-SemSeg/wiki/%E5%AD%A6%E6%9C%AF%E8%AE%BA%E6%96%87%E8%AF%AD%E4%B9%89%E5%88%86%E5%89%B2---%E8%AE%BE%E8%AE%A1%E6%96%87%E6%A1%A3---v1.0)
 
 ## 下载
 #####   为下载该项目, 请在希望保存该项目的路径启动控制台并执行如下命令:
 ```
-git clone http://47.98.230.217:3000/Doc_SemSeg/Academic-Paper-SemSeg.git
+git clone https://github.com/Noba1anc3/Academic-Paper-PDF-SemSeg.git
 ```
 
 ## 环境
