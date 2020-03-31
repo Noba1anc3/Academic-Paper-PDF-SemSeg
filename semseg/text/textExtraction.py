@@ -56,10 +56,10 @@ class TextExtraction():
                 self.Note.append(Note)
                 self.Text.append(Text)
 
-        self.FigureNote = NotePostProcess(FigNoteList, "F")
-        self.TableNote  = NotePostProcess(TabNoteList, "T")
-
-        self.Text = FigTabNoteOut(self.Text, self.TableNote, self.FigureNote)
+        if self.TextLevel == 2:
+            self.TableNote  = NotePostProcess(TabNoteList, "T")
+            self.FigureNote = NotePostProcess(FigNoteList, "F")
+            self.Text = FigTabNoteOut(self.Text, self.TableNote, self.FigureNote)
 
         logging = Logger(__name__)
         Logger.get_log(logging).info('Text Segmentation Finished')

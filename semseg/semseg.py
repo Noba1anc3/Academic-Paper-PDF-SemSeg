@@ -32,7 +32,7 @@ class SemanticSegmentation():
             self.Text = TextExtraction(TextLevel, self.PagesLayout)
 
         elif self.configList.tit_choice == 2:
-            self.Image = ImageExtraction(self.PagesLayout)
+            self.Image = ImageExtraction(self.PagesImage, self.PagesLayout)
 
         elif self.configList.tit_choice == 3:
             self.Table = TableExtraction(TableLevel, self.PagesLayout)

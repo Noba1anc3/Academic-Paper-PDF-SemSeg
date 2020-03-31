@@ -6,7 +6,7 @@
 ## 下载
 #####   为下载该项目, 请在希望保存该项目的路径启动控制台并执行如下命令:
 ```
-git clone https://github.com/Noba1anc3/pdf_analysis.git
+git clone http://47.98.230.217:3000/Doc_SemSeg/Academic-Paper-SemSeg.git
 ```
 
 ## 环境
@@ -36,7 +36,7 @@ pip install -r requirements.txt
 
 ## 运行
 ```python
-python3 main.py
+python main.py
 ```
 
 ## 测试
