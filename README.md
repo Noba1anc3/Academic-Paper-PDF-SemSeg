@@ -1,4 +1,6 @@
 # 基于PDFMiner的英文学术论文语义分割
++ [标注工具] (https://bhpan.buaa.edu.cn:443/link/92598A40D3D902B217C407A3CF8C636C)
+
 ![Image text](https://img.shields.io/badge/Version-v1.0.0-lightgrey)
 + [需求文档](https://github.com/Noba1anc3/Academic-Paper-PDF-SemSeg/wiki/%E5%AD%A6%E6%9C%AF%E8%AE%BA%E6%96%87%E8%AF%AD%E4%B9%89%E5%88%86%E5%89%B2---%E9%9C%80%E6%B1%82%E6%96%87%E6%A1%A3---v1.0)
 + [设计文档](https://github.com/Noba1anc3/Academic-Paper-PDF-SemSeg/wiki/%E5%AD%A6%E6%9C%AF%E8%AE%BA%E6%96%87%E8%AF%AD%E4%B9%89%E5%88%86%E5%89%B2---%E8%AE%BE%E8%AE%A1%E6%96%87%E6%A1%A3---v1.0)
