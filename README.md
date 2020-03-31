@@ -1,5 +1,4 @@
 # 基于PDFMiner的英文学术论文语义分割
-+ [标注工具] (https://bhpan.buaa.edu.cn:443/link/92598A40D3D902B217C407A3CF8C636C)
 
 ![Image text](https://img.shields.io/badge/Version-v1.0.0-lightgrey)
 + [需求文档](https://github.com/Noba1anc3/Academic-Paper-PDF-SemSeg/wiki/%E5%AD%A6%E6%9C%AF%E8%AE%BA%E6%96%87%E8%AF%AD%E4%B9%89%E5%88%86%E5%89%B2---%E9%9C%80%E6%B1%82%E6%96%87%E6%A1%A3---v1.0)
@@ -43,6 +42,7 @@ python main.py
 
 ## 测试
 测试时，请在根目录下创建`example`文件夹, 并把pdf所在文件夹`pdf_file`和标注文件所在文件夹`annotation`分别放到`example`文件夹下, 在配置文件内启动测试功能后即可进行测试.
++ [标注工具] (https://github.com/Noba1anc3/Academic-Paper-PDF-SemSeg-labelImg)
 + [PDF文件下载] (https://bhpan.buaa.edu.cn:443/link/92598A40D3D902B217C407A3CF8C636C)
 + [标注文件下载] ( https://bhpan.buaa.edu.cn:443/link/1D7D70A6EBA2284AD633C7F0BA1A6B37)
 
