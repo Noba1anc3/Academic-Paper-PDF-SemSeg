@@ -13,7 +13,7 @@ git clone https://github.com/Noba1anc3/Academic-Paper-PDF-SemSeg.git
 ## 环境
 ![Image text](https://img.shields.io/badge/Python-3.6-green?style=flat)
 #####   项目运行所需要的依赖包如下所示：
- - pdfminer
+ - pdfminer3k
  - numpy
  - logzero
  - opencv-python
